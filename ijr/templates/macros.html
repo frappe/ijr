@@ -1,0 +1,39 @@
+<!-- Input Select -->
+{% macro input_select(options, value=None, label=None, query=None, url=None, class=None) %}
+
+{% macro select_options(options) %}
+{% for option in options %}
+<option value="{{ option.value }}" {% if option.value==value %}selected{% endif %}>{{ option.label }}</option>
+{% endfor %}
+{% endmacro %}
+
+<select class="{{ resolve_class(['custom-select font-size-sm', class]) }}"
+    {% if query %} onchange="set_query_params('{{ query }}', this.value)" {% endif %}
+    {% if url %} onchange="window.location.href = `{{ url }}`" {% endif %}
+>
+    {%- if label -%}
+    <option selected disabled>{{ label }}</option>
+    {%- endif -%}
+
+    {%- for option in options -%}
+    {%- if option.group -%}
+    <optgroup label="{{ option.group }}">
+        {{ select_options(option.options) }}
+    </optgroup>
+    {%- else -%}
+    {{ select_options([option]) }}
+    {%- endif -%}
+    {%- endfor -%}
+</select>
+
+{% endmacro %}
+
+
+<!-- Map with hover -->
+{% macro map_with_hover(state_rankings, zoom_state=None, hover_html=None) %}
+
+{%- with state_rankings=state_rankings, state=zoom_state, hover_html=hover_html -%}
+{% include "templates/includes/map_with_hover.html" %}
+{%- endwith -%}
+
+{% endmacro %}

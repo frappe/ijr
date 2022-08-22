@@ -1,0 +1,17 @@
+{% extends "frappe/templates/web.html" %}
+
+{%- block head -%}
+    {% if head_html is defined -%}
+    {{ head_html or "" }}
+    {%- endif %}
+
+    {%- if theme.name != 'Standard' -%}
+    <link type="text/css" rel="stylesheet" href="{{ theme.theme_url }}">
+    {%- else -%}
+    {{ include_style('ijr.bundle.css') }}
+    {%- endif -%}
+
+    {%- for link in web_include_css %}
+    {{ include_style(link) }}
+    {%- endfor -%}
+{%- endblock -%}

@@ -1,0 +1,83 @@
+<div class="position-relative">
+  <div class="map-container">
+    {% include "templates/includes/india_map.html" %}
+  </div>
+
+  <div class="info-box d-none d-md-block">
+    Hover over a state to view more information
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{% set ranked_states = frappe.db.get_all('State Ranking', {'ijr_number': 3}, pluck='region_code') %}
+
+<script>
+  let state_rankings = JSON.parse(`{{ as_json(state_rankings, indent=None) }}`);
+  let ranked_states = JSON.parse(`{{ as_json(ranked_states, indent=None) }}`);
+
+  frappe.ready(() => {
+    let $state_paths = $("#india-map path");
+    let $infobox = $(".info-box");
+
+    $state_paths.attr("disabled", true);
+
+    for (let d of state_rankings) {
+      let $path = $(`path#${d.region_code}`);
+      $path.removeAttr("disabled").css({
+        fill: d.color,
+      });
+    }
+
+    $state_paths.on("click", (e) => {
+      let $path = $(e.target);
+      if ($path.attr("disabled")) return;
+      let state = $path.attr("id");
+      window.location.href = "/state/" + state;
+    });
+
+    $state_paths.on("mouseenter", (e) => {
+      let $path = $(e.target);
+      let state_code = $path.attr("id");
+      show_state_info(state_code);
+      $(`.rankings tr[data-state="${state_code}"]`).addClass("highlight");
+    });
+    $state_paths.on("mouseleave", (e) => {
+      let $path = $(e.target);
+      let state_code = $path.attr("id");
+      $(`.rankings tr[data-state="${state_code}"]`).removeClass("highlight");
+      // reset_infobox();
+    });
+
+    $("tr[data-state]")
+      .on("mouseenter", (e) => {
+        let state = $(e.currentTarget).data("state");
+        if (state) {
+          show_state_info(state);
+          $("#india-map path#" + state).addClass("highlight");
+        }
+      })
+      .on("mouseleave", (e) => {
+        let state = $(e.currentTarget).data("state");
+        if (state) {
+          $("#india-map path#" + state).removeClass("highlight");
+        }
+      });
+
+    function show_state_info(region_code) {
+      let d = state_rankings.find((d) => d.region_code === region_code);
+      if (d) {
+        $infobox.html(`{{ hover_html }}`);
+      } else if (!ranked_states.includes(region_code)) {
+        $infobox.html(
+          "State not ranked in IJR.<br> For explanation, please refer to Methodology."
+        );
+      } else {
+        $infobox.html(``);
+      }
+    }
+
+    function reset_infobox() {
+      $infobox.html(`Hover over a state to view more information`);
+    }
+  });
+</script>

@@ -1,0 +1,97 @@
+---
+base_template: 'templates/web.html'
+---
+
+{% import "templates/macros.html" as m %}
+
+<div class="d-flex justify-content-between">
+    <h1 class="my-0 mr-4 font-size-3xl">{{ indicator_name }}</h1>
+    <div class="d-flex align-items-center">
+        {{ m.input_select(
+            options=[
+                {'label': 'Map View', 'value': 'map'},
+                {'label': 'Table View', 'value': 'table'},
+            ],
+            label='View',
+            value=view,
+            query='view',
+            class='mr-2'
+           )
+        }}
+        {{ m.input_select(
+            options=indicators,
+            label='Change indicator',
+            value=frappe.utils.cint(indicator_id),
+            url='/indicator/${this.value}'
+           )
+        }}
+    </div>
+</div>
+
+{%- if view == 'map' -%}
+<div class="row mt-6">
+    <div class="col-md-7">
+        {%- set hover_html -%}
+        <div>
+            <table class="table-state-rank">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Unit</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${d.raw_data.map(d => {
+                        return `
+                            <tr>
+                                <td>${d.raw_data_name}</td>
+                                <td>${d.raw_data_unit}</td>
+                                <td>${d.raw_data_value}</td>
+                            </tr>
+                        `
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+        {%- endset -%}
+        {{ m.map_with_hover(indicator_data, hover_html=hover_html) }}
+    </div>
+    <div class="col-md-5">
+        <div class="rankings">
+            {%- with state_rankings=indicator_data, score_field='ijr_score', rank_field='ijr_score', delta_field='ijr_score_delta' -%}
+            {% include "templates/includes/ranking_table.html" %}
+            {%- endwith -%}
+        </div>
+    </div>
+</div>
+{%- else -%}
+<div id="indicator-datatable"></div>
+
+<link href="https://unpkg.com/frappe-datatable@1.16.2/dist/frappe-datatable.min.css" rel="stylesheet">
+<script src="https://unpkg.com/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://unpkg.com/frappe-datatable@1.16.2/dist/frappe-datatable.min.js"></script>
+<script>
+    frappe.ready(() => {
+        window.indicator_data = JSON.parse(`{{ as_json(indicator_data) }}`);
+        let indicators_columns = [
+            {'name': 'State', 'id': 'state', format: (value, row, col, data) => {
+                return `<a href="/state/${data.region_cod}">${value}</a>`
+            }},
+            {'name': 'IJR Number', 'id': 'ijr_number'},
+            {'name': 'Year', 'id': 'year'},
+            {'name': 'Score', 'id': 'ijr_score'},
+            {'name': 'Indicator Value', 'id': 'indicator_value'},
+            {'name': 'Indicator Unit', 'id': 'indicator_unit'},
+        ]
+
+        if (indicator_data.length > 0) {
+            new DataTable('#indicator-datatable', {
+                data: indicator_data,
+                columns: indicators_columns,
+                layout: 'fluid',
+            });
+        }
+    });
+</script>
+{%- endif -%}

@@ -1,0 +1,217 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "creation": "2021-11-26 12:35:12.399324",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "state_details_section",
+  "state",
+  "region_code",
+  "cluster",
+  "column_break_3",
+  "ijr_number",
+  "year",
+  "section_break_6",
+  "overall_rank",
+  "column_break_9",
+  "overall_score",
+  "section_break_9",
+  "police_rank",
+  "prisons_rank",
+  "judiciary_rank",
+  "legal_aid_rank",
+  "column_break_16",
+  "police_score",
+  "prisons_score",
+  "judiciary_score",
+  "legal_aid_score",
+  "section_break_18",
+  "hr_rank",
+  "diversity_rank",
+  "trends_rank",
+  "column_break_25",
+  "hr_score",
+  "diversity_score",
+  "trends_score"
+ ],
+ "fields": [
+  {
+   "fieldname": "state_details_section",
+   "fieldtype": "Section Break",
+   "label": "State Details"
+  },
+  {
+   "bold": 1,
+   "fieldname": "state",
+   "fieldtype": "Link",
+   "label": "State",
+   "options": "State"
+  },
+  {
+   "fetch_from": "state.code",
+   "fieldname": "region_code",
+   "fieldtype": "Data",
+   "label": "Region Code",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "state.type",
+   "fieldname": "cluster",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Cluster",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ijr_number",
+   "fieldtype": "Int",
+   "label": "IJR Number"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Year"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break",
+   "label": "Overall"
+  },
+  {
+   "fieldname": "overall_rank",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Overall Rank"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "overall_score",
+   "fieldtype": "Float",
+   "label": "Overall Score"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break",
+   "label": "4 Pillars"
+  },
+  {
+   "fieldname": "police_rank",
+   "fieldtype": "Int",
+   "label": "Police Rank"
+  },
+  {
+   "fieldname": "prisons_rank",
+   "fieldtype": "Int",
+   "label": "Prisons Rank"
+  },
+  {
+   "fieldname": "judiciary_rank",
+   "fieldtype": "Int",
+   "label": "Judiciary Rank"
+  },
+  {
+   "fieldname": "legal_aid_rank",
+   "fieldtype": "Int",
+   "label": "Legal Aid Rank"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "police_score",
+   "fieldtype": "Float",
+   "label": "Police Score"
+  },
+  {
+   "fieldname": "prisons_score",
+   "fieldtype": "Float",
+   "label": "Prisons Score"
+  },
+  {
+   "fieldname": "judiciary_score",
+   "fieldtype": "Float",
+   "label": "Judiciary Score"
+  },
+  {
+   "fieldname": "legal_aid_score",
+   "fieldtype": "Float",
+   "label": "Legal Aid Score"
+  },
+  {
+   "fieldname": "section_break_18",
+   "fieldtype": "Section Break",
+   "label": "6 Themes"
+  },
+  {
+   "fieldname": "hr_rank",
+   "fieldtype": "Int",
+   "label": "HR Rank"
+  },
+  {
+   "fieldname": "diversity_rank",
+   "fieldtype": "Int",
+   "label": "Diversity Rank"
+  },
+  {
+   "fieldname": "trends_rank",
+   "fieldtype": "Int",
+   "label": "Trends Rank"
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hr_score",
+   "fieldtype": "Float",
+   "label": "HR Score"
+  },
+  {
+   "fieldname": "diversity_score",
+   "fieldtype": "Float",
+   "label": "Diversity Score"
+  },
+  {
+   "fieldname": "trends_score",
+   "fieldtype": "Float",
+   "label": "Trends Score"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-08-20 12:32:18.592438",
+ "modified_by": "Administrator",
+ "module": "India Justice Report",
+ "name": "State Ranking",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "state"
+}

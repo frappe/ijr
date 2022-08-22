@@ -15,8 +15,8 @@ app_license = "AGPLv3"
 # app_include_js = "/assets/ijr/js/ijr.js"
 
 # include js, css files in header of web template
-# web_include_css = "/assets/ijr/css/ijr.css"
-# web_include_js = "/assets/ijr/js/ijr.js"
+# web_include_css = "ijr.bundle.css"
+web_include_js = "/assets/ijr/js/ijr.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "ijr/public/scss/website"
@@ -50,6 +50,11 @@ app_license = "AGPLv3"
 
 # automatically create page for each record of this doctype
 # website_generators = ["Web Page"]
+
+website_route_rules = [
+	{"from_route": "/state/<state>", "to_route": "state"},
+	{"from_route": "/indicator/<indicator_id>", "to_route": "indicator"},
+]
 
 # Jinja
 # ----------

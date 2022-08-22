@@ -1,0 +1,111 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "creation": "2022-07-26 16:45:46.370194",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "indicator_name",
+  "indicator_id",
+  "pillar",
+  "theme",
+  "ijr_number",
+  "year",
+  "state",
+  "region_code",
+  "raw_data_sequence",
+  "raw_data_name",
+  "raw_data_value",
+  "raw_data_unit"
+ ],
+ "fields": [
+  {
+   "fieldname": "indicator_name",
+   "fieldtype": "Data",
+   "label": "Indicator Name"
+  },
+  {
+   "fieldname": "indicator_id",
+   "fieldtype": "Int",
+   "label": "Indicator ID"
+  },
+  {
+   "fieldname": "pillar",
+   "fieldtype": "Data",
+   "label": "Pillar"
+  },
+  {
+   "fieldname": "theme",
+   "fieldtype": "Data",
+   "label": "Theme"
+  },
+  {
+   "fieldname": "ijr_number",
+   "fieldtype": "Int",
+   "label": "IJR Number"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Data",
+   "label": "Year"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Link",
+   "label": "State",
+   "options": "State"
+  },
+  {
+   "fetch_from": "state.code",
+   "fieldname": "region_code",
+   "fieldtype": "Data",
+   "label": "Region Code"
+  },
+  {
+   "fieldname": "raw_data_sequence",
+   "fieldtype": "Int",
+   "label": "Raw Data Sequence"
+  },
+  {
+   "fieldname": "raw_data_name",
+   "fieldtype": "Data",
+   "label": "Raw Data Name"
+  },
+  {
+   "fieldname": "raw_data_value",
+   "fieldtype": "Float",
+   "label": "Raw Data Value"
+  },
+  {
+   "fieldname": "raw_data_unit",
+   "fieldtype": "Data",
+   "label": "Raw Data Unit"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-08-20 12:30:35.085494",
+ "modified_by": "Administrator",
+ "module": "India Justice Report",
+ "name": "State Indicator Raw Data",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
