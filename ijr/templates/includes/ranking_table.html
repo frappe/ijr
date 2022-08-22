@@ -1,40 +1,38 @@
 <!-- variables: state_rankings, score_field, rank_field, delta_field -->
 
-<table class="table-state-rank mt-6">
-  <thead>
+<table class="table-ranking">
+  <!-- <thead>
     <tr>
       <th width="200">State</th>
       <th width="10"></th>
       <th width="40">Rank</th>
       <th width="180">Score (out of 10)</th>
     </tr>
-  </thead>
+  </thead> -->
   <tbody>
     {% for d in state_rankings %}
     {% set score = d[score_field] %}
     {% set rank = d[rank_field] %}
     <tr data-state="{{ d.region_code }}">
-      <td>
+      <td width="250">
         <a href="/state/{{ d.region_code }}">{{ d.state }}</a>
       </td>
-      <td>
-        {% set delta = d[delta_field] * -1 %}
-        <span title="{{ '+' if delta > 0 else '' }}{{ delta }}">
-          {% if delta == 0 %} ↔ {% elif delta > 0 %} ↑ {% else %} ↓ {% endif %}
-        </span>
-      </td>
-      <td>{{ rank }}</td>
+      <td align="center">{{ rank }}</td>
       <td>
         <div class="d-flex">
           <div class="d-flex align-items-center" style="width: 120px">
-            <div
-              class="rank-bar"
-              style="
+            <div class="rank-bar" style="
                 width: {{ (score | flt) * 120 / 10 }}px;
                 background-color: {{ d.color }};
               "></div>
           </div>
-          <div class="pl-1">{{ score }}</div>
+          <div class="pl-1">
+            {{ score }}
+            {% set delta = d[delta_field] * -1 %}
+            <span title="{{ '+' if delta > 0 else '' }}{{ delta }}">
+              {% if delta == 0 %} ↔ {% elif delta > 0 %} ↑ {% else %} ↓ {% endif %}
+            </span>
+          </div>
         </div>
       </td>
     </tr>

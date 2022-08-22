@@ -15,7 +15,7 @@ app_license = "AGPLv3"
 # app_include_js = "/assets/ijr/js/ijr.js"
 
 # include js, css files in header of web template
-# web_include_css = "ijr.bundle.css"
+web_include_css = "/assets/ijr/css/ijr.css"
 web_include_js = "/assets/ijr/js/ijr.js"
 
 # include custom scss in every website theme (without file extension ".scss")

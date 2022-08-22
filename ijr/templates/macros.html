@@ -28,6 +28,33 @@
 
 {% endmacro %}
 
+{% macro input_select2(options, value=None, label=None, query=None, url=None, class=None) %}
+
+{% macro select_options(options) %}
+{% for option in options %}
+<sl-menu-item style="--sl-font-size-medium: 14px;" value="{{ option.value }}">{{ option.label }}</sl-menu-item>
+{% endfor %}
+{% endmacro %}
+
+<sl-select
+    class="{{ resolve_class(class) }}"
+    query="{{ query }}"
+    placeholder="{{ label or '' }}"
+    value="{{ value or '' }}"
+    size="small"
+    style="min-width: 160px;"
+>
+    {%- for option in options -%}
+    {%- if option.group -%}
+    <sl-menu-label>{{ option.group }}</sl-menu-label>
+    {{ select_options(option.options) }}
+    {%- else -%}
+    {{ select_options([option]) }}
+    {%- endif -%}
+    {%- endfor -%}
+</sl-select>
+{% endmacro %}
+
 
 <!-- Map with hover -->
 {% macro map_with_hover(state_rankings, zoom_state=None, hover_html=None) %}

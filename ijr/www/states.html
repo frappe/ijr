@@ -4,167 +4,173 @@ base_template: 'templates/web.html'
 
 {% import "templates/macros.html" as m %}
 
-<div class="row align-items-center">
-    <div class="col order-2 order-md-1">
-            <h1 class="my-0 mr-4 font-size-3xl">
-                {% if rank_by == 'overall' %}
-                    Overall State Ranking
-                {% else %}
-                    States Ranked by {{ rank_by.title().replace('_', ' ') }} score
-                {% endif %}
-            </h1>
-    </div>
-    <div class="col-md-3 order-3 order-md-2">
-        <div class="d-flex align-items-center justify-content-end">
-            <div class="font-size-sm mr-2">
-                Legend
-            </div>
-            {% set legend = [
-                {'label': 'Best', 'color': 'var(--best)'},
-                {'label': 'Middle', 'color': 'var(--middle)'},
-                {'label': 'Worst', 'color': 'var(--worst)'},
-            ] %}
-            {% for d in legend %}
-            <div class="color-legend" style="background-color: {{ d.color }};">
-                {{ d.label }}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    <div class="col-md-5 order-1 order-md-3">
-        <div class="flex">
-            {{ m.input_select(
-                options=[
-                    {'label': 'Map View', 'value': 'map'},
-                    {'label': 'Table View', 'value': 'table'},
-                ],
-                label='View',
-                value=view,
-                query='view',
-                class='mr-2'
-               )
-            }}
-            {{ m.input_select(
-                options=[
-                    {'label': 'IJR 1 (2019)', 'value' : '1'},
-                    {'label': 'IJR 2 (2020)', 'value' : '2'},
-                    {'label': 'IJR 3 (2022)', 'value' : '3'},
-                ],
-                label='IJR Number',
-                value=ijr_number,
-                query='ijr_number',
-                class='mr-2'
-               )
-            }}
-            {% if view == 'map' %}
-            {{ m.input_select(
-                options=[
-                    {'label': 'Overall', 'value' : 'overall'},
-                    {
-                        'group': 'Pillars',
-                        'options': [
-                            {'label': 'Police', 'value': 'police'},
-                            {'label': 'Prisons', 'value': 'prisons'},
-                            {'label': 'Judiciary', 'value': 'judiciary'},
-                            {'label': 'Legal Aid', 'value': 'legal_aid'},
-                        ]
-                    },
-                    {
-                        'group': 'Themes',
-                        'options': [
-                            {'label': 'HR', 'value': 'hr'},
-                            {'label': 'Diversity', 'value': 'diversity'},
-                            {'label': 'Trends', 'value': 'trends'},
-                        ]
-                    }
-                ],
-                label='Rank by another dimension',
-                value=rank_by,
-                query='rank_by',
-                class='mr-2'
-               )
-            }}
+<div class="title-toolbar">
+    <div>
+        <h1>
+            {% if rank_by == 'overall' %}
+                Overall State Ranking
+            {% else %}
+                States Ranked by {{ rank_by.title().replace('_', ' ') }} score
             {% endif %}
-            {% if view == 'table' %}
-            {{ m.input_select(
-                options=[
-                    {'label': '4 Pillars', 'value' : 'pillars'},
-                    {'label': '6 Themes', 'value' : 'themes'},
-                ],
-                label='Rank by',
-                value=table_view,
-                query='table_view',
-                class='mr-2'
-               )
-            }}
-            {% endif %}
-            {{ m.input_select(
-                options=[
-                    {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
-                    {'label': '7 Small States', 'value' : 'small'},
-                ],
-                label='Change Cluster',
-                value=cluster,
-                query='cluster'
-               )
-            }}
-        </div>
+        </h1>
+        <div>Score and rank done by overall analysis of scores across pillars</div>
+    </div>
+    <div class="color-legend-container">
+        <div>Best</div>
+        <div class="color-legend" style="background-color: var(--best)"></div>
+        <div class="color-legend" style="background-color: var(--middle)"></div>
+        <div class="color-legend" style="background-color: var(--worst)"></div>
+        <div>Worst</div>
     </div>
 </div>
-<div>
 
-<button class="btn btn-link btn-reset" onclick="show_how_to_read()">
-    How to read this page?
-</button>
+<div class="filters-toolbar">
+    <div class="flex">
+        {{ m.input_select2(
+            options=[
+                {'label': 'Map View', 'value': 'map'},
+                {'label': 'Table View', 'value': 'table'},
+            ],
+            label='View',
+            value=view,
+            query='view',
+            class='mr-2'
+           )
+        }}
+        {{ m.input_select2(
+            options=[
+                {'label': 'IJR 1 (2019)', 'value' : '1'},
+                {'label': 'IJR 2 (2020)', 'value' : '2'},
+                {'label': 'IJR 3 (2022)', 'value' : '3'},
+            ],
+            label='IJR Number',
+            value=ijr_number,
+            query='ijr_number',
+            class='mr-2'
+           )
+        }}
+        {% if view == 'map' %}
+        {{ m.input_select2(
+            options=[
+                {'label': 'Overall', 'value' : 'overall'},
+                {
+                    'group': 'Pillars',
+                    'options': [
+                        {'label': 'Police', 'value': 'police'},
+                        {'label': 'Prisons', 'value': 'prisons'},
+                        {'label': 'Judiciary', 'value': 'judiciary'},
+                        {'label': 'Legal Aid', 'value': 'legal_aid'},
+                    ]
+                },
+                {
+                    'group': 'Themes',
+                    'options': [
+                        {'label': 'HR', 'value': 'hr'},
+                        {'label': 'Diversity', 'value': 'diversity'},
+                        {'label': 'Trends', 'value': 'trends'},
+                    ]
+                }
+            ],
+            label='Rank by another dimension',
+            value=rank_by,
+            query='rank_by',
+            class='mr-2'
+           )
+        }}
+        {% endif %}
+        {% if view == 'table' %}
+        {{ m.input_select2(
+            options=[
+                {'label': '4 Pillars', 'value' : 'pillars'},
+                {'label': '6 Themes', 'value' : 'themes'},
+            ],
+            label='Rank by',
+            value=table_view,
+            query='table_view',
+            class='mr-2'
+           )
+        }}
+        {% endif %}
+        {{ m.input_select2(
+            options=[
+                {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
+                {'label': '7 Small States', 'value' : 'small'},
+            ],
+            label='Change Cluster',
+            value=cluster,
+            query='cluster'
+           )
+        }}
+    </div>
+    <sl-button onclick="show_how_to_read()" size="small" variant="text">
+        How to read this page?
+    </sl-button>
 </div>
 
-
-{% if view == 'map' %}
-<div class="row mt-6">
-    <div class="col-md-7">
-        {% set hover_html %}
-        <h3 class="my-0 font-size-2xl">${d.state}</h3>
-        <div class="text-primary font-size-xl">Overall</div>
-        <div class="row">
-            <div class="col">Ranking: ${d.overall_rank}</div>
-        </div>
-        <div class="row mt-2">
-            <div class="col">
-                <div class="text-primary font-size-xl">Pillars</div>
-                <ul class="list-unstyled mb-0">
-                    <li class="flex"><span>Prisons:</span> <span class="ml-auto">${d.prisons_rank}</span></li>
-                    <li class="flex"><span>Police:</span> <span class="ml-auto">${d.police_rank}</span></li>
-                    <li class="flex"><span>Judiciary:</span> <span class="ml-auto">${d.judiciary_rank}</span></li>
-                    <li class="flex"><span>Legal Aid:</span> <span class="ml-auto">${d.legal_aid_rank}</span></li>
-                </ul>
-            </div>
-            <div class="col">
-                <div class="text-primary font-size-xl">Themes</div>
-                <ul class="list-unstyled mb-0">
-                    <li class="flex"><span>HR:</span> <span class="ml-auto">${d.hr_rank}</span></li>
-                    <li class="flex"><span>Diversity:</span> <span class="ml-auto">${d.diversity_rank}</span></li>
-                    <li class="flex"><span>Trends:</span> <span class="ml-auto">${d.trends_rank}</span></li>
-                </ul>
-            </div>
-        </div>
-        <div class="mt-2 font-size-xs">
-            <a href="/state/${d.region_code}">Go to State Page</a>
-        <div>
-        {% endset %}
-
-        {{ m.map_with_hover(state_rankings, hover_html=hover_html) }}
-    </div>
-    <div class="col-md-5">
-        <div class="rankings">
-            <h3>States Ranked by {{ rank_by.title().replace('_', ' ') }} score</h3>
-
+{%- if view == 'map' -%}
+<div class="mt-4">
+    <h2>States Ranked by {{ rank_by.title().replace('_', ' ') }} score</h2>
+    <div class="flex justify-between" style="gap: 2rem;">
+        <div class="ranking-table-container">
             {%- with state_rankings=state_rankings, score_field=rank_by + '_score', rank_field=rank_by + '_rank', delta_field=rank_by + '_rank_delta' -%}
             {% include "templates/includes/ranking_table.html" %}
             {%- endwith -%}
         </div>
+
+        <div class="map-container">
+            {% set hover_html %}
+            <div class="font-size-sm">
+                <h3>${d.state}</h3>
+                <div class="flex-between" style="gap: 0.5rem;">
+                    <div>Overall Rank</div>
+                    <div>${d.overall_rank} / 18</div>
+                </div>
+                <div class="mt-1 flex-between text-muted">
+                    Pillars
+                </div>
+                <div class="flex-between" style="gap: 0.5rem;">
+                    <div>Police Rank</div>
+                    <div>${d.police_rank} / 18</div>
+                </div>
+                <div class="flex-between" style="gap: 0.5rem;">
+                    <div>Prisons Rank</div>
+                    <div>${d.prisons_rank} / 18</div>
+                </div>
+                <div class="flex-between" style="gap: 0.5rem;">
+                    <div>Judiciary Rank</div>
+                    <div>${d.judiciary_rank} / 18</div>
+                </div>
+                <div class="flex-between" style="gap: 0.5rem;">
+                    <div>Legal Aid Rank</div>
+                    <div>${d.legal_aid_rank} / 18</div>
+                </div>
+                <div class="mt-1 flex-between text-muted">
+                    Themes
+                </div>
+                <div class="flex-between" style="gap: 0.5rem;">
+                    <div>HR Rank</div>
+                    <div>${d.hr_rank} / 18</div>
+                </div>
+                <div class="flex-between" style="gap: 0.5rem;">
+                    <div>Diversity Rank</div>
+                    <div>${d.diversity_rank} / 18</div>
+                </div>
+                <div class="flex-between" style="gap: 0.5rem;">
+                    <div>Trends Rank</div>
+                    <div>${d.trends_rank} / 18</div>
+                </div>
+                <div class="mt-2 font-size-xs">
+                    <a href="/state/${d.region_code}">Go to State Page</a>
+                <div>
+            </div>
+            {% endset %}
+            {{ m.map_with_hover(state_rankings, hover_html=hover_html) }}
+        </div>
     </div>
 </div>
-{% elif view == 'table' %}
+{%- endif -%}
+
+{% if view == 'table' %}
 <div class="mt-6">
     <link href="https://unpkg.com/frappe-datatable@1.16.2/dist/frappe-datatable.min.css" rel="stylesheet">
     <style>
