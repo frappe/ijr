@@ -1,11 +1,11 @@
-<div class="position-relative">
-  <div class="map-container">
-    {% include "templates/includes/india_map.html" %}
-  </div>
+<!-- variables: state_rankings, color_field, hover_html, zoom_state -->
 
-  <div class="info-box d-none d-md-block">
-    Hover over a state to view more information
-  </div>
+{%- with state=zoom_state -%}
+{% include "templates/includes/india_map.html" %}
+{%- endwith -%}
+
+<div class="info-box d-none d-md-block">
+  Hover over a state to view more information
 </div>
 
 <!-- prettier-ignore -->
@@ -23,8 +23,9 @@
 
     for (let d of state_rankings) {
       let $path = $(`path#${d.region_code}`);
+      let color = d['{{ color_field or "overall_rank_color" }}'];
       $path.removeAttr("disabled").css({
-        fill: d.color,
+        fill: color,
       });
     }
 

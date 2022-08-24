@@ -1,0 +1,120 @@
+<!-- variables: columns, data -->
+{%- set context = 'featured_table_context_' + frappe.utils.generate_hash(length=4) -%}
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        let { columns, data } = {{ as_json({'columns': columns, 'data': data }, indent=None) }};
+        let formatters = {};
+        {% for column in columns %}
+        {% if column.format %}
+        formatters.{{ column.id }} = d => {
+            return `{{ column.format }}`;
+        };
+        {% endif %}
+        {% endfor %}
+
+        Alpine.data('{{ context }}', () => ({
+            columns,
+            originalData: JSON.parse(JSON.stringify(data)),
+            data,
+            sortByColumn: null,
+            sortOrder: null,
+            filters: {},
+            showFilters: false,
+            formatters,
+            sortBy(column_id) {
+                if (this.sortByColumn === column_id) {
+                    if (this.sortOrder == null) {
+                        this.sortOrder = 'asc';
+                    } else if (this.sortOrder === 'asc') {
+                        this.sortOrder = 'desc';
+                    } else if (this.sortOrder === 'desc') {
+                        this.sortOrder = null;
+                        this.sortByColumn = null;
+                    }
+                } else {
+                    this.sortByColumn = column_id;
+                    this.sortOrder = 'asc';
+                }
+                if (this.sortOrder == null) {
+                    this.data = this.originalData.slice()
+                } else {
+                    this.data = this.originalData.slice().sort((a, b) => {
+                        let a_value = a[this.sortByColumn];
+                        let b_value = b[this.sortByColumn];
+                        if (this.sortOrder === 'asc') {
+                            return a_value > b_value ? 1 : -1;
+                        } else {
+                            return a_value < b_value ? 1 : -1;
+                        }
+                    });
+                }
+
+            },
+            filterData(key, values) {
+                if (!values?.length) {
+                    this.filters = {}
+                    this.data = this.originalData.slice();
+                } else {
+                    this.filters = { [key]: values }
+                    this.data = this.originalData.filter((row) => {
+                        return values.includes(row[key]);
+                    });
+                }
+            }
+        }))
+    });
+</script>
+
+<table class="featured-table" x-data="{{ context }}">
+    <thead>
+        <tr>
+            <template x-for="column in columns">
+                <th :width="column.width || ''" :style="{'text-align': column.align || 'left'}">
+                    <div class="flex items-center">
+                        <button
+                            style="border: none; background: transparent; width: 100%; text-align: inherit; padding: 0; outline: none;"
+                            @click="sortBy(column.id)">
+                            <span x-text="column.label">
+                            </span>
+                            <sl-icon x-show="sortByColumn == column.id"
+                                :name="sortOrder == 'asc' ? 'sort-up-alt' : 'sort-down-alt'"></sl-icon>
+                        </button>
+                        <template x-if="column.filter">
+                            <sl-icon-button @click="showFilters = !showFilters" name="filter"
+                                :label="'Filter by ' + column.label">
+                            </sl-icon-button>
+                        </template>
+                    </div>
+                </th>
+            </template>
+        </tr>
+        <tr x-show="showFilters">
+            <template x-for="column in columns">
+                <th>
+                    <template x-if="column.filter">
+                        <sl-select placeholder="Select values to filter" multiple clearable size="small"
+                            style="--sl-font-size-medium: 14px;"
+                            x-on:sl-change="filterData(column.id, $event.target.value)">
+
+                            <template x-for="option in originalData.map(d => d[column.id])">
+                                <sl-menu-item x-bind:value="option" x-text="option"></sl-menu-item>
+                            </template>
+                        </sl-select>
+                    </template>
+                </th>
+            </template>
+        </tr>
+    </thead>
+    <tbody>
+        <template x-for="row in data">
+            <tr>
+                <template x-for="column in columns">
+                    <td :style="{'text-align': column.align || 'left', 'background-color': row[column.id + '_color'] || '' }"
+                        x-html="formatters[column.id] ? formatters[column.id](row) : row[column.id]">
+                    </td>
+                </template>
+            </tr>
+        </template>
+    </tbody>
+</table>

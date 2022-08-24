@@ -8,9 +8,6 @@ $border-color: $teal-blue;
 $body-color: #fff;
 $headings-color: #fff;
 
-$primary: $beige;
-$body-bg: $dark-green;
-
 
 @import "frappe/public/scss/website.bundle";
 
@@ -25,8 +22,6 @@ $body-bg: $dark-green;
     --middle: #eab308;
     --worst: #fde047;
 
-
-
     --primary: #{$primary};
     --primary-color: #{$primary};
     --bg-color: #{$body-bg};
@@ -36,42 +31,12 @@ $body-bg: $dark-green;
     display: none !important;
 }
 
-.navbar-light {
-    padding: 0.5rem 1rem;
-    background-color: $dark-green;
-    border-color: $teal-blue;
-
-    .navbar-nav .nav-link {
-        color: $beige;
-
-        &:hover {
-            color: #fff;
-        }
-    }
-
-    .navbar-brand {
-        color: $beige;
-
-        &:hover {
-            color: $light-green;
-        }
-    }
-}
-
-.btn.btn-primary {
-    color: var(--dark-green);
-}
-
-.btn-secondary:not(:disabled):not(.disabled).active {
-    background-color: var(--light-green);
-    border-color: var(--dark-green);
-}
 
 // India Map
 
 #india-map path {
     fill: transparent;
-    stroke: white;
+    stroke: black;
     stroke-width: 1;
     cursor: pointer;
 }

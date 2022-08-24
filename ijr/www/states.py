@@ -78,26 +78,21 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 		middle_values = 2 * one_third
 
 		if value <= best_values:
-			return 'Best'
+			return 'var(--best)'
 		if value <= middle_values:
-			return 'Middle'
-		return 'Worst'
+			return 'var(--middle)'
+		return 'var(--worst)'
 
 	i = 0
 	for d in data:
-		index = frappe.utils.cint(i / third)
-		if index > 2:
-			index = 2
-		color = colors[index]
-		d.color = color
-		d.overall_rank_type = get_value_type(d.overall_rank, len(data))
-		d.police_rank_type = get_value_type(d.police_rank, len(data))
-		d.prisons_rank_type = get_value_type(d.prisons_rank, len(data))
-		d.judiciary_rank_type = get_value_type(d.judiciary_rank, len(data))
-		d.legal_aid_rank_type = get_value_type(d.legal_aid_rank, len(data))
-		d.hr_rank_type = get_value_type(d.hr_rank, len(data))
-		d.diversity_rank_type = get_value_type(d.diversity_rank, len(data))
-		d.trends_rank_type = get_value_type(d.trends_rank, len(data))
+		d.overall_rank_color = get_value_type(d.overall_rank, len(data))
+		d.police_rank_color = get_value_type(d.police_rank, len(data))
+		d.prisons_rank_color = get_value_type(d.prisons_rank, len(data))
+		d.judiciary_rank_color = get_value_type(d.judiciary_rank, len(data))
+		d.legal_aid_rank_color = get_value_type(d.legal_aid_rank, len(data))
+		d.hr_rank_color = get_value_type(d.hr_rank, len(data))
+		d.diversity_rank_color = get_value_type(d.diversity_rank, len(data))
+		d.trends_rank_color = get_value_type(d.trends_rank, len(data))
 
 		# delta
 		d.overall_rank_delta = d.overall_rank - prev_ijr_data_by_state[d.state].overall_rank

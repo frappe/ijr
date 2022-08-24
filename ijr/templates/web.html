@@ -1,17 +1,25 @@
 {% extends "frappe/templates/web.html" %}
 
 {%- block head -%}
-    {% if head_html is defined -%}
-    {{ head_html or "" }}
-    {%- endif %}
 
-    {%- if theme.name != 'Standard' -%}
-    <link type="text/css" rel="stylesheet" href="{{ theme.theme_url }}">
-    {%- else -%}
-    {{ include_style('ijr.bundle.css') }}
-    {%- endif -%}
+{{ super() }}
 
-    {%- for link in web_include_css %}
-    {{ include_style(link) }}
-    {%- endfor -%}
+<!-- Rubik font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- shoelace -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.81/dist/themes/light.css"
+  integrity="sha256-bDM1Bq+ap/IkXl/Kx94rvlWq9Z/m6vjKmMQOzYZEw2A="
+  crossorigin="anonymous"
+/>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.81/dist/shoelace.js"
+  integrity="sha256-aUMaCL06Zx85l02tPI7UfVH+U7kozIADwrNsh166rJg="
+  crossorigin="anonymous"
+></script>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 {%- endblock -%}
