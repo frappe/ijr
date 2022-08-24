@@ -1,4 +1,4 @@
-<!-- variables: state_rankings, score_field, rank_field, delta_field -->
+<!-- variables: state_rankings, score_field, rank_field, delta_field, color_field -->
 
 <table class="table-ranking">
   <!-- <thead>
@@ -23,7 +23,7 @@
           <div class="d-flex align-items-center" style="width: 120px">
             <div class="rank-bar" style="
                 width: {{ (score | flt) * 120 / 10 }}px;
-                background-color: {{ d.color }};
+                background-color: {{ d[color_field] }};
               "></div>
           </div>
           <div class="pl-1">

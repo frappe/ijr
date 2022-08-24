@@ -3,7 +3,6 @@ base_template: 'templates/web.html'
 ---
 
 {% import "templates/macros.html" as m %}
-
 <div class="title-toolbar">
     <div>
         <h1>
@@ -112,7 +111,11 @@ base_template: 'templates/web.html'
     <h2>States Ranked by {{ rank_by.title().replace('_', ' ') }} score</h2>
     <div class="flex justify-between" style="gap: 2rem;">
         <div class="ranking-table-container">
-            {%- with state_rankings=state_rankings, score_field=rank_by + '_score', rank_field=rank_by + '_rank', delta_field=rank_by + '_rank_delta' -%}
+            {%- with state_rankings=state_rankings,
+                    score_field=rank_by + '_score',
+                    rank_field=rank_by + '_rank',
+                    delta_field=rank_by + '_rank_delta',
+                    color_field=rank_by + '_rank_color' -%}
             {% include "templates/includes/ranking_table.html" %}
             {%- endwith -%}
         </div>
@@ -164,172 +167,111 @@ base_template: 'templates/web.html'
                 <div>
             </div>
             {% endset %}
-            {{ m.map_with_hover(state_rankings, hover_html=hover_html) }}
+            {%- with state_rankings=state_rankings, color_field=rank_by + '_rank_color', hover_html=hover_html -%}
+            {% include "templates/includes/map_with_hover.html" %}
+            {%- endwith -%}
         </div>
     </div>
 </div>
 {%- endif -%}
 
-{% if view == 'table' %}
-<div class="mt-6">
-    <link href="https://unpkg.com/frappe-datatable@1.16.2/dist/frappe-datatable.min.css" rel="stylesheet">
-    <style>
-        .dt-scrollable {
-            height: {{ ((state_rankings | len) * 40) + 30 }}px !important;
-        }
-    </style>
-    <script src="https://unpkg.com/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script src="https://unpkg.com/frappe-datatable@1.16.2/dist/frappe-datatable.min.js"></script>
-    <script>
-        frappe.ready(() => {
-            function format_cell(rank_by) {
-                let key = rank_by + '_type';
-                return (value, row, column, data) => {
-                    return `<div class="value-type ${data[key]}">${value}</div>`
-                }
-            }
-            function format_state(value, row, column, data) {
-                return `<a href="/state/${data.region_code}">${value}</a>`
-            }
-            if ($('#table-ranking-pillars').length) {
-                new DataTable('#table-ranking-pillars', {
-                    columns: [
-                        {
-                            name: 'State',
-                            id: 'state',
-                            width: 1.5,
-                            // width: 165,
-                            editable: false,
-                            format: format_state
-                        },
-                        {
-                            name: 'Overall',
-                            id: 'overall_rank',
-                            width: 1,
-                            // width: 100,
-                            editable: false,
-                            align: 'center',
-                            format: format_cell('overall_rank')
-                        },
-                        {
-                            name: 'Police',
-                            id: 'police_rank',
-                            width: 1,
-                            // width: 100,
-                            editable: false,
-                            align: 'center',
-                            format: format_cell('police_rank')
-                        },
-                        {
-                            name: 'Prisons',
-                            id: 'prisons_rank',
-                            width: 1,
-                            // width: 100,
-                            editable: false,
-                            align: 'center',
-                            format: format_cell('prisons_rank')
-                        },
-                        {
-                            name: 'Judiciary',
-                            id: 'judiciary_rank',
-                            width: 1,
-                            // width: 100,
-                            editable: false,
-                            align: 'center',
-                            format: format_cell('judiciary_rank')
-                        },
-                        {
-                            name: 'Legal Aid',
-                            id: 'legal_aid_rank',
-                            width: 1,
-                            // width: 100,
-                            editable: false,
-                            align: 'center',
-                            format: format_cell('legal_aid_rank')
-                        },
-                    ],
-                    data: state_rankings,
-                    inlineFilters: true,
-                    layout: 'fluid'
-                });
-            }
-
-            if ($('#table-ranking-themes').length) {
-                new DataTable('#table-ranking-themes', {
-                    columns: [
-                        {
-                            name: 'State',
-                            id: 'state',
-                            width: 165,
-                            editable: false
-                        },
-                        // {
-                        //     name: 'Overall',
-                        //     id: 'overall_rank',
-                        //     width: 100,
-                        //     editable: false,
-                        //     format: format_cell('overall_rank')
-                        // },
-                        {
-                            name: 'HR',
-                            id: 'hr_rank',
-                            width: 100,
-                            editable: false,
-                            align: 'center',
-                            format: format_cell('hr_rank')
-                        },
-                        {
-                            name: 'Diversity',
-                            id: 'diversity_rank',
-                            width: 100,
-                            editable: false,
-                            align: 'center',
-                            format: format_cell('diversity_rank')
-                        },
-                        {
-                            name: 'Trends',
-                            id: 'trends_rank',
-                            width: 100,
-                            editable: false,
-                            align: 'center',
-                            format: format_cell('trends_rank')
-                        },
-                    ],
-                    data: state_rankings,
-                    layout: 'fluid'
-                });
-            }
-        })
-    </script>
-    {% if table_view == 'pillars' %}
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Ranking by 4 Pillars</h2>
-            <div id="table-ranking-pillars"></div>
-        </div>
-    </div>
-    {% elif table_view == 'themes' %}
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Ranking by 6 Themes</h2>
-            <div id="table-ranking-themes"></div>
-        </div>
-    </div>
-    {% endif %}
-
-
-</div>
-{% endif %}
-
+{%- if view == 'table' -%}
 <div>
-    <button class="btn btn-link font-size-lg" onclick="download_data()">
+    {%- if table_view == 'pillars' -%}
+    {%- set columns = [
+        {
+            'label': 'State',
+            'id': 'state',
+            'width': 250,
+            'filter': true,
+            'format': '''<a href="/state/${d.region_code}">${d.state}</a>'''
+        },
+        {
+            'label': 'Overall',
+            'id': 'overall_rank',
+            'align': 'center',
+            'width': 100
+        },
+        {
+            'label': 'Police',
+            'id': 'police_rank',
+            'align': 'center',
+            'width': 100
+        },
+        {
+            'label': 'Prisons',
+            'id': 'prisons_rank',
+            'align': 'center',
+            'width': 100
+        },
+        {
+            'label': 'Judiciary',
+            'id': 'judiciary_rank',
+            'align': 'center',
+            'width': 100
+        },
+        {
+            'label': 'Legal Aid',
+            'id': 'legal_aid_rank',
+            'align': 'center',
+            'width': 100
+        },
+    ] -%}
+    {%- elif table_view == 'themes' -%}
+    {%- set columns = [
+        {
+            'label': 'State',
+            'id': 'state',
+            'width': 250
+        },
+        {
+            'label': 'Overall',
+            'id': 'overall_rank',
+            'align': 'center',
+            'width': 100
+        },
+        {
+            'label': 'HR',
+            'id': 'hr_rank',
+            'align': 'center',
+            'width': 100
+        },
+        {
+            'label': 'Diversity',
+            'id': 'diversity_rank',
+            'align': 'center',
+            'width': 100
+        },
+        {
+            'label': 'Trends',
+            'id': 'trends_rank',
+            'align': 'center',
+            'width': 100
+        }
+    ] -%}
+    {%- endif -%}
+
+
+    <div class="mt-2">
+        {%- with columns=columns, data=state_rankings -%}
+        {% include "templates/includes/featured-table.html" %}
+        {%- endwith -%}
+    </div>
+</div>
+{%- endif -%}
+
+<div class="mt-6 filters-toolbar">
+    <sl-button onclick="download_data()" size="small">
         Download Data
-    </button>
+    </sl-button>
+
+    <div class="flex justify-between">
+        <sl-icon-button name="twitter" label="Share on Twitter"></sl-icon-button>
+        <sl-icon-button name="linkedin" label="Share on LinkedIn"></sl-icon-button>
+    </div>
 </div>
 
 <script>
-    window.state_rankings = JSON.parse(`{{ as_json(state_rankings) }}`);
-
     function download_data() {
         let url = generate_export_url({
             doctype: 'State Ranking',
