@@ -32,7 +32,7 @@
 
 {% macro select_options(options) %}
 {% for option in options %}
-<sl-menu-item style="--sl-font-size-medium: 14px;" value="{{ option.value }}">{{ option.label }}</sl-menu-item>
+<sl-menu-item value="{{ option.value }}">{{ option.label }}</sl-menu-item>
 {% endfor %}
 {% endmacro %}
 

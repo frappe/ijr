@@ -30,8 +30,8 @@ function link_with_query_params() {
   });
 }
 
-function set_query_params(key, value) {
-  let searchParams = new URLSearchParams(window.location.search);
+function set_query_params(key, value, clear_others = false) {
+  let searchParams = new URLSearchParams(clear_others ? '' : window.location.search);
   searchParams.set(key, value);
   window.location.search = searchParams.toString();
 }

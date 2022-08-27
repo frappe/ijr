@@ -3,200 +3,175 @@ base_template: 'templates/web.html'
 no_cache: 1
 ---
 
-{% macro table(columns, data) %}
-<table class="table table-sm table-responsive table-borderless">
-    <thead>
-        <tr>
-            {% for col in columns %}
-            <th width="100">{{ col.label }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in data %}
-        <tr>
-            {% for col in columns %}
-            {% set cell_tag = 'th' if col.heading else 'td' %}
-            <{{ cell_tag }}>
-                <div class="value-type {{ row[col.name + '_type'] or '' }}">
-                    {{ row[col.name] }}
-                </div>
-            </{{ cell_tag }}>
-            {% endfor %}
-        </tr>
+<div class="title-toolbar">
+    <div>
+        <sl-popup placement="bottom" id="changeStatePopup">
+            <div slot="anchor" onclick="window.changeStatePopup.active = !window.changeStatePopup.active">
+                <h1>{{ state.name }}</h1>
+            </div>
+            <div>
+                <sl-menu style="max-height: 300px">
+                    {% for cluster in states_by_cluster %}
+                    <sl-menu-label>{{ cluster }}</sl-menu-label>
+                    {% set states = states_by_cluster[cluster] %}
+                    {% for state in states %}
+                    <sl-menu-item value="{{ state.code }}" onclick="window.location.href = '/state/{{ state.code}}'">
+                        {{ state.name }}
+                    </sl-menu-item>
+                    {% endfor %}
+                    {% endfor %}
+                </sl-menu>
+            </div>
+        </sl-popup>
+
+        <div>Score and rank done by overall analysis of scores across pillars</div>
+    </div>
+    <div class="color-legend-container">
+        <div>Best</div>
+        <div class="color-legend" style="background-color: var(--best)"></div>
+        <div class="color-legend" style="background-color: var(--middle)"></div>
+        <div class="color-legend" style="background-color: var(--worst)"></div>
+        <div>Worst</div>
+    </div>
+</div>
+
+<div class="filters-toolbar">
+    {%- set tabs = [
+    {'label': 'Overall', 'onclick': "window.location.href = '/state/" + state.code + "'"},
+    {'label': 'Police', 'onclick': "set_query_params('pillar', 'Police', true)"},
+    {'label': 'Prisons', 'onclick': "set_query_params('pillar', 'Prisons', true)"},
+    {'label': 'Judiciary', 'onclick': "set_query_params('pillar', 'Judiciary', true)"},
+    {'label': 'Legal Aid', 'onclick': "set_query_params('pillar', 'Legal Aid', true)"},
+    {'label': 'HR', 'onclick': "set_query_params('theme', 'HR', true)"},
+    {'label': 'Diversity', 'onclick': "set_query_params('theme', 'Diversity', true)"},
+    {'label': 'Trends', 'onclick': "set_query_params('theme', 'Trends', true)"},
+    ] -%}
+    <div>
+        {% for tab in tabs %}
+        <sl-tab onclick="{{ tab.onclick }}" {{ 'active' if active_tab==tab.label else '' }}>
+            {{ tab.label }}
+        </sl-tab>
         {% endfor %}
-    </tbody>
-</table>
-{% endmacro %}
-<div>
-    <a href="/insights/map">← Back to Overall State Ranking</a>
-</div>
-<div class="row mt-2">
-    <div class="col order-2 order-md-1">
-        <h1>{{ state.name }}</h1>
     </div>
-
-    <div class="col-md-3 order-1 order-md-2">
-        <select class="custom-select mb-4" onchange="window.location.href = '/state/' + this.value">
-            <option selected>Choose another state</option>
-            {% for cluster in states_by_cluster %}
-                <optgroup label="{{ cluster }}">
-                {% set states = states_by_cluster[cluster] %}
-                {% for state in states %}
-                <option value="{{ state.code }}">{{ state.name }}</option>
-                {% endfor %}
-                </optgroup>
-            {% endfor %}
-        </select>
-    </div>
+    <sl-button onclick="show_how_to_read()" size="small" variant="text">
+        How to read this page?
+    </sl-button>
 </div>
 
-
-<section class="row mt-6">
-    <div class="col-md-3">
-        {{ web_block('India Map 2022', values={'state': state.code }) }}
-        <div>
-        <div class="d-flex align-items-center mt-4">
-            {% set legend = [
-                {'label': 'Best', 'color': colors[0]},
-                {'label': 'Middle', 'color': colors[1]},
-                {'label': 'Worst', 'color': colors[2]},
-            ] %}
-            {% for d in legend %}
-            <div class="color-legend" style="background-color: {{ d.color }};">
-                {{ d.label }}
-            </div>
-            {% endfor %}
-            </div>
-            <div class="font-size-sm">
-                Legend
-            </div>
-        </div>
-    </div>
-    <div class="col mt-6 mt-md-0 offset-1">
-        <div class="font-size-2xl font-weight-bold">
-            <p>Overall Score: {{ current_ranking.overall_score }} / 10</p>
-            <p>Overall Rank: {{ current_ranking.overall_rank }} / {{ total_rankings }}</p>
-        </div>
-        <div class="row">
-            <div class="col">
-                <h2 class="font-size-xl">Performance by Pillars</h2>
-                <div id="pillars"></div>
-                {#
-                {{ table([
-                    {'label': '', 'name': 'dimension', 'heading': true},
-                    {'label': 'IJR 1', 'name': 'ijr_1'},
-                    {'label': 'IJR 2', 'name': 'ijr_2'},
-                    {'label': 'IJR 3', 'name': 'ijr_3'},
-                ], state_performance_data[:5]) }}
-                #}
-            </div>
-            <div class="col">
-                <h2 class="font-size-xl">Performance by Themes</h2>
-                <div id="themes"></div>
-                {#
-                {{ table([
-                    {'label': '', 'name': 'dimension', 'heading': true},
-                    {'label': 'IJR 1', 'name': 'ijr_1'},
-                    {'label': 'IJR 2', 'name': 'ijr_2'},
-                    {'label': 'IJR 3', 'name': 'ijr_3'},
-                ], state_performance_data[5:]) }}
-                #}
-            </div>
-        </div>
-    </div>
-</section>
-
-
-
-<section class="row mt-12">
-    <div class="col-md-4">
-        <h2>State Performance:</h2>
-    </div>
-    <div class="col-md-4">
-        <select class="custom-select" onchange="window.location.href = this.value">
-            <option>Select indicator type</option>
-            <optgroup label="Pillars">
-                {% for opt in ['Police', 'Prisons', 'Judiciary', 'Legal Aid'] %}
-                <option {{ 'selected' if frappe.form_dict.pillar == opt else ''}} value="?pillar={{ opt }}">
-                    {{ opt }}</option>
-                {% endfor %}
-            </optgroup>
-            <optgroup label="Themes">
-                {% for opt in ['Budgets', 'Human Resources', 'Trends'] %}
-                <option {{ 'selected' if frappe.form_dict.theme == opt else ''}} value="?theme={{ opt }}">
-                    {{ opt }}</option>
-                {% endfor %}
-            </optgroup>
-        </select>
-    </div>
-    <div class="col-12" id="indicator-datatable"></div>
-</section>
-
-
-
-<link href="https://unpkg.com/frappe-datatable@1.16.2/dist/frappe-datatable.min.css" rel="stylesheet">
-<script src="https://unpkg.com/sortablejs@1.15.0/Sortable.min.js"></script>
-<script src="https://unpkg.com/frappe-datatable@1.16.2/dist/frappe-datatable.min.js"></script>
-<script>
-    frappe.ready(() => {
-        let state_performance_data = JSON.parse(`{{ as_json(state_performance_data) }}`)
-        new DataTable('#pillars', {
-            data: state_performance_data.slice(0, 5),
-            columns: [
-                {'name': '', 'id': 'dimension'},
-                {'name': 'IJR 1', 'id': 'ijr_1'},
-                {'name': 'IJR 2', 'id': 'ijr_2'},
-                {'name': 'IJR 3', 'id': 'ijr_3'},
-            ]
-        });
-        new DataTable('#themes', {
-            data: state_performance_data.slice(5),
-            columns: [
-                {'name': '', 'id': 'dimension'},
-                {'name': 'IJR 1', 'id': 'ijr_1'},
-                {'name': 'IJR 2', 'id': 'ijr_2'},
-                {'name': 'IJR 3', 'id': 'ijr_3'},
-            ]
-        });
-
-        window.indicators_data = JSON.parse(`{{ as_json(indicators_data) }}`);
-        let indicators_columns = [
-            {'name': 'Indicator', 'id': 'indicator_name', format: (value, row, col, data) => {
-                return `<a href="/indicator/${data.indicator_id}">${value}</a>`
-            }},
-            {'name': 'IJR Number', 'id': 'ijr_number'},
-            {'name': 'Year', 'id': 'year'},
-            {'name': 'Score', 'id': 'ijr_score'},
-            {'name': 'Indicator Value', 'id': 'indicator_value'},
-            {'name': 'Indicator Unit', 'id': 'indicator_unit'},
-            {
-                'name': 'Calculation',
-                'id': 'indicator_name',
-                format: (value, row, col, data) => {
-                    if (data.raw_data.length) {
-                        return `<a onclick="event.preventDefault(); show_calculations(${row.meta.rowIndex});" class="" href="#">Show Calculation</a>`
-                    }
-                    return ''
-                }
-            },
-        ]
-
-        if (indicators_data.length > 0) {
-            new DataTable('#indicator-datatable', {
-                data: indicators_data,
-                columns: indicators_columns,
-                layout: 'fluid',
-            });
+<div class="flex items-start justify-between mt-6">
+    <div style="width: 65%;">
+        {% if active_tab == 'Overall' %}
+        {%- set columns = [
+        {
+            'label': 'IJR',
+            'id': 'ijr_number',
+            'width': 80,
+            'filter': true,
+            'format': '''IJR ${d.ijr_number}'''
+        },
+        {
+            'label': 'Overall',
+            'id': 'overall_rank',
+            'align': 'center',
+            'width': 80
+        },
+        {
+            'label': 'Police',
+            'id': 'police_rank',
+            'align': 'center',
+            'width': 80
+        },
+        {
+            'label': 'Prisons',
+            'id': 'prisons_rank',
+            'align': 'center',
+            'width': 80
+        },
+        {
+            'label': 'Judiciary',
+            'id': 'judiciary_rank',
+            'align': 'center',
+            'width': 80
+        },
+        {
+            'label': 'Legal Aid',
+            'id': 'legal_aid_rank',
+            'align': 'center',
+            'width': 80
+        },
+        {
+            'label': 'HR',
+            'id': 'hr_rank',
+            'align': 'center',
+            'width': 80
+        },
+        {
+            'label': 'Diversity',
+            'id': 'diversity_rank',
+            'align': 'center',
+            'width': 80
+        },
+        {
+            'label': 'Trends',
+            'id': 'trends_rank',
+            'align': 'center',
+            'width': 80
         }
+        ] -%}
+        {%- with data=all_rankings, columns=columns -%}
+        {% include "templates/includes/featured-table.html" %}
+        {%- endwith -%}
 
-    })
+        {% else %}
+
+        {%- set columns = [
+        {
+            'label': 'Indicator',
+            'id': 'indicator_name',
+            'format': '''<a href="/indicator/${d.indicator_id}">${d.indicator_name}</a>''',
+            'width': 200
+        },
+        { 'label': 'IJR', 'id': 'ijr_number' },
+        { 'label': 'Year', 'id': 'year' },
+        { 'label': 'Score', 'id': 'ijr_score' },
+        { 'label': 'Indicator Value', 'id': 'indicator_value' },
+        { 'label': 'Indicator Unit', 'id': 'indicator_unit' },
+        {
+            'label': 'Calculation',
+            'id': 'calculation',
+            'format': '''
+                if (d.raw_data.length) {
+                    return `<a onclick="event.preventDefault(); show_calculations(${i});" class="" href="#">
+                        Show Calculation
+                    </a>`
+                }
+                return ""
+            '''
+        },
+        ] -%}
+
+        {%- with data=indicators_data, columns=columns -%}
+        {% include "templates/includes/featured-table.html" %}
+        {%- endwith -%}
+
+        <sl-dialog label="Calculations" id="calculationsDialog">
+            <sl-button slot="footer" variant="primary">Close</sl-button>
+        </sl-dialog>
+
+        {% endif %}
+    </div>
+    <div class="flex-shrink-0">
+        {%- with state=state.code -%}
+        {% include "templates/includes/india_map.html" %}
+        {%- endwith -%}
+    </div>
+</div>
+
+<script>
+    let indicators_data = {{ as_json(indicators_data, indent = None) }};
     function show_calculations(i) {
         let raw_data = indicators_data[i].raw_data;
-        let d = new frappe.ui.Dialog({
-            title: 'Calculations',
-            size: 'large'
-        });
+        let dialog = window.calculationsDialog;
         let rows = raw_data.map(row => {
             return `<tr>
                 <td>${row.raw_data_name}</td>
@@ -204,8 +179,8 @@ no_cache: 1
                 <td>${row.raw_data_value}</td>
             </tr>`
         }).join('');
-        d.$body.html(`
-            <table class="table table-bordered table-dark">
+        dialog.innerHTML = `
+            <table class="table table-bordered">
                 <thead>
                     <th>Metric Name</th>
                     <th>Metric Unit</th>
@@ -213,10 +188,7 @@ no_cache: 1
                 </thead>
                 <tbody>${rows}</tbody>
             </table>
-        `);
-        d.show();
+        `;
+        dialog.show();
     }
 </script>
-
-
-

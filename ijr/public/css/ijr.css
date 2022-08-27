@@ -129,6 +129,7 @@ tr[data-state].highlight .rank-bar, tr[data-state]:hover .rank-bar {
     table-layout: fixed;
     width: 100%;
     border-collapse: separate;
+    font-size: 14px;
 }
 
 .featured-table thead tr {
@@ -141,4 +142,17 @@ tr[data-state].highlight .rank-bar, tr[data-state]:hover .rank-bar {
 
 .featured-table td, .featured-table th {
     padding: 6px 12px 6px 12px;
+}
+
+/* Tabs */
+sl-tab::part(base) {
+    padding: var(--sl-spacing-small) var(--sl-spacing-medium);
+}
+
+sl-tab[active]::part(base) {
+    background-color: white;
+}
+
+sl-menu-item {
+    --sl-font-size-medium: 14px;
 }

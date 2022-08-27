@@ -7,8 +7,12 @@
         let formatters = {};
         {% for column in columns %}
         {% if column.format %}
-        formatters.{{ column.id }} = d => {
+        formatters.{{ column.id }} = (d, i) => {
+            {% if 'return' in column.format %}
+            {{ column.format }}
+            {% else %}
             return `{{ column.format }}`;
+            {% endif %}
         };
         {% endif %}
         {% endfor %}
@@ -94,7 +98,6 @@
                 <th>
                     <template x-if="column.filter">
                         <sl-select placeholder="Select values to filter" multiple clearable size="small"
-                            style="--sl-font-size-medium: 14px;"
                             x-on:sl-change="filterData(column.id, $event.target.value)">
 
                             <template x-for="option in originalData.map(d => d[column.id])">
@@ -107,11 +110,11 @@
         </tr>
     </thead>
     <tbody>
-        <template x-for="row in data">
+        <template x-for="(row, i) in data">
             <tr>
                 <template x-for="column in columns">
                     <td :style="{'text-align': column.align || 'left', 'background-color': row[column.id + '_color'] || '' }"
-                        x-html="formatters[column.id] ? formatters[column.id](row) : row[column.id]">
+                        x-html="formatters[column.id] ? formatters[column.id](row, i) : row[column.id]">
                     </td>
                 </template>
             </tr>
