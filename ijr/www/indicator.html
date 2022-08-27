@@ -5,10 +5,25 @@ no_cache: 1
 
 {% import "templates/macros.html" as m %}
 
-<div class="d-flex justify-content-between">
-    <h1 class="my-0 mr-4 font-size-3xl">{{ indicator_name }}</h1>
-    <div class="d-flex align-items-center">
-        {{ m.input_select(
+<div class="title-toolbar">
+    <div>
+        <a href="#" onclick="window.changeIndicatorPopup.active = !window.changeIndicatorPopup.active">
+            <h1 id="indicator-title">{{ indicator_name }}</h1>
+        </a>
+        <div>Score and rank done by overall analysis of scores across pillars</div>
+    </div>
+    <div class="color-legend-container">
+        <div>Best</div>
+        <div class="color-legend" style="background-color: var(--best)"></div>
+        <div class="color-legend" style="background-color: var(--middle)"></div>
+        <div class="color-legend" style="background-color: var(--worst)"></div>
+        <div>Worst</div>
+    </div>
+</div>
+
+<div class="filters-toolbar">
+    <div class="flex">
+        {{ m.input_select2(
             options=[
                 {'label': 'Map View', 'value': 'map'},
                 {'label': 'Table View', 'value': 'table'},
@@ -19,80 +34,126 @@ no_cache: 1
             class='mr-2'
            )
         }}
-        {{ m.input_select(
-            options=indicators,
-            label='Change indicator',
-            value=frappe.utils.cint(indicator_id),
-            url='/indicator/${this.value}'
+        {{ m.input_select2(
+            options=[
+                {'label': 'IJR 1 (2019)', 'value' : '1'},
+                {'label': 'IJR 2 (2020)', 'value' : '2'},
+                {'label': 'IJR 3 (2022)', 'value' : '3'},
+            ],
+            label='IJR Number',
+            value=ijr_number,
+            query='ijr_number',
+            class='mr-2'
+           )
+        }}
+        {% if view == 'table' %}
+        {{ m.input_select2(
+            options=[
+                {'label': '4 Pillars', 'value' : 'pillars'},
+                {'label': '6 Themes', 'value' : 'themes'},
+            ],
+            label='Rank by',
+            value=table_view,
+            query='table_view',
+            class='mr-2'
+           )
+        }}
+        {% endif %}
+        {{ m.input_select2(
+            options=[
+                {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
+                {'label': '7 Small States', 'value' : 'small'},
+            ],
+            label='Change Cluster',
+            value=cluster,
+            query='cluster'
            )
         }}
     </div>
+    <sl-button onclick="show_how_to_read()" size="small" variant="text">
+        How to read this page?
+    </sl-button>
 </div>
 
-{%- if view == 'map' -%}
-<div class="row mt-6">
-    <div class="col-md-7">
-        {%- set hover_html -%}
-        <div>
-            <table class="table-state-rank">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Unit</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${d.raw_data.map(d => {
-                        return `
-                            <tr>
-                                <td>${d.raw_data_name}</td>
-                                <td>${d.raw_data_unit}</td>
-                                <td>${d.raw_data_value}</td>
-                            </tr>
-                        `
-                    }).join('')}
-                </tbody>
-            </table>
-        </div>
-        {%- endset -%}
-        {{ m.map_with_hover(indicator_data, hover_html=hover_html) }}
+<sl-popup placement="bottom" sync="width" id="changeIndicatorPopup" anchor="indicator-title">
+    <div>
+        <sl-menu style="max-height: 300px">
+            {% for indicator in indicators %}
+            <sl-menu-item value="{{ indicator.value }}" onclick="window.location.href = '/indicator/{{ indicator.value }}'">
+                {{ indicator.label }}
+            </sl-menu-item>
+            {% endfor %}
+        </sl-menu>
     </div>
-    <div class="col-md-5">
-        <div class="rankings">
-            {%- with state_rankings=indicator_data, score_field='ijr_score', rank_field='ijr_score', delta_field='ijr_score_delta' -%}
+</sl-popup>
+
+{%- if view == 'map' -%}
+<div class="mt-4">
+    <h2>States Ranked by score</h2>
+    <div class="flex justify-between" style="gap: 2rem;">
+        <div class="ranking-table-container">
+            {%- with state_rankings=indicator_data,
+                    score_field='ijr_score',
+                    rank_field='ijr_score',
+                    delta_field='ijr_score_delta',
+                    color_field='ijr_score_color' -%}
             {% include "templates/includes/ranking_table.html" %}
+            {%- endwith -%}
+        </div>
+
+        <div class="map-container">
+            {% set hover_html %}
+            <div>
+                <table class="table-state-rank">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Unit</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${d.raw_data.map(d => {
+                            return `
+                                <tr>
+                                    <td>${d.raw_data_name}</td>
+                                    <td>${d.raw_data_unit}</td>
+                                    <td>${d.raw_data_value}</td>
+                                </tr>
+                            `
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+            {% endset %}
+            {%- with state_rankings=indicator_data, color_field='ijr_score_color', hover_html=hover_html -%}
+            {% include "templates/includes/map_with_hover.html" %}
             {%- endwith -%}
         </div>
     </div>
 </div>
-{%- else -%}
-<div id="indicator-datatable"></div>
+{%- endif -%}
 
-<link href="https://unpkg.com/frappe-datatable@1.16.2/dist/frappe-datatable.min.css" rel="stylesheet">
-<script src="https://unpkg.com/sortablejs@1.15.0/Sortable.min.js"></script>
-<script src="https://unpkg.com/frappe-datatable@1.16.2/dist/frappe-datatable.min.js"></script>
-<script>
-    frappe.ready(() => {
-        window.indicator_data = JSON.parse(`{{ as_json(indicator_data) }}`);
-        let indicators_columns = [
-            {'name': 'State', 'id': 'state', format: (value, row, col, data) => {
-                return `<a href="/state/${data.region_cod}">${value}</a>`
-            }},
-            {'name': 'IJR Number', 'id': 'ijr_number'},
-            {'name': 'Year', 'id': 'year'},
-            {'name': 'Score', 'id': 'ijr_score'},
-            {'name': 'Indicator Value', 'id': 'indicator_value'},
-            {'name': 'Indicator Unit', 'id': 'indicator_unit'},
-        ]
+{%- if view == 'table' -%}
+<div>
+    {%- set columns = [
+        {
+            'label': 'State',
+            'id': 'state',
+            'filter': true,
+            'format': '''<a href="/state/${d.region_code}">${d.state}</a>'''
+        },
+        {'label': 'IJR', 'id': 'ijr_number'},
+        {'label': 'Year', 'id': 'year'},
+        {'label': 'Score', 'id': 'ijr_score'},
+        {'label': 'Indicator Value', 'id': 'indicator_value'},
+        {'label': 'Indicator Unit', 'id': 'indicator_unit'},
+    ] -%}
 
-        if (indicator_data.length > 0) {
-            new DataTable('#indicator-datatable', {
-                data: indicator_data,
-                columns: indicators_columns,
-                layout: 'fluid',
-            });
-        }
-    });
-</script>
+    <div class="mt-2">
+        {%- with columns=columns, data=indicator_data -%}
+        {% include "templates/includes/featured-table.html" %}
+        {%- endwith -%}
+    </div>
+</div>
 {%- endif -%}

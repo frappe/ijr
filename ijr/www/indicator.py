@@ -9,7 +9,13 @@ def get_context(context):
 	view = frappe.form_dict.view or 'map'
 	indicator_id = frappe.form_dict.indicator_id
 	ijr_number = frappe.form_dict.ijr_number or '3'
-	cluster = frappe.form_dict.cluster or 'Large / Mid State'
+
+	cluster = frappe.form_dict.cluster or 'large-mid'
+	cluster_filter = None
+	if cluster == 'large-mid':
+		cluster_filter = 'Large / Mid State'
+	if cluster == 'small':
+		cluster_filter = 'Small State'
 
 	if view == 'table':
 		context.indicator_data = frappe.db.get_all(
@@ -19,7 +25,7 @@ def get_context(context):
 			order_by='state asc, ijr_number asc'
 		)
 	elif view == 'map':
-		context.indicator_data = indicator_rankings_data(indicator_id=indicator_id, ijr_number=ijr_number, cluster=cluster)
+		context.indicator_data = indicator_rankings_data(indicator_id=indicator_id, ijr_number=ijr_number, cluster=cluster_filter)
 
 	if context.indicator_data:
 		context.indicator_name = context.indicator_data[0].indicator_name
@@ -27,6 +33,8 @@ def get_context(context):
 	context.indicator_id = indicator_id
 	context.indicators = frappe.db.get_all('State Indicator', fields=['distinct(`indicator_id`) as value', 'indicator_name as label'], order_by='indicator_name asc')
 	context.view = view
+	context.ijr_number = ijr_number
+	context.cluster = cluster
 
 
 def indicator_rankings_data(indicator_id, ijr_number, cluster):
@@ -59,7 +67,7 @@ def indicator_rankings_data(indicator_id, ijr_number, cluster):
 	colors = ["var(--best)",  "var(--middle)", "var(--worst)"]
 
 	for d in data:
-		d.color = colors[d.color_code - 1] if d.color_code else None
+		d.ijr_score_color = colors[d.color_code - 1] if d.color_code else None
 		# delta
 		d.ijr_score_delta = d.ijr_score - prev_ijr_data_by_state.get(d.state, {}).ijr_score
 		d.raw_data = frappe.db.get_all('State Indicator Raw Data',
