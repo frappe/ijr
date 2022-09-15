@@ -144,6 +144,15 @@ tr[data-state].highlight .rank-bar, tr[data-state]:hover .rank-bar {
     padding: 6px 12px 6px 12px;
 }
 
+/* table state rank */
+.table-state-rank {
+    table-layout: fixed;
+}
+
+.table-state-rank th, .table-state-rank td {
+    padding-right: 1rem;
+}
+
 /* Tabs */
 sl-tab::part(base) {
     padding: var(--sl-spacing-small) var(--sl-spacing-medium);

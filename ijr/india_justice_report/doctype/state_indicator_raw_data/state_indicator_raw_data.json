@@ -24,6 +24,7 @@
   {
    "fieldname": "indicator_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Indicator Name"
   },
   {
@@ -44,6 +45,8 @@
   {
    "fieldname": "ijr_number",
    "fieldtype": "Int",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "IJR Number"
   },
   {
@@ -54,6 +57,8 @@
   {
    "fieldname": "state",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "State",
    "options": "State"
   },
@@ -71,22 +76,25 @@
   {
    "fieldname": "raw_data_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Raw Data Name"
   },
   {
    "fieldname": "raw_data_value",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Raw Data Value"
   },
   {
    "fieldname": "raw_data_unit",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Raw Data Unit"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-20 12:30:35.085494",
+ "modified": "2022-09-15 22:40:10.441784",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "State Indicator Raw Data",
@@ -105,7 +113,8 @@
    "write": 1
   }
  ],
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_field": "raw_data_sequence",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "indicator_name"
 }

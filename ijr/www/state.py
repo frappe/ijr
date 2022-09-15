@@ -55,16 +55,8 @@ def get_context(context):
 
 	for row in indicators_data:
 		row.ijr_score_color = ['', 'var(--best)', 'var(--middle)', 'var(--worst)'][row.color_code]
-		row.raw_data = frappe.db.get_all('State Indicator Raw Data',
-			fields='*',
-			filters={
-				'ijr_number': row.ijr_number,
-				'indicator_id': row.indicator_id,
-				'state': row.state
-			},
-			order_by='raw_data_sequence asc'
-		)
 
+	context.raw_data = get_raw_data_by_indicator(state_code)
 	context.state = state
 	context.title = 'State Analysis: ' + context.state.name
 	context.current_ranking = current_ranking
@@ -89,3 +81,21 @@ def get_value_color(value, max_value):
 	if value <= middle_values:
 		return 'var(--middle)'
 	return 'var(--worst)'
+
+def get_raw_data_by_indicator(state_code):
+	raw_data = frappe.db.get_all('State Indicator Raw Data',
+		fields='*',
+		filters={'region_code': state_code},
+		order_by='raw_data_sequence asc, ijr_number asc'
+	)
+	raw_data_by_indicator = {}
+	raw_data_with_all_ijrs = {}
+	for r in raw_data:
+		key = (r.indicator_id, r.raw_data_sequence)
+		data = raw_data_by_indicator.get(key)
+		if not data:
+			data = raw_data_by_indicator[key] = r
+		data[f'ijr_{r.ijr_number}_value'] = r.raw_data_value
+		if r.ijr_number == 1:
+			raw_data_with_all_ijrs.setdefault(r.indicator_id, []).append(data)
+	return raw_data_with_all_ijrs

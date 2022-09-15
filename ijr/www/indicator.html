@@ -109,16 +109,20 @@ no_cache: 1
                         <tr>
                             <th>Data</th>
                             <th>Unit</th>
-                            <th>Value</th>
+                            <th>IJR 1</th>
+                            <th>IJR 2</th>
+                            <th>IJR 3</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${d.raw_data.map(d => {
+                        ${(raw_data[d.state] || []).map(d => {
                             return `
                                 <tr>
                                     <td>${d.raw_data_name}</td>
                                     <td>${d.raw_data_unit}</td>
-                                    <td>${d.raw_data_value}</td>
+                                    <td>${d.ijr_1_value}</td>
+                                    <td>${d.ijr_2_value}</td>
+                                    <td>${d.ijr_3_value}</td>
                                 </tr>
                             `
                         }).join('')}
@@ -136,20 +140,6 @@ no_cache: 1
 
 {%- if view == 'table' -%}
 <div>
-    {%- set columns = [
-        {
-            'label': 'State',
-            'id': 'state',
-            'filter': true,
-            'format': '''<a href="/state/${d.region_code}">${d.state}</a>'''
-        },
-        {'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': true},
-        {'label': 'Year', 'id': 'year'},
-        {'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'right'},
-        {'label': 'Indicator Value', 'id': 'indicator_value'},
-        {'label': 'Indicator Unit', 'id': 'indicator_unit'},
-    ] -%}
-
     <div class="mt-2">
         {%- with columns=columns, data=indicator_data -%}
         {% include "templates/includes/featured-table.html" %}
@@ -157,3 +147,8 @@ no_cache: 1
     </div>
 </div>
 {%- endif -%}
+
+<script>
+    let raw_data = {{ as_json(raw_data, indent = None) }};
+    window.raw_data = raw_data
+</script>

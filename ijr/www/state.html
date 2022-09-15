@@ -141,8 +141,8 @@ no_cache: 1
             'label': 'Calculation',
             'id': 'calculation',
             'format': '''
-                if (d.raw_data.length) {
-                    return `<a onclick="event.preventDefault(); show_calculations(${i});" class="" href="#">
+                if (d.indicator_id && raw_data[d.indicator_id]) {
+                    return `<a onclick="event.preventDefault(); show_calculations(${d.indicator_id});" class="" href="#">
                         Show Calculation
                     </a>`
                 }
@@ -155,7 +155,7 @@ no_cache: 1
         {% include "templates/includes/featured-table.html" %}
         {%- endwith -%}
 
-        <sl-dialog label="Calculations" id="calculationsDialog">
+        <sl-dialog label="Calculations" id="calculationsDialog" style="--width: max-content;">
             <sl-button slot="footer" variant="primary">Close</sl-button>
         </sl-dialog>
 
@@ -169,15 +169,18 @@ no_cache: 1
 </div>
 
 <script>
-    let indicators_data = {{ as_json(indicators_data, indent = None) }};
-    function show_calculations(i) {
-        let raw_data = indicators_data[i].raw_data;
+    let raw_data = {{ as_json(raw_data, indent = None) }};
+    window.raw_data = raw_data
+    function show_calculations(indicator_id) {
+        let data = raw_data[indicator_id];
         let dialog = window.calculationsDialog;
-        let rows = raw_data.map(row => {
+        let rows = data.map(row => {
             return `<tr>
                 <td>${row.raw_data_name}</td>
                 <td>${row.raw_data_unit}</td>
-                <td>${row.raw_data_value}</td>
+                <td>${row.ijr_1_value}</td>
+                <td>${row.ijr_2_value}</td>
+                <td>${row.ijr_3_value}</td>
             </tr>`
         }).join('');
         dialog.innerHTML = `
@@ -185,7 +188,9 @@ no_cache: 1
                 <thead>
                     <th>Metric Name</th>
                     <th>Metric Unit</th>
-                    <th>Metric Value</th>
+                    <th>IJR 1</th>
+                    <th>IJR 2</th>
+                    <th>IJR 3</th>
                 </thead>
                 <tbody>${rows}</tbody>
             </table>
