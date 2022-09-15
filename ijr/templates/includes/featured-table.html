@@ -65,6 +65,9 @@
                         return values.includes(row[key]);
                     });
                 }
+            },
+            columnFilterOptions(column) {
+                return [...new Set(this.originalData.map(d => d[column.id]))]
             }
         }))
     });
@@ -100,7 +103,7 @@
                         <sl-select placeholder="Select values to filter" multiple clearable size="small"
                             x-on:sl-change="filterData(column.id, $event.target.value)">
 
-                            <template x-for="option in originalData.map(d => d[column.id])">
+                            <template x-for="option in columnFilterOptions(column)">
                                 <sl-menu-item x-bind:value="option" x-text="option"></sl-menu-item>
                             </template>
                         </sl-select>

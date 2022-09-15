@@ -24,6 +24,8 @@ def get_context(context):
 			fields=['*'],
 			order_by='state asc, ijr_number asc'
 		)
+		for d in context.indicator_data:
+			d.ijr_score_color = ['', 'var(--best)', 'var(--middle)', 'var(--worst)'][d.color_code or 0]
 	elif view == 'map':
 		context.indicator_data = indicator_rankings_data(indicator_id=indicator_id, ijr_number=ijr_number, cluster=cluster_filter)
 
@@ -64,10 +66,8 @@ def indicator_rankings_data(indicator_id, ijr_number, cluster):
 	for d in prev_ijr_data:
 		prev_ijr_data_by_state[d.state] = d
 
-	colors = ["var(--best)",  "var(--middle)", "var(--worst)"]
-
 	for d in data:
-		d.ijr_score_color = colors[d.color_code - 1] if d.color_code else None
+		d.ijr_score_color = ['', 'var(--best)', 'var(--middle)', 'var(--worst)'][d.color_code or 0]
 		# delta
 		d.ijr_score_delta = d.ijr_score - prev_ijr_data_by_state.get(d.state, {}).ijr_score
 		d.raw_data = frappe.db.get_all('State Indicator Raw Data',

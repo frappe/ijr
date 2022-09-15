@@ -129,12 +129,13 @@ no_cache: 1
             'label': 'Indicator',
             'id': 'indicator_name',
             'format': '''<a href="/indicator/${d.indicator_id}">${d.indicator_name}</a>''',
-            'width': 200
+            'width': 200,
+            'filter': true
         },
-        { 'label': 'IJR', 'id': 'ijr_number' },
+        { 'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': true },
         { 'label': 'Year', 'id': 'year' },
-        { 'label': 'Score', 'id': 'ijr_score' },
-        { 'label': 'Indicator Value', 'id': 'indicator_value' },
+        { 'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'right' },
+        { 'label': 'Indicator Value', 'id': 'indicator_value', 'align': 'right' },
         { 'label': 'Indicator Unit', 'id': 'indicator_unit' },
         {
             'label': 'Calculation',

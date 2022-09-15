@@ -143,9 +143,9 @@ no_cache: 1
             'filter': true,
             'format': '''<a href="/state/${d.region_code}">${d.state}</a>'''
         },
-        {'label': 'IJR', 'id': 'ijr_number'},
+        {'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': true},
         {'label': 'Year', 'id': 'year'},
-        {'label': 'Score', 'id': 'ijr_score'},
+        {'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'right'},
         {'label': 'Indicator Value', 'id': 'indicator_value'},
         {'label': 'Indicator Unit', 'id': 'indicator_unit'},
     ] -%}

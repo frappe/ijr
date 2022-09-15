@@ -54,6 +54,7 @@ def get_context(context):
 	) if pillar or theme else []
 
 	for row in indicators_data:
+		row.ijr_score_color = ['', 'var(--best)', 'var(--middle)', 'var(--worst)'][row.color_code]
 		row.raw_data = frappe.db.get_all('State Indicator Raw Data',
 			fields='*',
 			filters={
