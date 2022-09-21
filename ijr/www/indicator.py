@@ -59,6 +59,7 @@ def get_context(context):
 	context.view = view
 	context.ijr_number = ijr_number
 	context.cluster = cluster
+	context.no_cache = 1
 
 
 def indicator_rankings_data(filters, order_by):
