@@ -1,24 +1,24 @@
 <!-- variables: state_rankings, score_field, rank_field, delta_field, color_field -->
 
 <table class="table-ranking">
-  <!-- <thead>
+  <thead>
     <tr>
-      <th width="200">State</th>
-      <th width="10"></th>
-      <th width="40">Rank</th>
-      <th width="180">Score (out of 10)</th>
+      <th>State</th>
+      <th>Rank</th>
+      <th class="text-right">Score (out of 10)</th>
     </tr>
-  </thead> -->
+  </thead>
   <tbody>
     {% for d in state_rankings %}
     {% set score = d[score_field] %}
     {% set rank = d[rank_field] %}
+    {% set delta = (d[delta_field] or 0) * -1 %}
     <tr data-state="{{ d.region_code }}">
       <td width="250">
         <a href="/state/{{ d.region_code }}">{{ d.state }}</a>
       </td>
       <td align="center">{{ rank }}</td>
-      <td>
+      <td title="{{ '+' if delta > 0 else '' }}{{ delta }}">
         <div class="d-flex">
           <div class="d-flex align-items-center" style="width: 120px">
             <div class="rank-bar" style="
@@ -26,12 +26,13 @@
                 background-color: {{ d[color_field] }};
               "></div>
           </div>
-          <div class="pl-1">
-            {{ score }}
-            {% set delta = d[delta_field] * -1 %}
-            <span title="{{ '+' if delta > 0 else '' }}{{ delta }}">
-              {% if delta == 0 %} ↔ {% elif delta > 0 %} ↑ {% else %} ↓ {% endif %}
+          <div class="text-center" style="width: 16px;">
+            <span>
+              {% if delta == 0 %} &ndash; {% elif delta > 0 %} ↑ {% else %} ↓ {% endif %}
             </span>
+          </div>
+          <div class="pl-1" style="font-variant-numeric: tabular-nums;">
+            {{ "%.2f" % frappe.utils.rounded(score, 2) }}
           </div>
         </div>
       </td>

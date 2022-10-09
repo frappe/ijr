@@ -39,6 +39,7 @@ no_cache: 1
         }}
         {{ m.input_select2(
             options=[
+                {'label': 'All IJRs', 'value' : '0'} if view == 'table' else null,
                 {'label': 'IJR 1 (2019)', 'value' : '1'},
                 {'label': 'IJR 2 (2020)', 'value' : '2'},
                 {'label': 'IJR 3 (2022)', 'value' : '3'},
@@ -63,7 +64,7 @@ no_cache: 1
                     ]
                 },
                 {
-                    'group': 'Themes',
+                    'group': 'Ranked Themes',
                     'options': [
                         {'label': 'HR', 'value': 'hr'},
                         {'label': 'Diversity', 'value': 'diversity'},
@@ -82,7 +83,7 @@ no_cache: 1
         {{ m.input_select2(
             options=[
                 {'label': '4 Pillars', 'value' : 'pillars'},
-                {'label': '6 Themes', 'value' : 'themes'},
+                {'label': '3 Ranked Themes', 'value' : 'themes'},
             ],
             label='Rank by',
             value=table_view,
@@ -94,7 +95,7 @@ no_cache: 1
         {{ m.input_select2(
             options=[
                 {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
-                {'label': '7 Small States', 'value' : 'small'},
+                {'label': '7 Small States' + ('&nbsp;' * 20), 'value' : 'small'},
             ],
             label='Change Cluster',
             value=cluster,
@@ -109,7 +110,6 @@ no_cache: 1
 
 {%- if view == 'map' -%}
 <div class="mt-4">
-    <h2>States Ranked by {{ rank_by.title().replace('_', ' ') }} score</h2>
     <div class="flex justify-between" style="gap: 2rem;">
         <div class="ranking-table-container">
             {%- with state_rankings=state_rankings,
@@ -124,44 +124,45 @@ no_cache: 1
         <div class="map-container">
             {% set hover_html %}
             <div class="font-size-sm">
-                <h3>${d.state}</h3>
+                {% set max_rank = '18' if cluster == 'large-mid' else '7' %}
+                <h3>${d.state} Rankings</h3>
                 <div class="flex-between" style="gap: 0.5rem;">
                     <div>Overall Rank</div>
-                    <div>${d.overall_rank} / 18</div>
+                    <div>${d.overall_rank} of {{ max_rank }}</div>
                 </div>
                 <div class="mt-1 flex-between text-muted">
                     Pillars
                 </div>
                 <div class="flex-between" style="gap: 0.5rem;">
                     <div>Police Rank</div>
-                    <div>${d.police_rank} / 18</div>
+                    <div>${d.police_rank} of {{ max_rank }}</div>
                 </div>
                 <div class="flex-between" style="gap: 0.5rem;">
                     <div>Prisons Rank</div>
-                    <div>${d.prisons_rank} / 18</div>
+                    <div>${d.prisons_rank} of {{ max_rank }}</div>
                 </div>
                 <div class="flex-between" style="gap: 0.5rem;">
                     <div>Judiciary Rank</div>
-                    <div>${d.judiciary_rank} / 18</div>
+                    <div>${d.judiciary_rank} of {{ max_rank }}</div>
                 </div>
                 <div class="flex-between" style="gap: 0.5rem;">
                     <div>Legal Aid Rank</div>
-                    <div>${d.legal_aid_rank} / 18</div>
+                    <div>${d.legal_aid_rank} of {{ max_rank }}</div>
                 </div>
                 <div class="mt-1 flex-between text-muted">
                     Themes
                 </div>
                 <div class="flex-between" style="gap: 0.5rem;">
                     <div>HR Rank</div>
-                    <div>${d.hr_rank} / 18</div>
+                    <div>${d.hr_rank} of {{ max_rank }}</div>
                 </div>
                 <div class="flex-between" style="gap: 0.5rem;">
                     <div>Diversity Rank</div>
-                    <div>${d.diversity_rank} / 18</div>
+                    <div>${d.diversity_rank} of {{ max_rank }}</div>
                 </div>
                 <div class="flex-between" style="gap: 0.5rem;">
                     <div>Trends Rank</div>
-                    <div>${d.trends_rank} / 18</div>
+                    <div>${d.trends_rank} of {{ max_rank }}</div>
                 </div>
                 <div class="mt-2 font-size-xs">
                     <a href="/state/${d.region_code}">Go to State Page</a>
@@ -188,10 +189,12 @@ no_cache: 1
             'format': '''<a href="/state/${d.region_code}">${d.state}</a>'''
         },
         {
-            'label': 'Overall',
-            'id': 'overall_rank',
+            'label': 'IJR',
+            'id': 'ijr_number',
             'align': 'center',
-            'width': 100
+            'width': 80,
+            'filter': true,
+            'hide_condition': ijr_number != '0'
         },
         {
             'label': 'Police',
@@ -223,13 +226,16 @@ no_cache: 1
         {
             'label': 'State',
             'id': 'state',
-            'width': 250
+            'width': 250,
+            'filter': true
         },
         {
-            'label': 'Overall',
-            'id': 'overall_rank',
+            'label': 'IJR',
+            'id': 'ijr_number',
             'align': 'center',
-            'width': 100
+            'width': 80,
+            'filter': true,
+            'hide_condition': ijr_number != '0'
         },
         {
             'label': 'HR',
@@ -253,7 +259,7 @@ no_cache: 1
     {%- endif -%}
 
 
-    <div class="mt-2">
+    <div class="mt-4">
         {%- with columns=columns, data=state_rankings -%}
         {% include "templates/includes/featured-table.html" %}
         {%- endwith -%}
@@ -262,11 +268,19 @@ no_cache: 1
 {%- endif -%}
 
 <div class="mt-6 filters-toolbar">
-    <sl-button onclick="download_data()" size="small">
-        Download Data
-    </sl-button>
+    <div>
+        <sl-button size="small">
+            Notes
+        </sl-button>
+        <sl-button onclick="download_data()" size="small">
+            Download Data
+        </sl-button>
+        <sl-button size="small">
+            Download Image
+        </sl-button>
+    </div>
 
-    <div class="flex justify-between">
+    <div class="flex align-items-center">
         <sl-icon-button name="twitter" label="Share on Twitter"></sl-icon-button>
         <sl-icon-button name="linkedin" label="Share on LinkedIn"></sl-icon-button>
     </div>

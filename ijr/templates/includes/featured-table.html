@@ -1,5 +1,6 @@
 <!-- variables: columns, data -->
 {%- set context = 'featured_table_context_' + frappe.utils.generate_hash(length=4) -%}
+{% set columns = list(columns | rejectattr('hide_condition')) %}
 
 <script>
     document.addEventListener('alpine:init', () => {
@@ -78,20 +79,24 @@
         <tr>
             <template x-for="column in columns">
                 <th :width="column.width || ''" :style="{'text-align': column.align || 'left'}">
-                    <div class="flex items-center">
-                        <button
-                            style="border: none; background: transparent; width: 100%; text-align: inherit; padding: 0; outline: none;"
-                            @click="sortBy(column.id)">
-                            <span x-text="column.label">
-                            </span>
-                            <sl-icon x-show="sortByColumn == column.id"
-                                :name="sortOrder == 'asc' ? 'sort-up-alt' : 'sort-down-alt'"></sl-icon>
-                        </button>
-                        <template x-if="column.filter">
-                            <sl-icon-button @click="showFilters = !showFilters" name="filter"
-                                :label="'Filter by ' + column.label">
-                            </sl-icon-button>
-                        </template>
+                    <div class="flex align-items-center">
+                        <div x-text="column.label"></div>
+                        <div class="ml-auto flex-shrink-0">
+                            <sl-tooltip content="Sort">
+                                <sl-icon-button @click="sortBy(column.id)"
+                                    :name="sortByColumn == column.id
+                                        ? sortOrder == 'asc' ? 'sort-up-alt' : 'sort-down-alt'
+                                        : 'list-nested'"
+                                ></sl-icon-button>
+                            </sl-tooltip>
+                            <template x-if="column.filter">
+                                <sl-tooltip content="Filter">
+                                    <sl-icon-button @click="showFilters = !showFilters" name="filter-circle"
+                                        :label="'Filter by ' + column.label">
+                                    </sl-icon-button>
+                                </sl-tooltip>
+                            </template>
+                        </div>
                     </div>
                 </th>
             </template>

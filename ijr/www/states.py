@@ -11,6 +11,9 @@ def get_context(context):
 	rank_by = frappe.form_dict.rank_by or 'overall'
 	ijr_number = frappe.form_dict.ijr_number or '3'
 
+	if view == 'map' and ijr_number in ['0', 0]:
+		ijr_number = 3
+
 	cluster = frappe.form_dict.cluster or 'large-mid'
 	cluster_filter = None
 	if cluster == 'large-mid':
@@ -47,30 +50,33 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 	if cluster == 'small':
 		cluster = 'Small State'
 
-	filters = {'ijr_number': ijr_number, 'cluster': cluster}
+	filters = {'cluster': cluster}
+	if ijr_number:
+		filters['ijr_number'] = ijr_number
+
+	order_by = f'{rank_by}_score desc'
+	if ijr_number == 0:
+		order_by = 'state asc, ijr_number asc'
 
 	data = frappe.get_all('State Ranking',
 		filters=filters,
 		fields=['*'],
-		order_by=f'{rank_by}_score desc'
+		order_by=order_by
 	)
 
 	# prev ijr data for comparison
-	prev_ijr_filters = filters.copy().update({'ijr_number': ijr_number - 1})
-	prev_ijr_data = frappe.get_all('State Ranking',
-		filters=prev_ijr_filters,
-		fields=['*'],
-		order_by=f'{rank_by}_score desc'
-	)
-	prev_ijr_data_by_state = {}
-	for d in prev_ijr_data:
-		prev_ijr_data_by_state[d.state] = d
+	prev_ijr_number = ijr_number - 1 if ijr_number > 1 else None
 
-
-	colors = ["var(--best)",  "var(--middle)", "var(--worst)"]
-	legend = ['Best', 'Middle', 'Worst']
-
-	third = frappe.utils.cint(len(data) / 3)
+	if prev_ijr_number:
+		prev_ijr_filters = filters.copy().update({'ijr_number': prev_ijr_number})
+		prev_ijr_data = frappe.get_all('State Ranking',
+			filters=prev_ijr_filters,
+			fields=['*'],
+			order_by=f'{rank_by}_score desc'
+		)
+		prev_ijr_data_by_state = {}
+		for d in prev_ijr_data:
+			prev_ijr_data_by_state[d.state] = d
 
 	def get_value_type(value, max_value):
 		one_third = frappe.utils.cint(max_value / 3)
@@ -94,15 +100,16 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 		d.diversity_rank_color = get_value_type(d.diversity_rank, len(data))
 		d.trends_rank_color = get_value_type(d.trends_rank, len(data))
 
-		# delta
-		d.overall_rank_delta = d.overall_rank - prev_ijr_data_by_state[d.state].overall_rank
-		d.police_rank_delta = d.police_rank - prev_ijr_data_by_state[d.state].police_rank
-		d.prisons_rank_delta = d.prisons_rank - prev_ijr_data_by_state[d.state].prisons_rank
-		d.judiciary_rank_delta = d.judiciary_rank - prev_ijr_data_by_state[d.state].judiciary_rank
-		d.legal_aid_rank_delta = d.legal_aid_rank - prev_ijr_data_by_state[d.state].legal_aid_rank
-		d.hr_rank_delta = d.hr_rank - prev_ijr_data_by_state[d.state].hr_rank
-		d.diversity_rank_delta = d.diversity_rank - prev_ijr_data_by_state[d.state].diversity_rank
-		d.trends_rank_delta = d.trends_rank - prev_ijr_data_by_state[d.state].trends_rank
+		if prev_ijr_number:
+			# delta
+			d.overall_rank_delta = d.overall_rank - prev_ijr_data_by_state[d.state].overall_rank
+			d.police_rank_delta = d.police_rank - prev_ijr_data_by_state[d.state].police_rank
+			d.prisons_rank_delta = d.prisons_rank - prev_ijr_data_by_state[d.state].prisons_rank
+			d.judiciary_rank_delta = d.judiciary_rank - prev_ijr_data_by_state[d.state].judiciary_rank
+			d.legal_aid_rank_delta = d.legal_aid_rank - prev_ijr_data_by_state[d.state].legal_aid_rank
+			d.hr_rank_delta = d.hr_rank - prev_ijr_data_by_state[d.state].hr_rank
+			d.diversity_rank_delta = d.diversity_rank - prev_ijr_data_by_state[d.state].diversity_rank
+			d.trends_rank_delta = d.trends_rank - prev_ijr_data_by_state[d.state].trends_rank
 
 		i = i + 1
 

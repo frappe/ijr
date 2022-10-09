@@ -1,38 +1,11 @@
 <!-- Input Select -->
-{% macro input_select(options, value=None, label=None, query=None, url=None, class=None) %}
-
-{% macro select_options(options) %}
-{% for option in options %}
-<option value="{{ option.value }}" {% if option.value==value %}selected{% endif %}>{{ option.label }}</option>
-{% endfor %}
-{% endmacro %}
-
-<select class="{{ resolve_class(['custom-select font-size-sm', class]) }}"
-    {% if query %} onchange="set_query_params('{{ query }}', this.value)" {% endif %}
-    {% if url %} onchange="window.location.href = `{{ url }}`" {% endif %}
->
-    {%- if label -%}
-    <option selected disabled>{{ label }}</option>
-    {%- endif -%}
-
-    {%- for option in options -%}
-    {%- if option.group -%}
-    <optgroup label="{{ option.group }}">
-        {{ select_options(option.options) }}
-    </optgroup>
-    {%- else -%}
-    {{ select_options([option]) }}
-    {%- endif -%}
-    {%- endfor -%}
-</select>
-
-{% endmacro %}
-
 {% macro input_select2(options, value=None, label=None, query=None, url=None, class=None) %}
 
 {% macro select_options(options) %}
 {% for option in options %}
+{%- if option -%}
 <sl-menu-item value="{{ option.value }}">{{ option.label }}</sl-menu-item>
+{%- endif -%}
 {% endfor %}
 {% endmacro %}
 
@@ -45,7 +18,7 @@
     style="min-width: 160px;"
 >
     {%- for option in options -%}
-    {%- if option.group -%}
+    {%- if option and option.group -%}
     <sl-menu-label>{{ option.group }}</sl-menu-label>
     {{ select_options(option.options) }}
     {%- else -%}
