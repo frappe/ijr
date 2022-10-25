@@ -73,12 +73,12 @@
         }))
     });
 </script>
-
-<table class="featured-table" x-data="{{ context }}">
+{%- set table_classes = resolve_class(class or '') -%}
+<table class="featured-table {{ table_classes }}" x-data="{{ context }}">
     <thead>
         <tr>
             <template x-for="column in columns">
-                <th :width="column.width || ''" :style="{'text-align': column.align || 'left'}">
+                <th :width="column.width || ''" :style="{'text-align': column.align || 'left'}" :data-column="column.id">
                     <div class="flex align-items-center">
                         <div x-text="column.label"></div>
                         <div class="ml-auto flex-shrink-0">
@@ -121,7 +121,7 @@
         <template x-for="(row, i) in data">
             <tr>
                 <template x-for="column in columns">
-                    <td :style="{'text-align': column.align || 'left', 'background-color': row[column.id + '_color'] || '' }"
+                    <td :data-column="column.id" :style="{'text-align': column.align || 'left', 'background-color': row[column.id + '_color'] || '' }"
                         x-html="formatters[column.id] ? formatters[column.id](row, i) : row[column.id]">
                     </td>
                 </template>

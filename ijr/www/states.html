@@ -260,7 +260,7 @@ no_cache: 1
 
 
     <div class="mt-4">
-        {%- with columns=columns, data=state_rankings -%}
+        {%- with columns=columns, data=state_rankings, class='w-100' -%}
         {% include "templates/includes/featured-table.html" %}
         {%- endwith -%}
     </div>

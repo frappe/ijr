@@ -9,12 +9,15 @@ def get_context(context):
 	view = frappe.form_dict.view or 'map'
 	indicator_id = frappe.form_dict.indicator_id
 	ijr_number = frappe.utils.cint(frappe.form_dict.ijr_number or '3')
-	cluster = frappe.form_dict.cluster or 'large-mid'
+	default_cluster = 'large-mid' if view == 'map' else 'all'
+	cluster = frappe.form_dict.cluster or default_cluster
 	cluster_value = None
 	if cluster == 'large-mid':
 		cluster_value = 'Large / Mid State'
 	if cluster == 'small':
 		cluster_value = 'Small State'
+	if cluster == 'all':
+		cluster_value = ''
 
 	order_by = ''
 	filters = {}
@@ -22,8 +25,11 @@ def get_context(context):
 		filters = {'indicator_id': indicator_id}
 		order_by = 'state asc, ijr_number asc'
 	elif view == 'map':
-		filters = {'indicator_id': indicator_id, 'ijr_number': ijr_number, 'cluster': cluster_value}
+		filters = {'indicator_id': indicator_id, 'ijr_number': ijr_number}
 		order_by = 'ijr_score desc'
+
+	if cluster_value:
+		filters['cluster'] = cluster_value
 
 	context.indicator_data = indicator_rankings_data(filters, order_by)
 	if context.indicator_data:
@@ -39,23 +45,24 @@ def get_context(context):
 			},
 			{'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': True},
 			{'label': 'Year', 'id': 'year'},
-			{'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'right'},
-			{'label': 'Indicator Value', 'id': 'indicator_value'},
-			{'label': 'Indicator Unit', 'id': 'indicator_unit'},
+			{'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'center'},
+			{'label': 'Indicator Value', 'id': 'indicator_value', 'align': 'center'},
+			{'label': 'Indicator Unit', 'id': 'indicator_unit', 'align': 'center'},
 		]
 		if context.indicator_data:
 			for d in context.indicator_data[0].raw_data:
 				context.columns.append({
-					'label': d.raw_data_name,
+					'label': f'{d.raw_data_name} ({d.raw_data_unit})',
 					'id': d.raw_data_name,
+					'align': 'center'
 				})
 			for row in context.indicator_data:
 				for d in row.raw_data:
-					row[d.raw_data_name] = f'{d.raw_data_value} {d.raw_data_unit}'
+					row[d.raw_data_name] = f'{d.raw_data_value}'
 
 	context.raw_data = get_raw_data_by_state(indicator_id)
 	context.indicator_id = indicator_id
-	context.indicators = frappe.db.get_all('State Indicator', fields=['distinct(`indicator_id`) as value', 'indicator_name as label'], order_by='indicator_name asc')
+	context.indicators_by_pillars = get_indicators_by_pillars()
 	context.view = view
 	context.ijr_number = ijr_number
 	context.cluster = cluster
@@ -110,3 +117,13 @@ def get_raw_data_by_state(indicator_id):
 		if r.ijr_number == 1:
 			raw_data_with_all_ijrs.setdefault(r.state, []).append(data)
 	return raw_data_with_all_ijrs
+
+def get_indicators_by_pillars():
+	indicators = frappe.db.get_all('State Indicator',
+		fields=['distinct(`indicator_id`) as value', 'indicator_name as label', 'pillar'],
+		order_by='indicator_id asc'
+	)
+	indicators_by_pillars = {}
+	for i in indicators:
+		indicators_by_pillars.setdefault(i.pillar, []).append(i)
+	return indicators_by_pillars

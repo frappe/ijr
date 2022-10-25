@@ -27,14 +27,11 @@ def get_context(context):
 
 	for d in all_rankings:
 		d.ijr = f'IJR {d.ijr_number}'
-		d.overall_rank_color = get_value_color(d.overall_rank, total_rankings)
-		d.police_rank_color = get_value_color(d.police_rank, total_rankings)
-		d.prisons_rank_color = get_value_color(d.prisons_rank, total_rankings)
-		d.judiciary_rank_color = get_value_color(d.judiciary_rank, total_rankings)
-		d.legal_aid_rank_color = get_value_color(d.legal_aid_rank, total_rankings)
-		d.hr_rank_color = get_value_color(d.hr_rank, total_rankings)
-		d.diversity_rank_color = get_value_color(d.diversity_rank, total_rankings)
-		d.trends_rank_color = get_value_color(d.trends_rank, total_rankings)
+		keys = ['overall', 'police', 'prisons', 'judiciary', 'legal_aid', 'hr', 'diversity', 'trends']
+		for key in keys:
+			color = get_value_color(d.get(f'{key}_rank'), total_rankings)
+			d[f'{key}_rank_color'] = color
+			d[f'{key}_score_color'] = color
 
 	states = frappe.db.get_all('State', fields=['name', 'code', 'type'], order_by='type asc, name asc')
 	states_by_cluster = {}

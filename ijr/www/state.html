@@ -5,24 +5,27 @@ no_cache: 1
 
 <div class="title-toolbar">
     <div>
-        <sl-popup placement="bottom" id="changeStatePopup">
-            <div slot="anchor" onclick="window.changeStatePopup.active = !window.changeStatePopup.active">
-                <h1>{{ state.name }}</h1>
-            </div>
-            <div>
-                <sl-menu style="max-height: 300px">
-                    {% for cluster in states_by_cluster %}
-                    <sl-menu-label>{{ cluster }}</sl-menu-label>
-                    {% set states = states_by_cluster[cluster] %}
-                    {% for state in states %}
-                    <sl-menu-item value="{{ state.code }}" onclick="window.location.href = '/state/{{ state.code}}'">
-                        {{ state.name }}
-                    </sl-menu-item>
-                    {% endfor %}
-                    {% endfor %}
-                </sl-menu>
-            </div>
-        </sl-popup>
+        <div class="d-flex align-items-center">
+            <h1 class="mr-2">{{ state.name }}</h1>
+            <sl-tooltip content="Change State">
+                <sl-dropdown>
+                    <sl-button slot="trigger" variant="default" size="small">
+                        <sl-icon slot="suffix" name="chevron-down"></sl-icon>
+                    </sl-button>
+                    <sl-menu>
+                        {% for cluster in states_by_cluster %}
+                        <sl-menu-label>{{ cluster }}</sl-menu-label>
+                        {% set states = states_by_cluster[cluster] %}
+                        {% for state in states %}
+                        <sl-menu-item value="{{ state.code }}" onclick="window.location.href = '/state/{{ state.code}}'">
+                            {{ state.name }}
+                        </sl-menu-item>
+                        {% endfor %}
+                        {% endfor %}
+                    </sl-menu>
+                </sl-dropdown>
+            </sl-tooltip>
+        </div>
 
         <div>Score and rank done by overall analysis of scores across pillars</div>
     </div>
@@ -58,114 +61,207 @@ no_cache: 1
     </sl-button>
 </div>
 
-<div class="flex items-start justify-between mt-6">
-    <div style="width: 75%;">
-        {% if active_tab == 'Overall' %}
-        {%- set columns = [
+<div class="flex items-start justify-between mt-4">
+    {% if active_tab == 'Overall' %}
+    <div>
+    <div class="flex mb-4">
+        <div>
+            <div class="display-4">{{ current_ranking.overall_rank }}</div>
+            <div>IJR {{ current_ranking.ijr_number }} Rank</div>
+        </div>
+        <div class="ml-8">
+            <div class="display-4">{{ current_ranking.overall_score }}</div>
+            <div>IJR {{ current_ranking.ijr_number }} score</div>
+        </div>
+    </div>
+
+    {%- set columns = [
+    {
+        'label': 'IJR',
+        'id': 'ijr_number',
+        'width': 100,
+        'format': '''IJR ${d.ijr_number}'''
+    },
+    {
+        'label': 'Overall',
+        'id': 'overall_rank',
+        'align': 'center',
+        'width': 120
+    },
+    {
+        'label': 'Overall',
+        'id': 'overall_score',
+        'align': 'center',
+        'width': 120
+    },
+    {
+        'label': 'Police',
+        'id': 'police_rank',
+        'align': 'center',
+        'width': 120
+    },
+    {
+        'label': 'Police',
+        'id': 'police_score',
+        'align': 'center',
+        'width': 120
+    },
+    {
+        'label': 'Prisons',
+        'id': 'prisons_rank',
+        'align': 'center',
+        'width': 120
+    },
+    {
+        'label': 'Prisons',
+        'id': 'prisons_score',
+        'align': 'center',
+        'width': 120
+    },
+    {
+        'label': 'Judiciary',
+        'id': 'judiciary_rank',
+        'align': 'center',
+        'width': 120
+    },
+    {
+        'label': 'Judiciary',
+        'id': 'judiciary_score',
+        'align': 'center',
+        'width': 120
+    },
+    {
+        'label': 'Legal Aid',
+        'id': 'legal_aid_rank',
+        'align': 'center',
+        'width': 120
+    },
+    {
+        'label': 'Legal Aid',
+        'id': 'legal_aid_score',
+        'align': 'center',
+        'width': 120
+    },
+    ] -%}
+    {%- with data=all_rankings, columns=columns -%}
+    <h2 class="mt-4 mb-2">Pillar Ranks</h2>
+    {% include "templates/includes/featured-table.html" %}
+    {%- endwith -%}
+
+    {%- set columns = [
         {
             'label': 'IJR',
             'id': 'ijr_number',
-            'width': 80,
-            'filter': true,
+            'width': 100,
             'format': '''IJR ${d.ijr_number}'''
-        },
-        {
-            'label': 'Overall',
-            'id': 'overall_rank',
-            'align': 'center',
-            'width': 80
-        },
-        {
-            'label': 'Police',
-            'id': 'police_rank',
-            'align': 'center',
-            'width': 80
-        },
-        {
-            'label': 'Prisons',
-            'id': 'prisons_rank',
-            'align': 'center',
-            'width': 80
-        },
-        {
-            'label': 'Judiciary',
-            'id': 'judiciary_rank',
-            'align': 'center',
-            'width': 80
-        },
-        {
-            'label': 'Legal Aid',
-            'id': 'legal_aid_rank',
-            'align': 'center',
-            'width': 80
         },
         {
             'label': 'HR',
             'id': 'hr_rank',
             'align': 'center',
-            'width': 80
+            'width': 120
+        },
+        {
+            'label': 'HR',
+            'id': 'hr_score',
+            'align': 'center',
+            'width': 120
         },
         {
             'label': 'Diversity',
             'id': 'diversity_rank',
             'align': 'center',
-            'width': 80
+            'width': 120
+        },
+        {
+            'label': 'Diversity',
+            'id': 'diversity_score',
+            'align': 'center',
+            'width': 120
         },
         {
             'label': 'Trends',
             'id': 'trends_rank',
             'align': 'center',
-            'width': 80
+            'width': 120
+        },
+        {
+            'label': 'Trends',
+            'id': 'trends_score',
+            'align': 'center',
+            'width': 120
         }
-        ] -%}
-        {%- with data=all_rankings, columns=columns -%}
-        {% include "templates/includes/featured-table.html" %}
-        {%- endwith -%}
+    ] -%}
+    {%- with data=all_rankings, columns=columns -%}
+    <h2 class="mt-4 mb-2">Theme Ranks</h2>
+    {% include "templates/includes/featured-table.html" %}
+    {%- endwith -%}
 
-        {% else %}
-
-        {%- set columns = [
-        {
-            'label': 'Indicator',
-            'id': 'indicator_name',
-            'format': '''<a href="/indicator/${d.indicator_id}">${d.indicator_name}</a>''',
-            'width': 200,
-            'filter': true
-        },
-        { 'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': true },
-        { 'label': 'Year', 'id': 'year' },
-        { 'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'right' },
-        { 'label': 'Indicator Value', 'id': 'indicator_value', 'align': 'right' },
-        { 'label': 'Indicator Unit', 'id': 'indicator_unit' },
-        {
-            'label': 'Calculation',
-            'id': 'calculation',
-            'format': '''
-                if (d.indicator_id && raw_data[d.indicator_id]) {
-                    return `<a onclick="event.preventDefault(); show_calculations(${d.indicator_id});" class="" href="#">
-                        Show Calculation
-                    </a>`
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('toggleScoreData', () => ({
+                toggleScore(e) {
+                    let showScore = e.target.checked;
+                    document.querySelectorAll('.featured-table').forEach(function(table) {
+                        if (showScore) {
+                            table.classList.add('show-scores');
+                        } else {
+                            table.classList.remove('show-scores');
+                        }
+                    });
                 }
-                return ""
-            '''
-        },
-        ] -%}
-
-        {%- with data=indicators_data, columns=columns -%}
-        {% include "templates/includes/featured-table.html" %}
-        {%- endwith -%}
-
-        <sl-dialog label="Calculations" id="calculationsDialog" style="--width: max-content;">
-            <sl-button slot="footer" variant="primary">Close</sl-button>
-        </sl-dialog>
-
-        {% endif %}
+            }))
+        })
+    </script>
+    <div class="my-4" x-data="toggleScoreData">
+        <sl-switch @sl-change="toggleScore">Show Scores</sl-switch>
     </div>
+    </div>
+
     <div class="flex-shrink-0">
         {%- with state=state.code -%}
         {% include "templates/includes/india_map.html" %}
         {%- endwith -%}
     </div>
+
+    {% else %}
+
+    {%- set columns = [
+    {
+        'label': 'Indicator',
+        'id': 'indicator_name',
+        'format': '''<a href="/indicator/${d.indicator_id}">${d.indicator_name}</a>''',
+        'width': 310,
+        'filter': true
+    },
+    { 'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': true },
+    { 'label': 'Year', 'id': 'year' },
+    { 'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'right' },
+    { 'label': 'Indicator Value', 'id': 'indicator_value', 'align': 'right' },
+    { 'label': 'Indicator Unit', 'id': 'indicator_unit' },
+    {
+        'label': 'Calculation',
+        'id': 'calculation',
+        'format': '''
+            if (d.indicator_id && raw_data[d.indicator_id]) {
+                return `<a onclick="event.preventDefault(); show_calculations(${d.indicator_id});" class="" href="#">
+                    Calculation
+                </a>`
+            }
+            return ""
+        '''
+    },
+    ] -%}
+
+    {%- with data=indicators_data, columns=columns, class="w-100" -%}
+    {% include "templates/includes/featured-table.html" %}
+    {%- endwith -%}
+
+    <sl-dialog label="Calculations" id="calculationsDialog" style="--width: max-content;">
+        <sl-button slot="footer" variant="primary">Close</sl-button>
+    </sl-dialog>
+
+    {% endif %}
 </div>
 
 <script>
@@ -184,10 +280,10 @@ no_cache: 1
             </tr>`
         }).join('');
         dialog.innerHTML = `
-            <table class="table table-bordered">
+            <table class="table table-bordered table-calculations">
                 <thead>
                     <th>Metric Name</th>
-                    <th>Metric Unit</th>
+                    <th>Unit</th>
                     <th>IJR 1</th>
                     <th>IJR 2</th>
                     <th>IJR 3</th>

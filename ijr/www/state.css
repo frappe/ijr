@@ -1,29 +1,18 @@
-#india-map path {
-    opacity: 0.5;
+#india-map path:not([style*="opacity: 1"]):hover {
+    fill: var(--sl-color-gray-100) !important;
 }
 
-.score-bar {
-    width: 200px;
-    border-radius: 4px;
-    height: 1.5rem;
-    background-color: #C9DFDC;
-}
-
-.score-bar-value {
-    text-align: right;
-    padding-right: 0.5rem;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    height: 1.5rem;
-    background-color: #70A9A1;
-}
-
-.value-type {
-    padding: 0.3rem;
-    margin: -0.3rem;
-    border: 1px solid var(--dark-green);
-}
-
-.dt-dropdown__list-item[data-index="3"] {
+.featured-table [data-column*="_score"] {
     display: none;
+}
+
+.featured-table.show-scores [data-column*="_score"] {
+    display: table-cell;
+}
+.featured-table.show-scores [data-column*="_rank"] {
+    display: none;
+}
+
+.table-calculations tr:last-child td {
+    font-weight: bold;
 }

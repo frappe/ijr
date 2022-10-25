@@ -1,14 +1,32 @@
 ---
 base_template: 'templates/web.html'
+no_cache: 1
 ---
 
 {% import "templates/macros.html" as m %}
 
 <div class="title-toolbar">
     <div>
-        <a href="#" onclick="window.changeIndicatorPopup.active = !window.changeIndicatorPopup.active">
-            <h1 id="indicator-title">{{ indicator_name }}</h1>
-        </a>
+        <div class="d-flex align-items-center">
+            <h1 class="mr-2">{{ indicator_name }}</h1>
+            <sl-tooltip content="Change Indicator">
+                <sl-dropdown>
+                    <sl-button slot="trigger" variant="default" size="small">
+                        <sl-icon slot="suffix" name="chevron-down"></sl-icon>
+                    </sl-button>
+                    <sl-menu>
+                        {% for pillar, indicators in indicators_by_pillars.items() %}
+                        <sl-menu-label>{{ pillar }}</sl-menu-label>
+                        {%- for indicator in indicators -%}
+                        <sl-menu-item value="{{ indicator.value }}" onclick="window.location.href = '/indicator/{{ indicator.value }}'">
+                            {{ indicator.label }}
+                        </sl-menu-item>
+                        {%- endfor -%}
+                        {% endfor %}
+                    </sl-menu>
+                </sl-dropdown>
+            </sl-tooltip>
+        </div>
         <div>Score and rank done by overall analysis of scores across pillars</div>
     </div>
     <div class="color-legend-container">
@@ -45,21 +63,9 @@ base_template: 'templates/web.html'
             class='mr-2'
            )
         }}
-        {% if view == 'table' %}
         {{ m.input_select2(
             options=[
-                {'label': '4 Pillars', 'value' : 'pillars'},
-                {'label': '6 Themes', 'value' : 'themes'},
-            ],
-            label='Rank by',
-            value=table_view,
-            query='table_view',
-            class='mr-2'
-           )
-        }}
-        {% endif %}
-        {{ m.input_select2(
-            options=[
+                {'label': 'All States and Union Territories', 'value' : 'all'},
                 {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
                 {'label': '7 Small States', 'value' : 'small'},
             ],
@@ -74,21 +80,8 @@ base_template: 'templates/web.html'
     </sl-button>
 </div>
 
-<sl-popup placement="bottom" sync="width" id="changeIndicatorPopup" anchor="indicator-title">
-    <div>
-        <sl-menu style="max-height: 300px">
-            {% for indicator in indicators %}
-            <sl-menu-item value="{{ indicator.value }}" onclick="window.location.href = '/indicator/{{ indicator.value }}'">
-                {{ indicator.label }}
-            </sl-menu-item>
-            {% endfor %}
-        </sl-menu>
-    </div>
-</sl-popup>
-
 {%- if view == 'map' -%}
 <div class="mt-4">
-    <h2>States Ranked by score</h2>
     <div class="flex justify-between" style="gap: 2rem;">
         <div class="ranking-table-container">
             {%- with state_rankings=indicator_data,
@@ -102,7 +95,7 @@ base_template: 'templates/web.html'
 
         <div class="map-container">
             {% set hover_html %}
-            <div>
+            <div class="font-size-sm">
                 <table class="table-state-rank">
                     <thead>
                         <tr>
@@ -139,7 +132,7 @@ base_template: 'templates/web.html'
 
 {%- if view == 'table' -%}
 <div>
-    <div class="mt-2">
+    <div class="mt-2 overflow-auto">
         {%- with columns=columns, data=indicator_data -%}
         {% include "templates/includes/featured-table.html" %}
         {%- endwith -%}
