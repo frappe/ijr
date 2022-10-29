@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestStateIndicator(FrappeTestCase):
+class TestStateIndicatorData(FrappeTestCase):
 	pass

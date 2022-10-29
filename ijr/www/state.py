@@ -45,7 +45,7 @@ def get_context(context):
 	if theme:
 		indicator_filters['theme'] = theme
 
-	indicators_data = frappe.db.get_all('State Indicator',
+	indicators_data = frappe.db.get_all('State Indicator Data',
 		filters=indicator_filters,
 		fields=['*']
 	) if pillar or theme else []

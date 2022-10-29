@@ -18,6 +18,8 @@
   "overall_rank",
   "column_break_9",
   "overall_score",
+  "column_break_12",
+  "overall_color",
   "section_break_9",
   "police_rank",
   "prisons_rank",
@@ -28,6 +30,11 @@
   "prisons_score",
   "judiciary_score",
   "legal_aid_score",
+  "column_break_24",
+  "police_color",
+  "prisons_color",
+  "judiciary_color",
+  "legal_aid_color",
   "section_break_18",
   "hr_rank",
   "diversity_rank",
@@ -35,7 +42,11 @@
   "column_break_25",
   "hr_score",
   "diversity_score",
-  "trends_score"
+  "trends_score",
+  "column_break_37",
+  "hr_color",
+  "diversity_color",
+  "trends_color"
  ],
  "fields": [
   {
@@ -187,11 +198,63 @@
    "fieldname": "trends_score",
    "fieldtype": "Float",
    "label": "Trends Score"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "overall_color",
+   "fieldtype": "Int",
+   "label": "Overall Color"
+  },
+  {
+   "fieldname": "column_break_24",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "police_color",
+   "fieldtype": "Int",
+   "label": "Police Color"
+  },
+  {
+   "fieldname": "prisons_color",
+   "fieldtype": "Int",
+   "label": "Prisons Color"
+  },
+  {
+   "fieldname": "judiciary_color",
+   "fieldtype": "Int",
+   "label": "Judiciary Color"
+  },
+  {
+   "fieldname": "legal_aid_color",
+   "fieldtype": "Int",
+   "label": "Legal Aid Color"
+  },
+  {
+   "fieldname": "column_break_37",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hr_color",
+   "fieldtype": "Int",
+   "label": "HR Color"
+  },
+  {
+   "fieldname": "diversity_color",
+   "fieldtype": "Int",
+   "label": "Diversity Color"
+  },
+  {
+   "fieldname": "trends_color",
+   "fieldtype": "Int",
+   "label": "Trends Color"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-20 12:32:18.592438",
+ "modified": "2022-10-29 17:23:20.158682",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "State Ranking",

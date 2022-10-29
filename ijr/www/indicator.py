@@ -70,7 +70,7 @@ def get_context(context):
 
 
 def indicator_rankings_data(filters, order_by):
-	data = frappe.get_all('State Indicator',
+	data = frappe.get_all('State Indicator Data',
 		filters=filters,
 		fields=['*'],
 		order_by=order_by
@@ -80,7 +80,7 @@ def indicator_rankings_data(filters, order_by):
 	prev_ijr_data_by_state = {}
 	if filters.get('ijr_number'):
 		prev_ijr_filters = filters.copy().update({'ijr_number': filters.get('ijr_number') - 1})
-		prev_ijr_data = frappe.get_all('State Indicator',
+		prev_ijr_data = frappe.get_all('State Indicator Data',
 			filters=prev_ijr_filters,
 			fields=['*'],
 			order_by=order_by
@@ -119,7 +119,7 @@ def get_raw_data_by_state(indicator_id):
 	return raw_data_with_all_ijrs
 
 def get_indicators_by_pillars():
-	indicators = frappe.db.get_all('State Indicator',
+	indicators = frappe.db.get_all('State Indicator Data',
 		fields=['distinct(`indicator_id`) as value', 'indicator_name as label', 'pillar'],
 		order_by='indicator_id asc'
 	)
