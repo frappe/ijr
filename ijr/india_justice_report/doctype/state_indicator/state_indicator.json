@@ -2,38 +2,46 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "Prompt",
- "creation": "2021-11-23 17:00:44.045356",
+ "autoname": "prompt",
+ "creation": "2022-10-29 17:34:08.940527",
+ "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "code",
-  "cluster"
+  "indicator_name",
+  "pillar",
+  "theme"
  ],
  "fields": [
   {
-   "fieldname": "code",
+   "fieldname": "indicator_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Code",
-   "reqd": 1,
-   "unique": 1
+   "label": "Indicator Name",
+   "reqd": 1
   },
   {
-   "fieldname": "cluster",
+   "fieldname": "pillar",
    "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Cluster",
-   "options": "State Cluster"
+   "label": "Pillar",
+   "options": "Pillar",
+   "reqd": 1
+  },
+  {
+   "fieldname": "theme",
+   "fieldtype": "Link",
+   "label": "Theme",
+   "options": "Theme",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-01-06 14:55:01.569659",
+ "modified": "2023-01-02 12:55:33.106156",
  "modified_by": "Administrator",
  "module": "India Justice Report",
- "name": "State",
+ "name": "State Indicator",
  "naming_rule": "Set by user",
  "owner": "Administrator",
  "permissions": [

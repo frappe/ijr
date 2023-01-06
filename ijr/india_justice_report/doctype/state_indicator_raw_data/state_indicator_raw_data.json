@@ -7,8 +7,8 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "indicator_name",
   "indicator_id",
+  "indicator_name",
   "pillar",
   "theme",
   "ijr_number",
@@ -22,25 +22,34 @@
  ],
  "fields": [
   {
+   "fetch_from": "indicator_id.indicator_name",
    "fieldname": "indicator_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Indicator Name"
+   "label": "Indicator Name",
+   "read_only": 1
   },
   {
    "fieldname": "indicator_id",
-   "fieldtype": "Int",
-   "label": "Indicator ID"
+   "fieldtype": "Link",
+   "label": "Indicator ID",
+   "options": "State Indicator"
   },
   {
+   "fetch_from": "indicator_id.pillar",
    "fieldname": "pillar",
-   "fieldtype": "Data",
-   "label": "Pillar"
+   "fieldtype": "Link",
+   "label": "Pillar",
+   "options": "Pillar",
+   "read_only": 1
   },
   {
+   "fetch_from": "indicator_id.theme",
    "fieldname": "theme",
-   "fieldtype": "Data",
-   "label": "Theme"
+   "fieldtype": "Link",
+   "label": "Theme",
+   "options": "Theme",
+   "read_only": 1
   },
   {
    "fieldname": "ijr_number",
@@ -66,7 +75,8 @@
    "fetch_from": "state.code",
    "fieldname": "region_code",
    "fieldtype": "Data",
-   "label": "Region Code"
+   "label": "Region Code",
+   "read_only": 1
   },
   {
    "fieldname": "raw_data_sequence",
@@ -94,7 +104,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-15 22:40:10.441784",
+ "modified": "2023-01-06 14:08:48.382930",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "State Indicator Raw Data",

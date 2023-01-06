@@ -17,9 +17,9 @@ def get_context(context):
 	cluster = frappe.form_dict.cluster or 'large-mid'
 	cluster_filter = None
 	if cluster == 'large-mid':
-		cluster_filter = 'Large / Mid State'
+		cluster_filter = 'Large and mid-sized states'
 	if cluster == 'small':
-		cluster_filter = 'Small State'
+		cluster_filter = 'Small states'
 
 	state_rankings = state_rankings_data(ijr_number=ijr_number, cluster=cluster_filter, rank_by=rank_by)
 
@@ -46,9 +46,9 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 	ijr_number = frappe.utils.cint(ijr_number)
 
 	if cluster == 'large-mid':
-		cluster = 'Large / Mid State'
+		cluster = 'Large and mid-sized states'
 	if cluster == 'small':
-		cluster = 'Small State'
+		cluster = 'Small states'
 
 	filters = {'cluster': cluster}
 	if ijr_number:
@@ -114,6 +114,3 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 		i = i + 1
 
 	return data
-
-
-

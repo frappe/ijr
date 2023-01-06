@@ -1,0 +1,30 @@
+[
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "State Cluster",
+  "modified": "2023-01-05 18:18:58.344394",
+  "name": "Large and mid-sized states"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "State Cluster",
+  "modified": "2023-01-05 18:19:04.314958",
+  "name": "Unranked states"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "State Cluster",
+  "modified": "2023-01-05 18:19:09.390798",
+  "name": "Union Territories"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "State Cluster",
+  "modified": "2023-01-05 18:19:14.811627",
+  "name": "Small states"
+ }
+]

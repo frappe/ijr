@@ -13,9 +13,9 @@ def get_context(context):
 	cluster = frappe.form_dict.cluster or default_cluster
 	cluster_value = None
 	if cluster == 'large-mid':
-		cluster_value = 'Large / Mid State'
+		cluster_value = 'Large and mid-sized states'
 	if cluster == 'small':
-		cluster_value = 'Small State'
+		cluster_value = 'Small states'
 	if cluster == 'all':
 		cluster_value = ''
 

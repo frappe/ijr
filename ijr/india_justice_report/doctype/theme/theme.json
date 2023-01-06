@@ -1,39 +1,28 @@
 {
  "actions": [],
- "allow_import": 1,
  "allow_rename": 1,
- "autoname": "Prompt",
- "creation": "2021-11-23 17:00:44.045356",
+ "autoname": "prompt",
+ "creation": "2023-01-02 12:39:50.702054",
+ "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "code",
-  "cluster"
+  "description"
  ],
  "fields": [
   {
-   "fieldname": "code",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Code",
-   "reqd": 1,
-   "unique": 1
-  },
-  {
-   "fieldname": "cluster",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Cluster",
-   "options": "State Cluster"
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-01-06 14:55:01.569659",
+ "modified": "2023-01-02 12:39:50.702054",
  "modified_by": "Administrator",
  "module": "India Justice Report",
- "name": "State",
+ "name": "Theme",
  "naming_rule": "Set by user",
  "owner": "Administrator",
  "permissions": [

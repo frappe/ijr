@@ -33,10 +33,10 @@ def get_context(context):
 			d[f'{key}_rank_color'] = color
 			d[f'{key}_score_color'] = color
 
-	states = frappe.db.get_all('State', fields=['name', 'code', 'type'], order_by='type asc, name asc')
+	states = frappe.db.get_all('State', fields=['name', 'code', 'cluster'], order_by='cluster asc, name asc')
 	states_by_cluster = {}
 	for d in states:
-		states_by_cluster.setdefault(d.type, []).append(d)
+		states_by_cluster.setdefault(d.cluster, []).append(d)
 
 	# indicators data
 	indicator_filters = {'region_code': state_code}

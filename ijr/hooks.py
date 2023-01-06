@@ -190,3 +190,7 @@ website_route_rules = [
 # auth_hooks = [
 #	"ijr.auth.validate"
 # ]
+
+fixtures = [
+	"State Cluster"
+]
