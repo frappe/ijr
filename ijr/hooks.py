@@ -192,5 +192,7 @@ website_route_rules = [
 # ]
 
 fixtures = [
-	"State Cluster"
+	"State Cluster",
+	"Pillar",
+	"Theme"
 ]

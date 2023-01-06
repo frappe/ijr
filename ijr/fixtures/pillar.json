@@ -1,0 +1,30 @@
+[
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Pillar",
+  "modified": "2023-01-02 12:38:21.381998",
+  "name": "Police"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Pillar",
+  "modified": "2023-01-02 12:38:48.064916",
+  "name": "Prisons"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Pillar",
+  "modified": "2023-01-02 12:38:57.855209",
+  "name": "Judiciary"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Pillar",
+  "modified": "2023-01-02 12:39:09.405886",
+  "name": "Legal aid"
+ }
+]
