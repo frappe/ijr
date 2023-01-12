@@ -91,7 +91,9 @@ def indicator_rankings_data(filters, order_by):
 	for d in data:
 		d.ijr_score_color = ['', 'var(--best)', 'var(--middle)', 'var(--worst)'][d.color_code or 0]
 		# delta
-		d.ijr_score_delta = d.ijr_score - prev_ijr_data_by_state.get(d.state, {}).get('ijr_score', 0)
+		prev_ijr_score = prev_ijr_data_by_state.get(d.state, {}).get('ijr_score', 0)
+		if prev_ijr_score is not None and d.ijr_score is not None:
+			d.ijr_score_delta = d.ijr_score - prev_ijr_score
 		d.raw_data = frappe.db.get_all('State Indicator Raw Data',
 			filters={'ijr_number': d.ijr_number, 'state': d.state, 'indicator_id': d.indicator_id},
 			fields=['*'],

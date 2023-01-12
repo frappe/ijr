@@ -32,7 +32,9 @@
             </span>
           </div>
           <div class="pl-1" style="font-variant-numeric: tabular-nums;">
+            {% if score is not none %}
             {{ "%.2f" % frappe.utils.rounded(score, 2) }}
+            {% endif %}
           </div>
         </div>
       </td>

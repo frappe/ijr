@@ -133,7 +133,7 @@ no_cache: 1
 {%- if view == 'table' -%}
 <div>
     <div class="mt-2 overflow-auto">
-        {%- with columns=columns, data=indicator_data -%}
+        {%- with columns=columns, data=indicator_data, class="w-100" -%}
         {% include "templates/includes/featured-table.html" %}
         {%- endwith -%}
     </div>
