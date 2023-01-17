@@ -2,14 +2,14 @@
     fill: var(--sl-color-gray-100) !important;
 }
 
-.featured-table [data-column*="_score"] {
+.overall-tab-table [data-column*="_score"] {
     display: none;
 }
 
-.featured-table.show-scores [data-column*="_score"] {
+.overall-tab-table.show-scores [data-column*="_score"] {
     display: table-cell;
 }
-.featured-table.show-scores [data-column*="_rank"] {
+.overall-tab-table.show-scores [data-column*="_rank"] {
     display: none;
 }
 
