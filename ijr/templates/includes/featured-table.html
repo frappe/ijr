@@ -1,3 +1,4 @@
+<!-- featured-table start -->
 <!-- variables: columns, data -->
 {%- set context = 'featured_table_context_' + frappe.utils.generate_hash(length=4) -%}
 {% set columns = list(columns | rejectattr('hide_condition')) %}
@@ -88,7 +89,7 @@
     <thead>
         <tr>
             <template x-for="column in columns">
-                <th :width="column.width || ''" :style="{'text-align': column.align || 'left'}" :data-column="column.id">
+                <th :width="column.width || ''" :style="{'text-align': column.align || 'left', 'white-space': column.wrapText ? 'normal' : 'nowrap'}" :data-column="column.id">
                     <div class="flex align-items-center">
                         <div x-text="column.label"></div>
                         <div class="ml-auto flex-shrink-0">
@@ -131,7 +132,7 @@
         <template x-for="(row, i) in data">
             <tr>
                 <template x-for="column in columns">
-                    <td :data-column="column.id" :style="{'text-align': column.align || 'left', 'background-color': row[column.id + '_color'] || '' }"
+                    <td :data-column="column.id" :style="{'text-align': column.align || 'left', 'background-color': row[column.id + '_color'] || '', 'white-space': column.wrapText ? 'normal' : 'nowrap' }"
                         x-html="formatters[column.id] ? formatters[column.id](row, i) : row[column.id]">
                     </td>
                 </template>
@@ -139,3 +140,4 @@
         </template>
     </tbody>
 </table>
+<!-- featured-table end -->

@@ -45,7 +45,7 @@ def get_context(context):
 			},
 			{'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': True},
 			{'label': 'Year', 'id': 'year'},
-			{'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'center'},
+			{'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'center', 'hide_condition': cluster == 'all'},
 			{'label': 'Indicator Value', 'id': 'indicator_value', 'align': 'center'},
 			{'label': 'Indicator Unit', 'id': 'indicator_unit', 'align': 'center'},
 		]
@@ -54,7 +54,8 @@ def get_context(context):
 				context.columns.append({
 					'label': f'{d.raw_data_name} ({d.raw_data_unit})',
 					'id': d.raw_data_name,
-					'align': 'center'
+					'align': 'center',
+					'wrapText': 1
 				})
 			for row in context.indicator_data:
 				for d in row.raw_data:

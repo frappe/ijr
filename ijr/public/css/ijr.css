@@ -149,13 +149,17 @@ tr[data-state].highlight .rank-bar, tr[data-state]:hover .rank-bar {
     padding: 6px 12px 6px 12px;
 }
 
-/* table state rank */
-.table-state-rank {
+/* table indicator raw data */
+.table-indicator-raw-data {
     table-layout: fixed;
 }
 
-.table-state-rank th, .table-state-rank td {
+.table-indicator-raw-data th, .table-indicator-raw-data td {
     padding-right: 1rem;
+}
+
+.table-indicator-raw-data tr:last-child {
+    font-weight: bold;
 }
 
 /* Tabs */

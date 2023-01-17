@@ -65,7 +65,7 @@ no_cache: 1
         }}
         {{ m.input_select2(
             options=[
-                {'label': 'All States and Union Territories', 'value' : 'all'},
+                {'label': 'All States and Union Territories', 'value' : 'all'} if view == 'table' else null,
                 {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
                 {'label': '7 Small States', 'value' : 'small'},
             ],
@@ -96,10 +96,12 @@ no_cache: 1
         <div class="map-container">
             {% set hover_html %}
             <div class="font-size-sm">
-                <table class="table-state-rank">
+                <h3>${d.state}</h3>
+                <p>${d.pillar}: ${d.indicator_name}</p>
+                <table class="mt-2 table-indicator-raw-data">
                     <thead>
                         <tr>
-                            <th>Data</th>
+                            <th>Metric</th>
                             <th>Unit</th>
                             <th>IJR 1</th>
                             <th>IJR 2</th>
@@ -133,7 +135,7 @@ no_cache: 1
 {%- if view == 'table' -%}
 <div>
     <div class="mt-2 overflow-auto">
-        {%- with columns=columns, data=indicator_data, class="w-100" -%}
+        {%- with columns=columns, data=indicator_data -%}
         {% include "templates/includes/featured-table.html" %}
         {%- endwith -%}
     </div>
