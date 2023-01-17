@@ -126,7 +126,7 @@ tr[data-state].highlight .rank-bar, tr[data-state]:hover .rank-bar {
     border-radius: 6px;
     padding: 12px;
     border: 1px solid var(--sl-color-gray-200);
-    min-width: 22ch;
+    min-width: 20ch;
 }
 
 /* Featured Table */

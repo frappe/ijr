@@ -125,44 +125,44 @@ no_cache: 1
             {% set hover_html %}
             <div class="font-size-sm">
                 {% set max_rank = '18' if cluster == 'large-mid' else '7' %}
-                <h3>${d.state} Rankings</h3>
+                <h3>${d.state} Ranks (out of {{ max_rank }})</h3>
                 <div class="flex-between" style="gap: 0.5rem;">
                     <div>Overall</div>
-                    <div>${d.overall_rank} of {{ max_rank }}</div>
+                    <div>${d.overall_rank}</div>
                 </div>
-                <div class="mt-1 flex-between text-muted">
+                <div class="mt-1 flex-between" style="color: var(--sl-color-primary-600)">
                     Pillars
                 </div>
-                <div class="flex-between" style="gap: 0.5rem;">
+                <div class="flex-between pl-2" style="gap: 0.5rem;">
                     <div>Police</div>
-                    <div>${d.police_rank} of {{ max_rank }}</div>
+                    <div>${d.police_rank}</div>
                 </div>
-                <div class="flex-between" style="gap: 0.5rem;">
+                <div class="flex-between pl-2" style="gap: 0.5rem;">
                     <div>Prisons</div>
-                    <div>${d.prisons_rank} of {{ max_rank }}</div>
+                    <div>${d.prisons_rank}</div>
                 </div>
-                <div class="flex-between" style="gap: 0.5rem;">
+                <div class="flex-between pl-2" style="gap: 0.5rem;">
                     <div>Judiciary</div>
-                    <div>${d.judiciary_rank} of {{ max_rank }}</div>
+                    <div>${d.judiciary_rank}</div>
                 </div>
-                <div class="flex-between" style="gap: 0.5rem;">
+                <div class="flex-between pl-2" style="gap: 0.5rem;">
                     <div>Legal Aid</div>
-                    <div>${d.legal_aid_rank} of {{ max_rank }}</div>
+                    <div>${d.legal_aid_rank}</div>
                 </div>
-                <div class="mt-1 flex-between text-muted">
+                <div class="mt-1 flex-between" style="color: var(--sl-color-primary-600)">
                     Ranked Themes
                 </div>
-                <div class="flex-between" style="gap: 0.5rem;">
+                <div class="flex-between pl-2" style="gap: 0.5rem;">
                     <div>Human Resources</div>
-                    <div>${d.hr_rank} of {{ max_rank }}</div>
+                    <div>${d.hr_rank}</div>
                 </div>
-                <div class="flex-between" style="gap: 0.5rem;">
+                <div class="flex-between pl-2" style="gap: 0.5rem;">
                     <div>Diversity</div>
-                    <div>${d.diversity_rank} of {{ max_rank }}</div>
+                    <div>${d.diversity_rank}</div>
                 </div>
-                <div class="flex-between" style="gap: 0.5rem;">
+                <div class="flex-between pl-2" style="gap: 0.5rem;">
                     <div>Trends</div>
-                    <div>${d.trends_rank} of {{ max_rank }}</div>
+                    <div>${d.trends_rank}</div>
                 </div>
                 <div class="mt-2 font-size-xs">
                     <a href="/state/${d.region_code}">Go to State Page</a>
@@ -333,4 +333,3 @@ no_cache: 1
         })
     }
 </script>
-

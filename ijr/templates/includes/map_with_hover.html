@@ -40,13 +40,13 @@
       let $path = $(e.target);
       let state_code = $path.attr("id");
       show_state_info(state_code);
-      $(`.rankings tr[data-state="${state_code}"]`).addClass("highlight");
+      $(`.table-ranking tr[data-state="${state_code}"]`).addClass("highlight");
     });
     $state_paths.on("mouseleave", (e) => {
       let $path = $(e.target);
       let state_code = $path.attr("id");
-      $(`.rankings tr[data-state="${state_code}"]`).removeClass("highlight");
-      // reset_infobox();
+      $(`.table-ranking tr[data-state="${state_code}"]`).removeClass("highlight");
+      reset_infobox();
     });
 
     $("tr[data-state]")
@@ -78,7 +78,7 @@
     }
 
     function reset_infobox() {
-      $infobox.html(`Hover over a state to view more information`);
+      $infobox.html(`Hover over a state to see more information`);
     }
   });
 </script>
