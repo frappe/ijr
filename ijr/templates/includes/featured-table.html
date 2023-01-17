@@ -41,10 +41,30 @@
                     this.sortByColumn = column_id;
                     this.sortOrder = 'asc';
                 }
-                if (this.sortOrder == null) {
-                    this.data = this.originalData.slice()
-                } else {
-                    this.data = this.originalData.slice().sort((a, b) => {
+                this.processData()
+            },
+            filterData(key, values) {
+                this.filters[key] = values;
+                if (!values?.length) {
+                    delete this.filters[key];
+                }
+                this.processData();
+            },
+            processData() {
+                let data = this.originalData.slice();
+
+                // filters
+                for (let [key, values] of Object.entries(this.filters)) {
+                    if (values?.length) {
+                        data = data.filter((row) => {
+                            return values.includes(row[key]);
+                        });
+                    }
+                }
+
+                // sort
+                if (this.sortOrder != null) {
+                    data = data.sort((a, b) => {
                         let a_value = a[this.sortByColumn];
                         let b_value = b[this.sortByColumn];
                         if (this.sortOrder === 'asc') {
@@ -55,17 +75,7 @@
                     });
                 }
 
-            },
-            filterData(key, values) {
-                if (!values?.length) {
-                    this.filters = {}
-                    this.data = this.originalData.slice();
-                } else {
-                    this.filters = { [key]: values }
-                    this.data = this.originalData.filter((row) => {
-                        return values.includes(row[key]);
-                    });
-                }
+                this.data = data;
             },
             columnFilterOptions(column) {
                 return [...new Set(this.originalData.map(d => d[column.id]))]
