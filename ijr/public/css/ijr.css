@@ -65,6 +65,13 @@ h3 {
     border-radius: 6px;
 }
 
+.tab-group-label {
+    background-color: var(--sl-color-gray-200);
+    width: 100%;
+    text-align: center;
+    font-size: var(--sl-font-size-small);
+}
+
 .table-ranking {
     font-size: 14px;
 }
@@ -73,16 +80,32 @@ h3 {
     padding: 6px 12px 6px 12px;
 }
 
-.table-ranking tr:nth-child(odd) {
-    background-color: var(--sl-color-gray-50);
+.table-ranking tr {
+    border-bottom: 1px solid var(--sl-color-gray-100);
 }
 
 .table-ranking thead tr {
     background-color: var(--sl-color-gray-100) !important;
 }
 
+.rank-bar-container {
+    display: flex;
+    align-items: center;
+    width: 120px;
+    background-color: var(--sl-color-blue-50);
+    height: 1rem;
+}
+
 .rank-bar {
     height: 1rem;
+}
+
+.delta-increase {
+    color: var(--sl-color-green-600);
+}
+
+.delta-decrease {
+    color: var(--sl-color-red-600);
 }
 
 .table-ranking tr[data-state].highlight, .table-ranking tr[data-state]:hover {

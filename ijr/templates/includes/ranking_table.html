@@ -19,16 +19,16 @@
       </td>
       <td align="center">{{ rank }}</td>
       <td title="{{ '+' if delta > 0 else '' }}{{ delta }}">
-        <div class="d-flex">
-          <div class="d-flex align-items-center" style="width: 120px">
+        <div class="d-flex align-items-center">
+          <div class="rank-bar-container">
             <div class="rank-bar" style="
                 width: {{ (score | flt) * 120 / 10 }}px;
                 background-color: {{ d[color_field] }};
               "></div>
           </div>
           <div class="text-center" style="width: 16px;">
-            <span>
-              {% if delta == 0 %} &ndash; {% elif delta > 0 %} ↑ {% else %} ↓ {% endif %}
+            <span class="{% if delta == 0 %} delta-same {% elif delta > 0 %} delta-increase {% else %} delta-decrease {% endif %}">
+              {% if delta == 0 %} &ndash; {% elif delta > 0 %} ▲ {% else %} ▼ {% endif %}
             </span>
           </div>
           <div class="pl-1" style="font-variant-numeric: tabular-nums;">
