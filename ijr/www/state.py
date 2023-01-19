@@ -84,16 +84,25 @@ def get_raw_data_by_indicator(state_code):
 	raw_data = frappe.db.get_all('State Indicator Raw Data',
 		fields='*',
 		filters={'region_code': state_code},
-		order_by='raw_data_sequence asc, ijr_number asc'
+		order_by='raw_data_sequence asc, ijr_number asc, year asc'
 	)
 	raw_data_by_indicator = {}
 	raw_data_with_all_ijrs = {}
 	for r in raw_data:
-		key = (r.indicator_id, r.raw_data_sequence)
-		data = raw_data_by_indicator.get(key)
-		if not data:
-			data = raw_data_by_indicator[key] = r
-		data[f'ijr_{r.ijr_number}_value'] = r.raw_data_value
-		if r.ijr_number == 1:
-			raw_data_with_all_ijrs.setdefault(r.indicator_id, []).append(data)
+		if r.theme == 'Trends':
+			key = (r.indicator_id, r.ijr_number, r.year, r.raw_data_sequence)
+			data = raw_data_by_indicator.get(key)
+			if not data:
+				data = raw_data_by_indicator[key] = r
+
+			_key = f'{r.indicator_id}-{r.ijr_number}'
+			raw_data_with_all_ijrs.setdefault(_key, []).append(data)
+		else:
+			key = (r.indicator_id, r.raw_data_sequence)
+			data = raw_data_by_indicator.get(key)
+			if not data:
+				data = raw_data_by_indicator[key] = r
+			data[f'ijr_{r.ijr_number}_value'] = r.raw_data_value
+			if r.ijr_number == 1:
+				raw_data_with_all_ijrs.setdefault(r.indicator_id, []).append(data)
 	return raw_data_with_all_ijrs

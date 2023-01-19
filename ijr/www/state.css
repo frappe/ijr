@@ -13,6 +13,6 @@
     display: none;
 }
 
-.table-calculations tr:last-child td {
+.table-calculations:not(.table-calculations-trends) tr:last-child td {
     font-weight: bold;
 }

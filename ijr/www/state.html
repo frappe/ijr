@@ -270,8 +270,8 @@ no_cache: 1
         'label': 'Calculation',
         'id': 'calculation',
         'format': '''
-            if (d.indicator_id && raw_data[d.indicator_id]) {
-                return `<a onclick="event.preventDefault(); show_calculations(${d.indicator_id});" class="" href="#">
+            if (d.indicator_id && get_raw_data(d)) {
+                return `<a onclick="event.preventDefault(); show_calculations(${d.indicator_id}, ${d.ijr_number});" class="" href="#">
                     Calculation
                 </a>`
             }
@@ -311,30 +311,75 @@ no_cache: 1
 <script>
     let raw_data = {{ as_json(raw_data, indent = None) }};
     window.raw_data = raw_data
-    function show_calculations(indicator_id) {
-        let data = raw_data[indicator_id];
-        let dialog = window.calculationsDialog;
+
+    function get_raw_data({ indicator_id, ijr_number }) {
+        return raw_data[indicator_id] || raw_data[`${indicator_id}-${ijr_number}`];
+    }
+
+    function show_calculations(indicator_id, ijr_number) {
+        let data = get_raw_data({ indicator_id, ijr_number });
         let title = data[0].state
         let description = `${data[0].pillar}: ${data[0].indicator_name}`
+
+        let dialog = window.calculationsDialog;
         dialog.label = title || 'Calculations';
-        let rows = data.map(row => {
-            return `<tr>
-                <td>${row.raw_data_name}</td>
-                <td>${row.raw_data_unit}</td>
-                <td>${row.ijr_1_value}</td>
-                <td>${row.ijr_2_value}</td>
-                <td>${row.ijr_3_value}</td>
-            </tr>`
-        }).join('');
+        let header = ''
+        let rows = ''
+        let table_class = ''
+        if (data[0].theme == 'Trends') {
+            let trends_years = [];
+            let trends_data = {};
+            for (let row of data) {
+                if (!trends_years.includes(row.year)) {
+                    trends_years.push(row.year);
+                }
+                trends_data[row.year] = trends_data[row.year] || {};
+                trends_data[row.year][row.raw_data_name] = row.raw_data_value;
+            }
+
+            let sequences = [...new Set(data.map(d => d.raw_data_sequence))];
+            let raw_data_headers = sequences.map(seq => {
+                let d = data.find(d => d.raw_data_sequence == seq)
+                return `<th>${d.raw_data_name} (${d.raw_data_unit})</th>`
+            }).join('');
+            header = `
+                <th>Year</th>
+                ${raw_data_headers}
+            `;
+            rows = trends_years.map(year => {
+                return `<tr>
+                    <td>${year}</td>
+                    ${sequences.map(seq => {
+                        let d = data.find(d => d.raw_data_sequence == seq)
+                        return `<td>${trends_data[year][d.raw_data_name]}</td>`
+                    }).join('')}
+                </tr>`
+            }).join('');
+            table_class = 'table-calculations-trends'
+        } else {
+            header = `
+                <th>Metric Name</th>
+                <th>Unit</th>
+                <th>IJR 1</th>
+                <th>IJR 2</th>
+                <th>IJR 3</th>
+            `;
+            rows = data.map(row => {
+                return `<tr>
+                    <td>${row.raw_data_name}</td>
+                    <td>${row.raw_data_unit}</td>
+                    <td>${row.ijr_1_value}</td>
+                    <td>${row.ijr_2_value}</td>
+                    <td>${row.ijr_3_value}</td>
+                </tr>`
+            }).join('');
+        }
+
         dialog.innerHTML = `
             <p>${description}</p>
-            <table class="table table-bordered table-calculations">
+            <table class="table table-bordered table-calculations ${table_class}">
                 <thead>
-                    <th>Metric Name</th>
-                    <th>Unit</th>
-                    <th>IJR 1</th>
-                    <th>IJR 2</th>
-                    <th>IJR 3</th>
+                    ${header}
                 </thead>
                 <tbody>${rows}</tbody>
             </table>
