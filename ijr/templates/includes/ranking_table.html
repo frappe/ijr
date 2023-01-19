@@ -22,7 +22,7 @@
         <div class="d-flex align-items-center">
           <div class="rank-bar-container">
             <div class="rank-bar" style="
-                width: {{ (score | flt) * 120 / 10 }}px;
+                width: calc(({{ (score | flt) }} * var(--bar-width)) / 10 );
                 background-color: {{ d[color_field] }};
               "></div>
           </div>

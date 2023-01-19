@@ -29,7 +29,7 @@ no_cache: 1
         </div>
         <div>Score and rank done by overall analysis of scores across pillars</div>
     </div>
-    <div class="color-legend-container">
+    <div class="color-legend-container d-none d-md-flex">
         <div>Best</div>
         <div class="color-legend" style="background-color: var(--best)"></div>
         <div class="color-legend" style="background-color: var(--middle)"></div>
@@ -38,8 +38,8 @@ no_cache: 1
     </div>
 </div>
 
-<div class="filters-toolbar">
-    <div class="flex">
+<div class="mt-2 filters-toolbar">
+    <div class="d-flex flex-column flex-md-row w-100" style="gap: 0.5rem">
         {{ m.input_select2(
             options=[
                 {'label': 'Map View', 'value': 'map'},
@@ -47,8 +47,7 @@ no_cache: 1
             ],
             label='View',
             value=view,
-            query='view',
-            class='mr-2'
+            query='view'
            )
         }}
         {{ m.input_select2(
@@ -59,8 +58,7 @@ no_cache: 1
             ],
             label='IJR Number',
             value=ijr_number,
-            query='ijr_number',
-            class='mr-2'
+            query='ijr_number'
            )
         }}
         {{ m.input_select2(
@@ -81,8 +79,8 @@ no_cache: 1
 </div>
 
 {%- if view == 'map' -%}
-<div class="mt-4">
-    <div class="flex justify-between" style="gap: 2rem;">
+<div class="mt-2">
+    <div class="d-flex flex-column flex-md-row justify-between" style="gap: 2rem;">
         <div class="ranking-table-container">
             {%- with state_rankings=indicator_data,
                     score_field='ijr_score',
@@ -93,6 +91,13 @@ no_cache: 1
             {%- endwith -%}
         </div>
 
+        <div class="color-legend-container d-md-none">
+            <div>Best</div>
+            <div class="color-legend" style="background-color: var(--best)"></div>
+            <div class="color-legend" style="background-color: var(--middle)"></div>
+            <div class="color-legend" style="background-color: var(--worst)"></div>
+            <div>Worst</div>
+        </div>
         <div class="map-container">
             {% set hover_html %}
             <div class="font-size-sm">
@@ -133,8 +138,8 @@ no_cache: 1
 {%- endif -%}
 
 {%- if view == 'table' -%}
-<div>
-    <div class="mt-2 overflow-auto">
+<div class="mt-2 featured-table-container">
+    <div>
         {%- with columns=columns, data=indicator_data -%}
         {% include "templates/includes/featured-table.html" %}
         {%- endwith -%}

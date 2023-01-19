@@ -40,7 +40,6 @@ h3 {
 .color-legend-container {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 0.75rem;
 }
 
@@ -53,12 +52,10 @@ h3 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.5rem 0;
 }
 
 .filters-toolbar {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     padding: 0.5rem;
     background-color: var(--sl-color-gray-100);
@@ -80,7 +77,7 @@ h3 {
     padding: 6px 12px 6px 12px;
 }
 
-.table-ranking tr {
+.table-ranking tbody tr {
     border-bottom: 1px solid var(--sl-color-gray-100);
 }
 
@@ -88,10 +85,21 @@ h3 {
     background-color: var(--sl-color-gray-100) !important;
 }
 
+.table-ranking thead tr th:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.table-ranking thead tr th:last-child {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
 .rank-bar-container {
+    --bar-width: 100px;
     display: flex;
     align-items: center;
-    width: 120px;
+    width: var(--bar-width);
     background-color: var(--sl-color-blue-50);
     height: 1rem;
 }
@@ -154,6 +162,11 @@ tr[data-state].highlight .rank-bar, tr[data-state]:hover .rank-bar {
 
 /* Featured Table */
 
+.featured-table-container {
+    /* table border spacing (2px) */
+    margin: 0 -2px;
+}
+
 .featured-table {
     table-layout: fixed;
     border-collapse: separate;
@@ -162,6 +175,16 @@ tr[data-state].highlight .rank-bar, tr[data-state]:hover .rank-bar {
 
 .featured-table thead tr {
     background-color: var(--sl-color-gray-100) !important;
+}
+
+.featured-table thead th:first-of-type {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.featured-table thead th:last-of-type {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
 }
 
 .featured-table tr:nth-child(odd) {
@@ -203,4 +226,46 @@ sl-menu-label {
 }
 sl-menu-label::part(base) {
     color: var(--sl-color-primary-600);
+}
+
+.w-full-mobile {
+    width: unset;
+}
+
+.w-full-desktop {
+    width: 100%;
+}
+
+/* styles for mobile view */
+@media (max-width: 767px) {
+    .title-toolbar {
+        flex-direction: column;
+    }
+
+    .filters-toolbar {
+        flex-direction: column;
+    }
+
+    .rank-bar-container {
+        --bar-width: 60px;
+    }
+
+    .featured-table-container {
+        overflow: auto;
+        /* container padding (1.5rem) + table border spacing (2px) */
+        margin: 0 calc(-1.5rem - 2px);
+    }
+
+    .featured-table {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .w-full-mobile {
+        width: 100%;
+    }
+
+    .w-full-desktop {
+        width: unset;
+    }
 }

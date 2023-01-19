@@ -29,7 +29,7 @@ no_cache: 1
 
         <div>Score and rank done by overall analysis of scores across pillars</div>
     </div>
-    <div class="color-legend-container">
+    <div class="color-legend-container d-none d-md-flex">
         <div>Best</div>
         <div class="color-legend" style="background-color: var(--best)"></div>
         <div class="color-legend" style="background-color: var(--middle)"></div>
@@ -44,7 +44,7 @@ no_cache: 1
 </sl-tab>
 {% endmacro %}
 
-<div class="filters-toolbar">
+<div class="mt-2 filters-toolbar">
     {%- set pillar_tabs = [
     {'label': 'Police', 'onclick': "set_query_params('pillar', 'Police', true)"},
     {'label': 'Prisons', 'onclick': "set_query_params('pillar', 'Prisons', true)"},
@@ -57,7 +57,7 @@ no_cache: 1
     {'label': 'Diversity', 'onclick': "set_query_params('theme', 'Diversity', true)"},
     {'label': 'Trends', 'onclick': "set_query_params('theme', 'Trends', true)"},
     ] -%}
-    <div class="d-flex align-items-end">
+    <div class="d-flex flex-column flex-md-row align-items-md-end" style="gap: 0.5rem">
         {{ render_tab({'label': 'Overall', 'onclick': "window.location.href = '/state/" + state.code + "'"}) }}
         <div>
             <label class="tab-group-label">Pillars</label>
@@ -67,7 +67,7 @@ no_cache: 1
                 {% endfor %}
             </div>
         </div>
-        <div class="ml-2">
+        <div>
             <label class="tab-group-label">Ranked Themes</label>
             <div class="d-flex align-items-center">
                 {% for tab in theme_tabs %}
@@ -81,20 +81,23 @@ no_cache: 1
     </sl-button>
 </div>
 
-<div class="mt-4">
+
     {% if active_tab == 'Overall' %}
+    <div class="mt-2 flex">
+        <div>
+            <div class="display-4">{{ current_ranking.overall_rank }}</div>
+            <div>IJR {{ current_ranking.ijr_number }} Rank</div>
+        </div>
+        <div class="ml-8">
+            <div class="display-4">{{ current_ranking.overall_score }}</div>
+            <div>IJR {{ current_ranking.ijr_number }} score</div>
+        </div>
+    </div>
+
+    <div class="mt-2 featured-table-container">
+    <!-- #region Overall -->
     <div class="flex items-start justify-between">
         <div>
-            <div class="flex mb-4">
-                <div>
-                    <div class="display-4">{{ current_ranking.overall_rank }}</div>
-                    <div>IJR {{ current_ranking.ijr_number }} Rank</div>
-                </div>
-                <div class="ml-8">
-                    <div class="display-4">{{ current_ranking.overall_score }}</div>
-                    <div>IJR {{ current_ranking.ijr_number }} score</div>
-                </div>
-            </div>
 
             {%- set columns = [
             {
@@ -165,7 +168,7 @@ no_cache: 1
             },
             ] -%}
             {%- with data=all_rankings, columns=columns, class="overall-tab-table" -%}
-            <h2 class="mt-4 mb-2">Pillar Ranks</h2>
+            <h2 class="mt-4 mb-2 pl-6 pl-md-0">Pillar Ranks</h2>
             {% include "templates/includes/featured-table.html" %}
             {%- endwith -%}
 
@@ -214,7 +217,7 @@ no_cache: 1
                 }
             ] -%}
             {%- with data=all_rankings, columns=columns, class="overall-tab-table" -%}
-            <h2 class="mt-4 mb-2">Theme Ranks</h2>
+            <h2 class="mt-4 mb-2 pl-6 pl-md-0">Theme Ranks</h2>
             {% include "templates/includes/featured-table.html" %}
             {%- endwith -%}
 
@@ -234,20 +237,21 @@ no_cache: 1
                     }))
                 })
             </script>
-            <div class="my-4" x-data="toggleScoreData">
+            <div class="my-4 pl-6 pl-md-0" x-data="toggleScoreData">
                 <sl-switch @sl-change="toggleScore">Show Scores</sl-switch>
             </div>
         </div>
 
-        <div class="flex-shrink-0">
+        <div class="flex-shrink-0 d-none d-md-block">
             {%- with state=state.code -%}
             {% include "templates/includes/india_map.html" %}
             {%- endwith -%}
         </div>
     </div>
-
+    <!-- endregion -->
+    </div>
     {% else %}
-
+    <div class="mt-2 featured-table-container">
     {%- set columns = [
     {
         'label': 'Indicator',
@@ -275,32 +279,33 @@ no_cache: 1
         '''
     },
     ] -%}
-
-    {%- with data=indicators_data, columns=columns, class="w-100" -%}
-    {% include "templates/includes/featured-table.html" %}
-    {%- endwith -%}
-
-    <div class="mt-6 filters-toolbar">
-        <div>
-            <sl-button size="small">
-                Notes
-            </sl-button>
-            <sl-button size="small">
-                Download Data
-            </sl-button>
-        </div>
-
-        <div class="flex align-items-center">
-            <sl-icon-button name="twitter" label="Share on Twitter"></sl-icon-button>
-            <sl-icon-button name="linkedin" label="Share on LinkedIn"></sl-icon-button>
-        </div>
+    <div>
+        {%- with data=indicators_data, columns=columns, class="w-full-desktop" -%}
+        {% include "templates/includes/featured-table.html" %}
+        {%- endwith -%}
     </div>
 
     <sl-dialog label="Calculations" id="calculationsDialog" style="--width: max-content;">
         <sl-button slot="footer" variant="primary">Close</sl-button>
     </sl-dialog>
+    </div>
 
-    {% endif %}
+{% endif %}
+
+<div class="mt-6 filters-toolbar">
+    <div>
+        <sl-button size="small">
+            Notes
+        </sl-button>
+        <sl-button size="small">
+            Download Data
+        </sl-button>
+    </div>
+
+    <div class="flex align-items-center">
+        <sl-icon-button name="twitter" label="Share on Twitter"></sl-icon-button>
+        <sl-icon-button name="linkedin" label="Share on LinkedIn"></sl-icon-button>
+    </div>
 </div>
 
 <script>
