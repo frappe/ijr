@@ -4,9 +4,11 @@
 {% include "templates/includes/india_map.html" %}
 {%- endwith -%}
 
-<div class="info-box d-none d-md-block">
-  Hover over a state to view more information
-</div>
+<sl-popup id="map-popup" placement="right-start">
+    <div class="info-box d-none d-md-block">
+      Hover over a state to view more information
+    </div>
+</sl-popup>
 
 <!-- prettier-ignore -->
 {% set ranked_states = frappe.db.get_all('State Ranking', {'ijr_number': 3}, pluck='region_code') %}
@@ -18,6 +20,9 @@
   frappe.ready(() => {
     let $state_paths = $("#india-map path");
     let $infobox = $(".info-box");
+    let $popup = document.getElementById("map-popup");
+
+    document.body.appendChild($popup);
 
     $state_paths.attr("disabled", true);
 
@@ -41,12 +46,20 @@
       let state_code = $path.attr("id");
       show_state_info(state_code);
       $(`.table-ranking tr[data-state="${state_code}"]`).addClass("highlight");
+
+      $popup.setAttribute('active', true);
+      $popup.setAttribute('anchor', state_code);
+      $popup.reposition();
     });
     $state_paths.on("mouseleave", (e) => {
       let $path = $(e.target);
       let state_code = $path.attr("id");
       $(`.table-ranking tr[data-state="${state_code}"]`).removeClass("highlight");
       reset_infobox();
+
+      $popup.removeAttribute('active');
+      $popup.removeAttribute('anchor');
+      $popup.reposition();
     });
 
     $("tr[data-state]")

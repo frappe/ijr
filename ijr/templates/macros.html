@@ -35,5 +35,14 @@
 {%- with state_rankings=state_rankings, state=zoom_state, hover_html=hover_html -%}
 {% include "templates/includes/map_with_hover.html" %}
 {%- endwith -%}
+{% endmacro %}
 
+{% macro color_legend(class) %}
+<div class="color-legend-container {{ resolve_class(class) }}">
+    <div>Best</div>
+    <div class="color-legend best ml-2" style="background-color: var(--best)"></div>
+    <div class="color-legend middle" style="background-color: var(--middle)"></div>
+    <div class="color-legend worst mr-2" style="background-color: var(--worst)"></div>
+    <div>Worst</div>
+</div>
 {% endmacro %}

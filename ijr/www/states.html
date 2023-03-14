@@ -4,26 +4,90 @@ no_cache: 1
 ---
 
 {% import "templates/macros.html" as m %}
+
+<div class="flex mt-4">
+
+{% macro sidebar_item(label, value) %}
+<a href="#" query="rank_by={{ value }}" class="sidebar-nav-item {{ 'active' if rank_by == value else '' }}">{{ label }}</a>
+{% endmacro %}
+
+
+<!-- Sidebar -->
+<div class="sidebar-nav d-none d-md-flex">
+    {{ sidebar_item('Overall', 'overall') }}
+    {{ sidebar_item('Police', 'police') }}
+    {{ sidebar_item('Prisons', 'prisons') }}
+    {{ sidebar_item('Judiciary', 'judiciary') }}
+    {{ sidebar_item('Legal Aid', 'legal_aid') }}
+    {{ sidebar_item('Human Resources', 'hr') }}
+    {{ sidebar_item('Diversity', 'diversity') }}
+    {{ sidebar_item('Trends', 'trends') }}
+</div>
+
+<div class="w-100">
+<!-- Main content -->
 <div class="title-toolbar">
     <div>
-        <h1>
-            {% if rank_by == 'overall' %}
-                Overall State Ranking
-            {% else %}
-                States Ranked by {{ rank_by.title().replace('_', ' ') }} score
-            {% endif %}
-        </h1>
-        <div>Score and rank done by overall analysis of scores across pillars</div>
+        <div class="d-flex align-items-center">
+            <h1>
+                {% if rank_by == 'overall' %}
+                    Overall State Ranking in
+                {% else %}
+                    States Ranked by {{ rank_by.title().replace('_', ' ') }} score in
+                {% endif %}
+            </h1>
+            &nbsp;
+            <select class="ijr-select" name="ijr_number" query="ijr_number">
+                {%- set ijr_options = [
+                    {'label': 'All IJRs', 'value' : '0'} if view == 'table' else null,
+                    {'label': 'IJR 1 (2019)', 'value' : '1'},
+                    {'label': 'IJR 2 (2020)', 'value' : '2'},
+                    {'label': 'IJR 3 (2022)', 'value' : '3'},
+                ] -%}
+                {% for option in ijr_options %}
+                {% if option %}
+                <option value="{{ option.value }}" {{ "selected" if option.value == ijr_number else "" }}>
+                    {{ option.label }}
+                </option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="d-md-none">
+            Score and rank done by overall analysis of scores across pillars
+        </div>
     </div>
-    <div class="color-legend-container d-none d-md-flex">
-        <div>Best</div>
-        <div class="color-legend" style="background-color: var(--best)"></div>
-        <div class="color-legend" style="background-color: var(--middle)"></div>
-        <div class="color-legend" style="background-color: var(--worst)"></div>
-        <div>Worst</div>
+
+
+    <div class="d-flex mt-4 mt-md-0">
+        <select class="cluster-select" name="cluster" query="cluster">
+        {%- set cluster_options = [
+            {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
+            {'label': '7 Small States' + ('&nbsp;' * 20), 'value' : 'small'},
+        ] -%}
+        {% for option in cluster_options %}
+        <option value="{{ option.value }}" {{ "selected" if option.value == cluster else "" }}>
+            {{ option.label }}
+        </option>
+        {% endfor %}
+        </select>
+
+        <div class="ml-2 view-switcher">
+            {% for option in [['Map', 'map'], ['Table', 'table']] %}
+            <a href="#" query="view={{ option[1] }}" class="{{ 'active' if option[1] == view else '' }}">{{ option[0] }}</a>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
+<div class="d-flex justify-content-between mb-4 mt-2">
+    <div class="d-none d-md-block">
+        Score and rank done by overall analysis of scores across pillars
+    </div>
+    {{ m.color_legend(class='d-none d-md-flex') }}
+</div>
+
+{#
 <div class="mt-2 filters-toolbar">
     <div class="d-flex flex-column flex-md-row w-100" style="gap: 0.5rem">
         {{ m.input_select2(
@@ -99,10 +163,8 @@ no_cache: 1
            )
         }}
     </div>
-    <sl-button onclick="show_how_to_read()" size="small" variant="text">
-        How to read this page?
-    </sl-button>
 </div>
+#}
 
 {%- if view == 'map' -%}
 <div class="mt-2">
@@ -117,59 +179,54 @@ no_cache: 1
             {%- endwith -%}
         </div>
 
-        <div class="color-legend-container d-md-none">
-            <div>Best</div>
-            <div class="color-legend" style="background-color: var(--best)"></div>
-            <div class="color-legend" style="background-color: var(--middle)"></div>
-            <div class="color-legend" style="background-color: var(--worst)"></div>
-            <div>Worst</div>
-        </div>
+        {{ m.color_legend(class='d-md-none') }}
+
         <div class="map-container">
             {% set hover_html %}
-            <div class="font-size-sm">
+            <div>
                 {% set max_rank = '18' if cluster == 'large-mid' else '7' %}
-                <h3>${d.state} Ranks (out of {{ max_rank }})</h3>
-                <div class="flex-between" style="gap: 0.5rem;">
+                <div class="mb-3">
+                    <h3>${d.state}</h3>
+                    <div class="font-size-xs text-muted">Ranks (out of {{ max_rank }})</div>
+                </div>
+                <div class="info-box-score mb-3">
                     <div>Overall</div>
                     <div>${d.overall_rank}</div>
                 </div>
-                <div class="mt-1 flex-between" style="color: var(--sl-color-primary-600)">
+                <div class="info-box-label mb-2">
                     Pillars
                 </div>
-                <div class="flex-between pl-2" style="gap: 0.5rem;">
+                <div class="info-box-score border-bottom">
                     <div>Police</div>
                     <div>${d.police_rank}</div>
                 </div>
-                <div class="flex-between pl-2" style="gap: 0.5rem;">
+                <div class="info-box-score border-bottom">
                     <div>Prisons</div>
                     <div>${d.prisons_rank}</div>
                 </div>
-                <div class="flex-between pl-2" style="gap: 0.5rem;">
+                <div class="info-box-score border-bottom">
                     <div>Judiciary</div>
                     <div>${d.judiciary_rank}</div>
                 </div>
-                <div class="flex-between pl-2" style="gap: 0.5rem;">
+                <div class="info-box-score">
                     <div>Legal Aid</div>
                     <div>${d.legal_aid_rank}</div>
                 </div>
-                <div class="mt-1 flex-between" style="color: var(--sl-color-primary-600)">
+                <div class="info-box-label mt-3 mb-2">
                     Ranked Themes
                 </div>
-                <div class="flex-between pl-2" style="gap: 0.5rem;">
+                <div class="info-box-score border-bottom">
                     <div>Human Resources</div>
                     <div>${d.hr_rank}</div>
                 </div>
-                <div class="flex-between pl-2" style="gap: 0.5rem;">
+                <div class="info-box-score border-bottom">
                     <div>Diversity</div>
                     <div>${d.diversity_rank}</div>
                 </div>
-                <div class="flex-between pl-2" style="gap: 0.5rem;">
+                <div class="info-box-score">
                     <div>Trends</div>
                     <div>${d.trends_rank}</div>
                 </div>
-                <div class="mt-2 font-size-xs">
-                    <a href="/state/${d.region_code}">Go to State Page</a>
-                <div>
             </div>
             {% endset %}
             {%- with state_rankings=state_rankings, color_field=rank_by + '_rank_color', hover_html=hover_html -%}
@@ -276,22 +333,28 @@ no_cache: 1
 </div>
 {%- endif -%}
 
-<div class="mt-6 filters-toolbar">
+</div>
+
+</div>
+
+<div class="mt-6 bottom-toolbar">
     <div>
-        <sl-button size="small">
-            Notes
-        </sl-button>
-        <sl-button onclick="download_data()" size="small">
+        <sl-button size="small" variant="text">Notes</sl-button>
+        <sl-button onclick="download_data()" size="small" variant="text">
             Download Data
         </sl-button>
-        <sl-button size="small">
+        <sl-button size="small" variant="text">
             Download Image
         </sl-button>
     </div>
 
-    <div class="flex align-items-center">
+    <div class="d-flex  align-items-center">
         <sl-icon-button name="twitter" label="Share on Twitter"></sl-icon-button>
         <sl-icon-button name="linkedin" label="Share on LinkedIn"></sl-icon-button>
+        <sl-button onclick="show_how_to_read()" size="small" variant="text">
+            <sl-icon slot="prefix" name="chat-square-dots"></sl-icon>
+            How to read this page?
+        </sl-button>
     </div>
 </div>
 

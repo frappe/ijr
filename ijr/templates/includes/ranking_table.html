@@ -3,9 +3,9 @@
 <table class="table-ranking">
   <thead>
     <tr>
-      <th>State</th>
       <th>Rank</th>
-      <th class="text-right">Score (out of 10)</th>
+      <th>State</th>
+      <th class="text-right whitespace-nowrap">Score (out of 10)</th>
     </tr>
   </thead>
   <tbody>
@@ -14,10 +14,12 @@
     {% set rank = d[rank_field] %}
     {% set delta = (d[delta_field] or 0) * -1 %}
     <tr data-state="{{ d.region_code }}">
-      <td width="250">
-        <a href="/state/{{ d.region_code }}">{{ d.state }}</a>
+      <td align="center">
+        <div class="rank-circle">{{ rank }}</div>
       </td>
-      <td align="center">{{ rank }}</td>
+      <td width="250">
+        <a href="/state/{{ d.region_code }}" style="font-weight:500">{{ d.state }}</a>
+      </td>
       <td title="{{ '+' if delta > 0 else '' }}{{ delta }}">
         <div class="d-flex align-items-center">
           <div class="rank-bar-container">
