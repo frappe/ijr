@@ -32,12 +32,12 @@ def get_context(context):
 	rank_by_title = 'Overall'
 	description = 'Performance across police, prisons, judiciary and legal aid'
 	if rank_by != 'overall':
-		if _pillar := frappe.db.get_value('Pillar', {'slug': rank_by}, ['name', 'description']):
-			rank_by_title = _pillar[0]
-			description = _pillar[1]
-		elif _theme := frappe.db.get_value('Theme', {'slug': rank_by}, ['name', 'description']):
-			rank_by_title = _theme[0]
-			description = _theme[1]
+		if _pillar := get_pillar(rank_by):
+			rank_by_title = _pillar.name
+			description = _pillar.description
+		elif _theme := get_theme(rank_by):
+			rank_by_title = _theme.name
+			description = _theme.description
 
 	context.title = title
 	context.description = description
@@ -90,27 +90,17 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 		for d in prev_ijr_data:
 			prev_ijr_data_by_state[d.state] = d
 
-	def get_value_type(value, max_value):
-		one_third = frappe.utils.cint(max_value / 3)
-		best_values = one_third
-		middle_values = 2 * one_third
-
-		if value <= best_values:
-			return 'var(--best)'
-		if value <= middle_values:
-			return 'var(--middle)'
-		return 'var(--worst)'
+	color_map = {
+		1: 'var(--best)',
+		2: 'var(--middle)',
+		3: 'var(--worst)'
+	}
 
 	i = 0
 	for d in data:
-		d.overall_rank_color = get_value_type(d.overall_rank, len(data))
-		d.police_rank_color = get_value_type(d.police_rank, len(data))
-		d.prisons_rank_color = get_value_type(d.prisons_rank, len(data))
-		d.judiciary_rank_color = get_value_type(d.judiciary_rank, len(data))
-		d.legal_aid_rank_color = get_value_type(d.legal_aid_rank, len(data))
-		d.hr_rank_color = get_value_type(d.hr_rank, len(data))
-		d.diversity_rank_color = get_value_type(d.diversity_rank, len(data))
-		d.trends_rank_color = get_value_type(d.trends_rank, len(data))
+		for k in ['overall', 'police', 'prisons', 'judiciary', 'legal_aid', 'hr', 'diversity', 'trends']:
+			color_code = d[f'{k}_color']
+			d[f'{k}_rank_color'] = color_map.get(color_code) or 'var(--brand-color)'
 
 		if prev_ijr_number:
 			# delta
@@ -126,3 +116,11 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 		i = i + 1
 
 	return data
+
+def get_pillar(slug=None):
+	if not slug: return
+	return frappe.db.get_value('Pillar', {'slug': slug}, '*', as_dict=True)
+
+def get_theme(slug=None):
+	if not slug: return
+	return frappe.db.get_value('Theme', {'slug': slug}, '*', as_dict=True)

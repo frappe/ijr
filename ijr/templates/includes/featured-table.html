@@ -19,6 +19,12 @@
         {% endif %}
         {% endfor %}
 
+        columns.forEach(col => {
+            if (col.sort == null) {
+                col.sort = true;
+            }
+        })
+
         Alpine.data('{{ context }}', () => ({
             columns,
             originalData: JSON.parse(JSON.stringify(data)),
@@ -93,13 +99,15 @@
                     <div class="flex align-items-center">
                         <div x-text="column.label"></div>
                         <div class="ml-auto flex-shrink-0">
-                            <sl-tooltip content="Sort">
-                                <sl-icon-button @click="sortBy(column.id)"
-                                    :name="sortByColumn == column.id
-                                        ? sortOrder == 'asc' ? 'sort-up-alt' : 'sort-down-alt'
-                                        : 'list-nested'"
-                                ></sl-icon-button>
-                            </sl-tooltip>
+                            <template x-if="column.sort">
+                                <sl-tooltip content="Sort">
+                                    <sl-icon-button @click="sortBy(column.id)"
+                                        :name="sortByColumn == column.id
+                                            ? sortOrder == 'asc' ? 'sort-up-alt' : 'sort-down-alt'
+                                            : 'list-nested'"
+                                    ></sl-icon-button>
+                                </sl-tooltip>
+                            </template>
                             <template x-if="column.filter">
                                 <sl-tooltip content="Filter">
                                     <sl-icon-button @click="showFilters = !showFilters" name="filter-circle"

@@ -3,12 +3,20 @@
 
 from __future__ import unicode_literals
 import frappe
+from ijr.www.states import get_pillar, get_theme
 
 
 def get_context(context):
 	state_code = frappe.form_dict.state
 	pillar = frappe.form_dict.pillar or None
 	theme = frappe.form_dict.theme or None
+
+	_pillar = get_pillar(pillar)
+	_theme = get_theme(theme)
+	if _pillar:
+		pillar = _pillar.name
+	if _theme:
+		theme = _theme.name
 
 	ijr_number = 3
 	state = frappe.get_doc('State', {'code': state_code})

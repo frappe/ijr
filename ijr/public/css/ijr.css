@@ -106,12 +106,23 @@ a:hover {
     color: white;
 }
 
-.ijr-select {
+.sidebar-nav-label {
+    font-size: 11px;
+    color: var(--sl-color-gray-500);
+    margin: 0.5rem 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+}
+
+.ijr-select, .state-select {
     appearance: none;
     border: none;
-    font-size: 22px;
     font-weight: 600;
     color: var(--brand-color);
+    font-size: 16px;
+    transform: scale(1.375);
+    transform-origin: left;
 
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230043EE' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.5rem center;
@@ -142,14 +153,16 @@ a:hover {
 }
 
 .view-switcher {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     padding: 2px;
     border-radius: var(--border-radius);
     background-color: var(--sl-color-gray-100);
 }
 
-.view-switcher a {
+.view-switcher a, .view-switcher button {
+    background-color: transparent;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -161,10 +174,18 @@ a:hover {
     line-height: 1;
 }
 
-.view-switcher a.active {
+.view-switcher a.active, .view-switcher button.active {
     color: var(--sl-color-gray-900);
     background-color: white;
     box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.12), 0px 0.5px 2px rgba(0, 0, 0, 0.15), 0px 2px 3px rgba(0, 0, 0, 0.05);
+}
+
+.view-switcher button:focus {
+    outline: none;
+}
+
+.view-switcher button:focus-visible {
+    outline: auto;
 }
 
 .color-legend-container {
@@ -216,6 +237,23 @@ a:hover {
     width: 100%;
     text-align: center;
     font-size: var(--sl-font-size-small);
+}
+
+.state-rank-number .title {
+    display: inline-flex;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--sl-color-gray-900);
+    padding: 0.5rem 0.75rem;
+    background-color: var(--sl-color-gray-100);
+    border-radius: var(--border-radius);
+    line-height: 1.1;
+}
+
+.state-rank-number .description {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-600);
 }
 
 .table-ranking {
@@ -356,6 +394,7 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
 .featured-table-container {
     /* table border spacing (2px) */
     margin: 0 -2px;
+    overflow: auto;
 }
 
 .featured-table {

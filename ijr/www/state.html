@@ -3,38 +3,76 @@ base_template: 'templates/web.html'
 no_cache: 1
 ---
 
+{% import "templates/macros.html" as m %}
+
+<div class="flex">
+    <!-- Sidebar -->
+    <div class="sidebar-nav d-none d-md-flex">
+        {% macro sidebar_item(label, value) %}
+        <a
+            class="sidebar-nav-item {{ 'active' if active_tab == label else '' }}"
+            {%- if value %}
+            href="#"
+            query="{{ value }}"
+            {%- else %}
+            href="/state/{{ state.code }}"
+            {%- endif %}
+        >
+            {{ label }}
+        </a>
+        {% endmacro %}
+
+        {{ sidebar_item('Overall', '') }}
+        <label class="sidebar-nav-label">Pillars</label>
+        {{ sidebar_item('Police', 'pillar=police') }}
+        {{ sidebar_item('Prisons', 'pillar=prisons') }}
+        {{ sidebar_item('Judiciary', 'pillar=judiciary') }}
+        {{ sidebar_item('Legal Aid', 'pillar=legal_aid') }}
+        <label class="sidebar-nav-label">Ranked Themes</label>
+        {{ sidebar_item('Human Resources', 'theme=hr') }}
+        {{ sidebar_item('Diversity', 'theme=diversity') }}
+        {{ sidebar_item('Trends', 'theme=trends') }}
+    </div>
+
+<div class="w-100">
+<!-- Main Content -->
+
 <div class="title-toolbar">
     <div>
         <div class="d-flex align-items-center">
-            <h1 class="mr-2">{{ state.name }}</h1>
-            <sl-tooltip content="Change State">
-                <sl-dropdown>
-                    <sl-button slot="trigger" variant="default" size="small">
-                        <sl-icon slot="suffix" name="chevron-down"></sl-icon>
-                    </sl-button>
-                    <sl-menu>
+            <h1>
+                <span class="sr-only">
+                    {{ state.name }}
+                </span>
+                <select class="state-select pl-0" onchange="window.location.href = '/state/' + this.value">
                         {% for cluster in states_by_cluster %}
-                        <sl-menu-label>{{ cluster }}</sl-menu-label>
+                        <optgroup label="{{ cluster }}">
                         {% set states = states_by_cluster[cluster] %}
-                        {% for state in states %}
-                        <sl-menu-item value="{{ state.code }}" onclick="window.location.href = '/state/{{ state.code}}'">
-                            {{ state.name }}
-                        </sl-menu-item>
+                        {% for _state in states %}
+                        <option value="{{ _state.code }}" {{ 'selected' if state.code == _state.code }}>
+                            {{ _state.name }}
+                        </option>
                         {% endfor %}
+                        </optgroup>
                         {% endfor %}
-                    </sl-menu>
-                </sl-dropdown>
-            </sl-tooltip>
+                </select>
+            </h1>
         </div>
 
-        <div>Score and rank done by overall analysis of scores across pillars</div>
+        <div class="mt-2">Score and rank done by overall analysis of scores across pillars</div>
     </div>
-    <div class="color-legend-container d-none d-md-flex">
-        <div>Best</div>
-        <div class="color-legend" style="background-color: var(--best)"></div>
-        <div class="color-legend" style="background-color: var(--middle)"></div>
-        <div class="color-legend" style="background-color: var(--worst)"></div>
-        <div>Worst</div>
+    <div class="text-right">
+        {% if active_tab == 'Overall' %}
+        <div class="view-switcher mb-2" x-data="toggleScoreData">
+            <button @click="toggleScore('Rank')" :class="currentValue == 'Rank' && 'active'">
+                Rank
+            </button>
+            <button @click="toggleScore('Score')" :class="currentValue == 'Score' && 'active'">
+                Score
+            </button>
+        </div>
+        {% endif %}
+        {{ m.color_legend(class='d-none d-md-flex') }}
     </div>
 </div>
 
@@ -44,6 +82,7 @@ no_cache: 1
 </sl-tab>
 {% endmacro %}
 
+{#
 <div class="mt-2 filters-toolbar">
     {%- set pillar_tabs = [
     {'label': 'Police', 'onclick': "set_query_params('pillar', 'Police', true)"},
@@ -76,21 +115,19 @@ no_cache: 1
             </div>
         </div>
     </div>
-    <sl-button onclick="show_how_to_read()" size="small" variant="text">
-        How to read this page?
-    </sl-button>
 </div>
+#}
 
 
     {% if active_tab == 'Overall' %}
-    <div class="mt-2 flex">
-        <div>
-            <div class="display-4">{{ current_ranking.overall_rank }}</div>
-            <div>IJR {{ current_ranking.ijr_number }} Rank</div>
+    <div class="mt-6 flex">
+        <div class="state-rank-number">
+            <div class="title">{{ current_ranking.overall_rank }}</div>
+            <div class="description">IJR {{ current_ranking.ijr_number }} Rank</div>
         </div>
-        <div class="ml-8">
-            <div class="display-4">{{ current_ranking.overall_score }}</div>
-            <div>IJR {{ current_ranking.ijr_number }} score</div>
+        <div class="state-rank-number ml-8">
+            <div class="title">{{ current_ranking.overall_score }}</div>
+            <div class="description">IJR {{ current_ranking.ijr_number }} score</div>
         </div>
     </div>
 
@@ -168,7 +205,7 @@ no_cache: 1
             },
             ] -%}
             {%- with data=all_rankings, columns=columns, class="overall-tab-table" -%}
-            <h2 class="mt-4 mb-2 pl-6 pl-md-0">Pillar Ranks</h2>
+            <h2 class="mt-8 mb-2 pl-6 pl-md-0">Pillar Ranks</h2>
             {% include "templates/includes/featured-table.html" %}
             {%- endwith -%}
 
@@ -217,15 +254,17 @@ no_cache: 1
                 }
             ] -%}
             {%- with data=all_rankings, columns=columns, class="overall-tab-table" -%}
-            <h2 class="mt-4 mb-2 pl-6 pl-md-0">Theme Ranks</h2>
+            <h2 class="mt-8 mb-2 pl-6 pl-md-0">Theme Ranks</h2>
             {% include "templates/includes/featured-table.html" %}
             {%- endwith -%}
 
             <script>
                 document.addEventListener('alpine:init', () => {
                     Alpine.data('toggleScoreData', () => ({
-                        toggleScore(e) {
-                            let showScore = e.target.checked;
+                        currentValue: 'Rank',
+                        toggleScore(value) {
+                            this.currentValue = value;
+                            let showScore = this.currentValue == 'Score';
                             document.querySelectorAll('.overall-tab-table').forEach(function(table) {
                                 if (showScore) {
                                     table.classList.add('show-scores');
@@ -237,9 +276,6 @@ no_cache: 1
                     }))
                 })
             </script>
-            <div class="my-4 pl-6 pl-md-0" x-data="toggleScoreData">
-                <sl-switch @sl-change="toggleScore">Show Scores</sl-switch>
-            </div>
         </div>
 
         <div class="flex-shrink-0 d-none d-md-block">
@@ -260,15 +296,17 @@ no_cache: 1
         'width': 310,
         'filter': true
     },
-    { 'label': 'Theme', 'id': 'theme', 'filter': true } if frappe.form_dict.pillar else { 'label': 'Pillar', 'id': 'pillar', 'filter': true },
-    { 'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': true },
-    { 'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'right' },
-    { 'label': 'Value', 'id': 'indicator_value', 'align': 'right' },
-    { 'label': 'Unit', 'id': 'indicator_unit' },
-    { 'label': 'Period', 'id': 'year' },
+    { 'label': 'Theme', 'id': 'theme', 'width': 150, 'filter': true } if frappe.form_dict.pillar else { 'label': 'Pillar', 'id': 'pillar', 'filter': true },
+    { 'label': 'IJR', 'id': 'ijr_number', 'width': 100, 'align': 'center', 'filter': true },
+    { 'label': 'Score', 'id': 'ijr_score', 'width': 100, 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'right' },
+    { 'label': 'Value', 'id': 'indicator_value', 'width': 100, 'align': 'right' },
+    { 'label': 'Unit', 'id': 'indicator_unit', 'width': 100 },
+    { 'label': 'Period', 'id': 'year', 'width': 150, },
     {
         'label': 'Calculation',
         'id': 'calculation',
+        'width': 100,
+        'sort': false,
         'format': '''
             if (d.indicator_id && get_raw_data(d)) {
                 return `<a onclick="event.preventDefault(); show_calculations(${d.indicator_id}, ${d.ijr_number});" class="" href="#">
@@ -291,13 +329,17 @@ no_cache: 1
     </div>
 
 {% endif %}
+<!-- Main Content -->
+</div>
 
-<div class="mt-6 filters-toolbar">
+</div>
+
+<div class="mt-6 bottom-toolbar">
     <div>
-        <sl-button size="small">
+        <sl-button size="small" variant="text">
             Notes
         </sl-button>
-        <sl-button size="small">
+        <sl-button size="small" variant="text">
             Download Data
         </sl-button>
     </div>
@@ -305,6 +347,9 @@ no_cache: 1
     <div class="flex align-items-center">
         <sl-icon-button name="twitter" label="Share on Twitter"></sl-icon-button>
         <sl-icon-button name="linkedin" label="Share on LinkedIn"></sl-icon-button>
+        <sl-button onclick="show_how_to_read()" size="small" variant="text">
+            How to read this page?
+        </sl-button>
     </div>
 </div>
 
