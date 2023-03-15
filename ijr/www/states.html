@@ -30,11 +30,7 @@ no_cache: 1
     <div>
         <div class="d-flex align-items-center">
             <h1>
-                {% if rank_by == 'overall' %}
-                    Overall State Ranking in
-                {% else %}
-                    States Ranked by {{ rank_by.title().replace('_', ' ') }} score in
-                {% endif %}
+                States Ranked by {{ rank_by_title }} score in
             </h1>
             &nbsp;
             <select class="ijr-select" name="ijr_number" query="ijr_number">
@@ -54,7 +50,7 @@ no_cache: 1
             </select>
         </div>
         <div class="d-md-none">
-            Score and rank done by overall analysis of scores across pillars
+            {{ description }}
         </div>
     </div>
 
@@ -82,7 +78,7 @@ no_cache: 1
 
 <div class="d-flex justify-content-between mb-4 mt-2">
     <div class="d-none d-md-block">
-        Score and rank done by overall analysis of scores across pillars
+        {{ description }}
     </div>
     {{ m.color_legend(class='d-none d-md-flex') }}
 </div>

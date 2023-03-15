@@ -168,6 +168,7 @@ a:hover {
 }
 
 .color-legend-container {
+    font-size: var(--sl-font-size-small);
     display: flex;
     align-items: center;
     gap: 1px;
@@ -257,12 +258,14 @@ a:hover {
     display: flex;
     align-items: center;
     width: var(--bar-width);
-    background-color: var(--sl-color-blue-50);
-    height: 1rem;
+    background-color: var(--sl-color-gray-100);
+    height: 0.5rem;
+    border-radius: 999px;
+    overflow: hidden;
 }
 
 .rank-bar {
-    height: 1rem;
+    height: 0.5rem;
 }
 
 .delta-increase {
@@ -273,8 +276,16 @@ a:hover {
     color: var(--sl-color-red-600);
 }
 
+.delta-same {
+    color: var(--sl-color-gray-400);
+}
+
+tr[data-state] td:first-child, tr[data-state] td:last-child {
+    border-radius: var(--border-radius);
+}
+
 tr[data-state].highlight, tr[data-state]:hover {
-    background-color: var(--sl-color-gray-100);
+    background-color: var(--sl-color-gray-50);
 }
 
 tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
@@ -351,6 +362,7 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
     table-layout: fixed;
     border-collapse: separate;
     font-size: 14px;
+    border-spacing: 1px;
 }
 
 .featured-table thead tr {
@@ -358,21 +370,34 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
 }
 
 .featured-table thead th:first-of-type {
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
+    border-top-left-radius: var(--border-radius);
 }
 
 .featured-table thead th:last-of-type {
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
+    border-top-right-radius: var(--border-radius);
+}
+
+.featured-table tbody tr:last-of-type td:first-of-type {
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.featured-table tbody tr:last-of-type td:last-of-type {
+    border-bottom-right-radius: var(--border-radius);
 }
 
 .featured-table tr:nth-child(odd) {
     background-color: var(--sl-color-gray-50);
 }
 
-.featured-table td, .featured-table th {
-    padding: 6px 12px 6px 12px;
+.featured-table th {
+    padding: 1px 10px;
+    line-height: 1.15;
+    font-weight: 500;
+}
+
+.featured-table td {
+    padding: 7px 10px;
+    line-height: 1.15;
 }
 
 /* table indicator raw data */
@@ -399,6 +424,11 @@ sl-tab[active]::part(base) {
 
 sl-menu-item {
     --sl-font-size-medium: 14px;
+}
+
+sl-menu-item:hover::part(base) {
+    background-color: var(--sl-color-gray-100);
+    color: var(--sl-color-neutral-700);
 }
 
 sl-menu-label {

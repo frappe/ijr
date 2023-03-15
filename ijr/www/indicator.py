@@ -61,6 +61,10 @@ def get_context(context):
 				for d in row.raw_data:
 					row[d.raw_data_name] = f'{d.raw_data_value}'
 
+	indicator = frappe.get_doc('State Indicator', indicator_id)
+
+	context.title = indicator.indicator_name
+	context.description = indicator.description
 	context.raw_data = get_raw_data_by_state(indicator_id)
 	context.indicator_id = indicator_id
 	context.indicators_by_pillars = get_indicators_by_pillars()

@@ -8,6 +8,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "slug",
   "description"
  ],
  "fields": [
@@ -15,11 +16,16 @@
    "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Description"
+  },
+  {
+   "fieldname": "slug",
+   "fieldtype": "Data",
+   "label": "Slug"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-01-02 12:39:50.702054",
+ "modified": "2023-03-15 16:48:48.651478",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "Theme",

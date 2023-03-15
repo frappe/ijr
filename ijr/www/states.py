@@ -29,7 +29,19 @@ def get_context(context):
 	if view == 'map':
 		title = title + ' | Overall Ranking | Map View'
 
+	rank_by_title = 'Overall'
+	description = 'Performance across police, prisons, judiciary and legal aid'
+	if rank_by != 'overall':
+		if _pillar := frappe.db.get_value('Pillar', {'slug': rank_by}, ['name', 'description']):
+			rank_by_title = _pillar[0]
+			description = _pillar[1]
+		elif _theme := frappe.db.get_value('Theme', {'slug': rank_by}, ['name', 'description']):
+			rank_by_title = _theme[0]
+			description = _theme[1]
+
 	context.title = title
+	context.description = description
+	context.rank_by_title = rank_by_title
 	context.state_rankings = state_rankings
 	context.view = view
 	context.cluster = cluster

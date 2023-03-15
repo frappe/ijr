@@ -17,12 +17,12 @@
       <td align="center">
         <div class="rank-circle">{{ rank }}</div>
       </td>
-      <td width="250">
+      <td width="200">
         <a href="/state/{{ d.region_code }}" style="font-weight:500">{{ d.state }}</a>
       </td>
       <td title="{{ '+' if delta > 0 else '' }}{{ delta }}">
         <div class="d-flex align-items-center">
-          <div class="rank-bar-container">
+          <div class="rank-bar-container mr-5">
             <div class="rank-bar" style="
                 width: calc(({{ (score | flt) }} * var(--bar-width)) / 10 );
                 background-color: {{ d[color_field] }};
@@ -30,7 +30,7 @@
           </div>
           <div class="text-center" style="width: 16px;">
             <span class="{% if delta == 0 %} delta-same {% elif delta > 0 %} delta-increase {% else %} delta-decrease {% endif %}">
-              {% if delta == 0 %} &ndash; {% elif delta > 0 %} ▲ {% else %} ▼ {% endif %}
+              {% if delta == 0 %} &ndash; {% elif delta > 0 %} ↑ {% else %} ↓ {% endif %}
             </span>
           </div>
           <div class="pl-1" style="font-variant-numeric: tabular-nums;">
