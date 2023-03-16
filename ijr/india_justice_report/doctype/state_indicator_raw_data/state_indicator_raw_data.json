@@ -18,7 +18,8 @@
   "raw_data_sequence",
   "raw_data_name",
   "raw_data_value",
-  "raw_data_unit"
+  "raw_data_unit",
+  "raw_data_value_decimals"
  ],
  "fields": [
   {
@@ -100,11 +101,16 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Raw Data Unit"
+  },
+  {
+   "fieldname": "raw_data_value_decimals",
+   "fieldtype": "Int",
+   "label": "Raw Data Value Decimals"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-01-06 14:08:48.382930",
+ "modified": "2023-03-16 15:47:55.245395",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "State Indicator Raw Data",

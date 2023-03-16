@@ -100,7 +100,7 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 	for d in data:
 		for k in ['overall', 'police', 'prisons', 'judiciary', 'legal_aid', 'hr', 'diversity', 'trends']:
 			color_code = d[f'{k}_color']
-			d[f'{k}_rank_color'] = color_map.get(color_code) or 'var(--brand-color)'
+			d[f'{k}_rank_color'] = get_color(color_code)
 
 		if prev_ijr_number:
 			# delta
@@ -124,3 +124,12 @@ def get_pillar(slug=None):
 def get_theme(slug=None):
 	if not slug: return
 	return frappe.db.get_value('Theme', {'slug': slug}, '*', as_dict=True)
+
+def get_color(color_code):
+	color_code = frappe.utils.cint(color_code)
+	color_map = {
+		1: 'var(--best)',
+		2: 'var(--middle)',
+		3: 'var(--worst)'
+	}
+	return color_map.get(color_code) or 'var(--sl-color-gray-100)'

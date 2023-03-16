@@ -5,29 +5,6 @@ no_cache: 1
 
 {% import "templates/macros.html" as m %}
 
-<div class="flex mt-4">
-
-{% macro sidebar_item(label, value) %}
-<a href="#" query="rank_by={{ value }}" class="sidebar-nav-item {{ 'active' if rank_by == value else '' }}">{{ label }}</a>
-{% endmacro %}
-
-
-<!-- Sidebar -->
-<div class="sidebar-nav d-none d-md-flex">
-    {{ sidebar_item('Overall', 'overall') }}
-    <label class="sidebar-nav-label">Pillars</label>
-    {{ sidebar_item('Police', 'police') }}
-    {{ sidebar_item('Prisons', 'prisons') }}
-    {{ sidebar_item('Judiciary', 'judiciary') }}
-    {{ sidebar_item('Legal Aid', 'legal_aid') }}
-    <label class="sidebar-nav-label">Ranked Themes</label>
-    {{ sidebar_item('Human Resources', 'hr') }}
-    {{ sidebar_item('Diversity', 'diversity') }}
-    {{ sidebar_item('Trends', 'trends') }}
-</div>
-
-<div class="w-100">
-<!-- Main content -->
 <div class="title-toolbar">
     <div>
         <div class="d-flex align-items-center">
@@ -85,87 +62,31 @@ no_cache: 1
     {{ m.color_legend(class='d-none d-md-flex') }}
 </div>
 
-{#
-<div class="mt-2 filters-toolbar">
-    <div class="d-flex flex-column flex-md-row w-100" style="gap: 0.5rem">
-        {{ m.input_select2(
-            options=[
-                {'label': 'Map View', 'value': 'map'},
-                {'label': 'Table View', 'value': 'table'},
-            ],
-            label='View',
-            value=view,
-            query='view'
-           )
-        }}
-        {{ m.input_select2(
-            options=[
-                {'label': 'All IJRs', 'value' : '0'} if view == 'table' else null,
-                {'label': 'IJR 1 (2019)', 'value' : '1'},
-                {'label': 'IJR 2 (2020)', 'value' : '2'},
-                {'label': 'IJR 3 (2022)', 'value' : '3'},
-            ],
-            label='IJR Number',
-            value=ijr_number,
-            query='ijr_number'
-           )
-        }}
-        {% if view == 'map' %}
-        {{ m.input_select2(
-            options=[
-                {'label': 'Overall', 'value' : 'overall'},
-                {
-                    'group': 'Pillars',
-                    'options': [
-                        {'label': 'Police', 'value': 'police'},
-                        {'label': 'Prisons', 'value': 'prisons'},
-                        {'label': 'Judiciary', 'value': 'judiciary'},
-                        {'label': 'Legal Aid', 'value': 'legal_aid'},
-                    ]
-                },
-                {
-                    'group': 'Ranked Themes',
-                    'options': [
-                        {'label': 'Human Resources', 'value': 'hr'},
-                        {'label': 'Diversity', 'value': 'diversity'},
-                        {'label': 'Trends', 'value': 'trends'},
-                    ]
-                }
-            ],
-            label='Rank by another dimension',
-            value=rank_by,
-            query='rank_by'
-           )
-        }}
-        {% endif %}
-        {% if view == 'table' %}
-        {{ m.input_select2(
-            options=[
-                {'label': '4 Pillars', 'value' : 'pillars'},
-                {'label': '3 Ranked Themes', 'value' : 'themes'},
-            ],
-            label='Rank by',
-            value=table_view,
-            query='table_view'
-           )
-        }}
-        {% endif %}
-        {{ m.input_select2(
-            options=[
-                {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
-                {'label': '7 Small States' + ('&nbsp;' * 20), 'value' : 'small'},
-            ],
-            label='Change Cluster',
-            value=cluster,
-            query='cluster'
-           )
-        }}
-    </div>
-</div>
-#}
+<div class="flex mt-4">
 
+
+<!-- Sidebar -->
+<div class="sidebar-nav d-none d-md-flex">
+    {% macro sidebar_item(label, value) %}
+    <a href="#" query="rank_by={{ value }}" class="sidebar-nav-item {{ 'active' if rank_by == value else '' }}">{{ label }}</a>
+    {% endmacro %}
+
+    {{ sidebar_item('Overall', 'overall') }}
+    <label class="sidebar-nav-label">Pillars</label>
+    {{ sidebar_item('Police', 'police') }}
+    {{ sidebar_item('Prisons', 'prisons') }}
+    {{ sidebar_item('Judiciary', 'judiciary') }}
+    {{ sidebar_item('Legal Aid', 'legal_aid') }}
+    <label class="sidebar-nav-label">Ranked Themes</label>
+    {{ sidebar_item('Human Resources', 'hr') }}
+    {{ sidebar_item('Diversity', 'diversity') }}
+    {{ sidebar_item('Trends', 'trends') }}
+</div>
+
+<div class="w-100">
+<!-- Main content -->
 {%- if view == 'map' -%}
-<div class="mt-2">
+<div>
     <div class="d-flex flex-column flex-md-row justify-between" style="gap: 2rem;">
         <div class="ranking-table-container">
             {%- with state_rankings=state_rankings,

@@ -141,7 +141,7 @@
             <tr>
                 <template x-for="column in columns">
                     <td :data-column="column.id" :style="{'text-align': column.align || 'left', 'background-color': row[column.id + '_color'] || '', 'white-space': column.wrapText ? 'normal' : 'nowrap' }"
-                        x-html="formatters[column.id] ? formatters[column.id](row, i) : row[column.id]">
+                        x-html="formatters[column.id] ? formatters[column.id](row, i) : (row[column.id + '_formatted'] || row[column.id])">
                     </td>
                 </template>
             </tr>

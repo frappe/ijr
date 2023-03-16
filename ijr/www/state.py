@@ -3,7 +3,8 @@
 
 from __future__ import unicode_literals
 import frappe
-from ijr.www.states import get_pillar, get_theme
+from ijr.www.states import get_color, get_pillar, get_theme
+from frappe.utils.formatters import format_value
 
 
 def get_context(context):
@@ -13,14 +14,19 @@ def get_context(context):
 
 	_pillar = get_pillar(pillar)
 	_theme = get_theme(theme)
+	description = 'Performance across police, prisons, judiciary and legal aid'
 	if _pillar:
 		pillar = _pillar.name
-	if _theme:
+		description = _pillar.description
+	elif _theme:
 		theme = _theme.name
+		description = _theme.description
 
 	ijr_number = 3
 	state = frappe.get_doc('State', {'code': state_code})
-	current_ranking = frappe.get_doc('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number })
+	current_ranking = None
+	if frappe.db.exists('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number }):
+		current_ranking = frappe.get_doc('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number })
 
 	all_rankings = frappe.db.get_all('State Ranking',
 		filters={'region_code': state_code},
@@ -28,16 +34,11 @@ def get_context(context):
 		order_by='ijr_number desc'
 	)
 
-	total_rankings = frappe.db.get_all('State Ranking',
-		filters={'cluster': current_ranking.cluster, 'ijr_number': ijr_number},
-		fields=['count(name) as count'],
-		pluck='count')[0]
-
 	for d in all_rankings:
 		d.ijr = f'IJR {d.ijr_number}'
 		keys = ['overall', 'police', 'prisons', 'judiciary', 'legal_aid', 'hr', 'diversity', 'trends']
 		for key in keys:
-			color = get_value_color(d.get(f'{key}_rank'), total_rankings)
+			color = get_color(d.get(f'{key}_color'))
 			d[f'{key}_rank_color'] = color
 			d[f'{key}_score_color'] = color
 
@@ -61,12 +62,20 @@ def get_context(context):
 
 	for row in indicators_data:
 		row.ijr_score_color = ['', 'var(--best)', 'var(--middle)', 'var(--worst)'][row.color_code]
+		row.indicator_value_formatted = format_value(row.indicator_value, {
+			'fieldtype': 'Float',
+			'precision': row.indicator_value_decimals or None
+		})
+		row.ijr_score_formatted = format_value(row.ijr_score, {
+			'fieldtype': 'Float',
+			'precision': row.ijr_score_decimals or None
+		})
 
 	context.raw_data = get_raw_data_by_indicator(state_code)
 	context.state = state
-	context.title = 'State Analysis: ' + context.state.name
+	context.title = f'{context.state.name} | State Analysis | India Justice Report'
+	context.description = description
 	context.current_ranking = current_ranking
-	context.total_rankings = total_rankings
 	context.all_rankings = all_rankings
 	context.states_by_cluster = states_by_cluster
 	context.indicators_data = indicators_data

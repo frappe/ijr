@@ -26,7 +26,7 @@ def get_context(context):
 		order_by = 'state asc, ijr_number asc'
 	elif view == 'map':
 		filters = {'indicator_id': indicator_id, 'ijr_number': ijr_number}
-		order_by = 'ijr_score desc'
+		order_by = 'ijr_score desc, `order` asc'
 
 	if cluster_value:
 		filters['cluster'] = cluster_value

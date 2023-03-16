@@ -13,6 +13,11 @@
     display: none;
 }
 
+.table-calculations th, .table-calculations td {
+    padding: 7px 10px;
+    font-size: var(--sl-font-size-small);
+}
+
 .table-calculations:not(.table-calculations-trends) tr:last-child td {
     font-weight: bold;
 }

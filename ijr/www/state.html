@@ -5,38 +5,6 @@ no_cache: 1
 
 {% import "templates/macros.html" as m %}
 
-<div class="flex">
-    <!-- Sidebar -->
-    <div class="sidebar-nav d-none d-md-flex">
-        {% macro sidebar_item(label, value) %}
-        <a
-            class="sidebar-nav-item {{ 'active' if active_tab == label else '' }}"
-            {%- if value %}
-            href="#"
-            query="{{ value }}"
-            {%- else %}
-            href="/state/{{ state.code }}"
-            {%- endif %}
-        >
-            {{ label }}
-        </a>
-        {% endmacro %}
-
-        {{ sidebar_item('Overall', '') }}
-        <label class="sidebar-nav-label">Pillars</label>
-        {{ sidebar_item('Police', 'pillar=police') }}
-        {{ sidebar_item('Prisons', 'pillar=prisons') }}
-        {{ sidebar_item('Judiciary', 'pillar=judiciary') }}
-        {{ sidebar_item('Legal Aid', 'pillar=legal_aid') }}
-        <label class="sidebar-nav-label">Ranked Themes</label>
-        {{ sidebar_item('Human Resources', 'theme=hr') }}
-        {{ sidebar_item('Diversity', 'theme=diversity') }}
-        {{ sidebar_item('Trends', 'theme=trends') }}
-    </div>
-
-<div class="w-100">
-<!-- Main Content -->
-
 <div class="title-toolbar">
     <div>
         <div class="d-flex align-items-center">
@@ -59,7 +27,7 @@ no_cache: 1
             </h1>
         </div>
 
-        <div class="mt-2">Score and rank done by overall analysis of scores across pillars</div>
+        <div class="mt-2">{{ description }}</div>
     </div>
     <div class="text-right">
         {% if active_tab == 'Overall' %}
@@ -76,51 +44,41 @@ no_cache: 1
     </div>
 </div>
 
+<div class="flex mt-4">
+    <!-- Sidebar -->
+    <div class="sidebar-nav d-none d-md-flex">
+        {% macro sidebar_item(label, value) %}
+        <a
+            class="sidebar-nav-item {{ 'active' if active_tab == label else '' }}"
+            href="/state/{{ state.code }}?{{ value }}"
+        >
+            {{ label }}
+        </a>
+        {% endmacro %}
+
+        {{ sidebar_item('Overall', '') }}
+        <label class="sidebar-nav-label">Pillars</label>
+        {{ sidebar_item('Police', 'pillar=police') }}
+        {{ sidebar_item('Prisons', 'pillar=prisons') }}
+        {{ sidebar_item('Judiciary', 'pillar=judiciary') }}
+        {{ sidebar_item('Legal Aid', 'pillar=legal_aid') }}
+        <label class="sidebar-nav-label">Ranked Themes</label>
+        {{ sidebar_item('Human Resources', 'theme=hr') }}
+        {{ sidebar_item('Diversity', 'theme=diversity') }}
+        {{ sidebar_item('Trends', 'theme=trends') }}
+    </div>
+
+<div class="w-100">
+<!-- Main Content -->
 {% macro render_tab(tab) %}
 <sl-tab onclick="{{ tab.onclick }}" {{ 'active' if active_tab==tab.label else '' }}>
     {{ tab.label }}
 </sl-tab>
 {% endmacro %}
 
-{#
-<div class="mt-2 filters-toolbar">
-    {%- set pillar_tabs = [
-    {'label': 'Police', 'onclick': "set_query_params('pillar', 'Police', true)"},
-    {'label': 'Prisons', 'onclick': "set_query_params('pillar', 'Prisons', true)"},
-    {'label': 'Judiciary', 'onclick': "set_query_params('pillar', 'Judiciary', true)"},
-    {'label': 'Legal Aid', 'onclick': "set_query_params('pillar', 'Legal Aid', true)"},
-    ] -%}
-
-    {%- set theme_tabs = [
-    {'label': 'Human Resources', 'onclick': "set_query_params('theme', 'Human Resources', true)"},
-    {'label': 'Diversity', 'onclick': "set_query_params('theme', 'Diversity', true)"},
-    {'label': 'Trends', 'onclick': "set_query_params('theme', 'Trends', true)"},
-    ] -%}
-    <div class="d-flex flex-column flex-md-row align-items-md-end" style="gap: 0.5rem">
-        {{ render_tab({'label': 'Overall', 'onclick': "window.location.href = '/state/" + state.code + "'"}) }}
-        <div>
-            <label class="tab-group-label">Pillars</label>
-            <div class="d-flex align-items-center">
-                {% for tab in pillar_tabs %}
-                {{ render_tab(tab) }}
-                {% endfor %}
-            </div>
-        </div>
-        <div>
-            <label class="tab-group-label">Ranked Themes</label>
-            <div class="d-flex align-items-center">
-                {% for tab in theme_tabs %}
-                {{ render_tab(tab) }}
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
-#}
-
-
-    {% if active_tab == 'Overall' %}
-    <div class="mt-6 flex">
+{% if active_tab == 'Overall' %}
+    {% if current_ranking %}
+    <div class="flex">
         <div class="state-rank-number">
             <div class="title">{{ current_ranking.overall_rank }}</div>
             <div class="description">IJR {{ current_ranking.ijr_number }} Rank</div>
@@ -287,6 +245,10 @@ no_cache: 1
     <!-- endregion -->
     </div>
     {% else %}
+    State not ranked in IJR
+    {% endif %}
+
+{% else %}
     <div class="mt-2 featured-table-container">
     {%- set columns = [
     {
@@ -323,7 +285,7 @@ no_cache: 1
         {%- endwith -%}
     </div>
 
-    <sl-dialog label="Calculations" id="calculationsDialog" style="--width: max-content;">
+    <sl-dialog label="Calculations" id="calculationsDialog" style="--width: max-content; --body-spacing: 0 1.25rem 1.25rem 1.25rem">
         <sl-button slot="footer" variant="primary">Close</sl-button>
     </sl-dialog>
     </div>
@@ -367,7 +329,7 @@ no_cache: 1
         let description = `${data[0].pillar}: ${data[0].indicator_name}`
 
         let dialog = window.calculationsDialog;
-        dialog.label = title || 'Calculations';
+        dialog.label = description || 'Calculations';
         let header = ''
         let rows = ''
         let table_class = ''
@@ -421,8 +383,7 @@ no_cache: 1
         }
 
         dialog.innerHTML = `
-            <p>${description}</p>
-            <table class="table table-bordered table-calculations ${table_class}">
+            <table class="table table-bordered table-calculations mb-0 ${table_class}">
                 <thead>
                     ${header}
                 </thead>

@@ -362,7 +362,7 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
     border-radius: 6px;
     padding: 0.875rem 1rem;
     border: 1px solid var(--sl-color-gray-200);
-    min-width: 20ch;
+    width: max-content;
     pointer-events: none;
 }
 
@@ -375,6 +375,7 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
     font-size: var(--sl-font-size-small);
     padding: 6px 0;
     line-height: 1.15;
@@ -494,6 +495,42 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
 
 .w-full-desktop {
     width: 100%;
+}
+
+.indicator-heading {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--brand-color);
+}
+
+.indicator-heading button {
+    all: inherit;
+    cursor: pointer;
+}
+
+.pillar-indicators {
+    margin-bottom: 1rem;
+}
+
+.pillar-indicators label {
+    font-size: var(--sl-font-size-medium);
+    color: var(--sl-color-gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.pillar-indicators a {
+    display: flex;
+    padding: 7px 10px;
+    font-size: var(--sl-font-size-small);
+    border-radius: var(--border-radius);
+}
+
+.pillar-indicators a:hover {
+    text-decoration: none;
+    background-color: var(--sl-color-gray-100);
 }
 
 /* styles for mobile view */

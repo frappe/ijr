@@ -17,9 +17,13 @@
   "region_code",
   "cluster",
   "indicator_value",
+  "indicator_value_decimals",
   "indicator_unit",
+  "indicator_rank",
   "ijr_score",
-  "color_code"
+  "ijr_score_decimals",
+  "color_code",
+  "order"
  ],
  "fields": [
   {
@@ -107,11 +111,32 @@
    "fieldname": "color_code",
    "fieldtype": "Int",
    "label": "Color Code"
+  },
+  {
+   "fieldname": "indicator_value_decimals",
+   "fieldtype": "Int",
+   "label": "Indicator Value Decimals"
+  },
+  {
+   "fieldname": "ijr_score_decimals",
+   "fieldtype": "Int",
+   "label": "IJR Score Decimals"
+  },
+  {
+   "description": "Used for sorting records when rank/score are the same",
+   "fieldname": "order",
+   "fieldtype": "Int",
+   "label": "Order"
+  },
+  {
+   "fieldname": "indicator_rank",
+   "fieldtype": "Int",
+   "label": "Indicator Rank"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-01-06 13:12:36.541035",
+ "modified": "2023-03-16 14:11:46.089066",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "State Indicator Data",

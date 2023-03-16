@@ -8,75 +8,70 @@ no_cache: 1
 <div class="title-toolbar">
     <div>
         <div class="d-flex align-items-center">
-            <h1 class="mr-2">{{ indicator_name }}</h1>
-            <sl-tooltip content="Change Indicator">
-                <sl-dropdown>
-                    <sl-button slot="trigger" variant="default" size="small">
-                        <sl-icon slot="suffix" name="chevron-down"></sl-icon>
-                    </sl-button>
-                    <sl-menu>
-                        {% for pillar, indicators in indicators_by_pillars.items() %}
-                        <sl-menu-label>{{ pillar }}</sl-menu-label>
-                        {%- for indicator in indicators -%}
-                        <sl-menu-item value="{{ indicator.value }}" onclick="window.location.href = '/indicator/{{ indicator.value }}'">
-                            {{ indicator.label }}
-                        </sl-menu-item>
-                        {%- endfor -%}
-                        {% endfor %}
-                    </sl-menu>
-                </sl-dropdown>
-            </sl-tooltip>
+            <h1 class="indicator-heading">
+                <sl-tooltip content="Change Indicator">
+                    <button onclick="changeIndicatorDialog.show()">
+                        {{ indicator_name }}
+                    </button>
+                </sl-tooltip>
+                in
+            </h1>
+            <select class="ijr-select" name="ijr_number" query="ijr_number">
+                {%- set ijr_options = [
+                    {'label': 'All IJRs', 'value' : '0'} if view == 'table' else null,
+                    {'label': 'IJR 1 (2019)', 'value' : 1},
+                    {'label': 'IJR 2 (2020)', 'value' : 2},
+                    {'label': 'IJR 3 (2022)', 'value' : 3},
+                ] -%}
+                {% for option in ijr_options %}
+                {% if option %}
+                <option value="{{ option.value }}" {{ "selected" if option.value == ijr_number else "" }}>
+                    {{ option.label }}
+                </option>
+                {% endif %}
+                {% endfor %}
+            </select>
         </div>
-        <div>{{ description }}</div>
+        <div class="mt-2">{{ description }}</div>
     </div>
-    <div class="color-legend-container d-none d-md-flex">
-        <div>Best</div>
-        <div class="color-legend" style="background-color: var(--best)"></div>
-        <div class="color-legend" style="background-color: var(--middle)"></div>
-        <div class="color-legend" style="background-color: var(--worst)"></div>
-        <div>Worst</div>
+
+    <div class="d-flex flex-column align-items-end">
+        <div class="d-flex mt-4 mt-md-0">
+            <select class="cluster-select" name="cluster" query="cluster">
+            {%- set cluster_options = [
+                {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
+                {'label': '7 Small States' + ('&nbsp;' * 20), 'value' : 'small'},
+            ] -%}
+            {% for option in cluster_options %}
+            <option value="{{ option.value }}" {{ "selected" if option.value == cluster else "" }}>
+                {{ option.label }}
+            </option>
+            {% endfor %}
+            </select>
+
+            <div class="ml-2 view-switcher">
+                {% for option in [['Map', 'map'], ['Table', 'table']] %}
+                <a href="#" query="view={{ option[1] }}" class="{{ 'active' if option[1] == view else '' }}">{{ option[0] }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        {{ m.color_legend('d-none d-md-flex mt-2') }}
     </div>
+
 </div>
 
-<div class="mt-2 filters-toolbar">
-    <div class="d-flex flex-column flex-md-row w-100" style="gap: 0.5rem">
-        {{ m.input_select2(
-            options=[
-                {'label': 'Map View', 'value': 'map'},
-                {'label': 'Table View', 'value': 'table'},
-            ],
-            label='View',
-            value=view,
-            query='view'
-           )
-        }}
-        {{ m.input_select2(
-            options=[
-                {'label': 'IJR 1 (2019)', 'value' : '1'},
-                {'label': 'IJR 2 (2020)', 'value' : '2'},
-                {'label': 'IJR 3 (2022)', 'value' : '3'},
-            ],
-            label='IJR Number',
-            value=ijr_number,
-            query='ijr_number'
-           )
-        }}
-        {{ m.input_select2(
-            options=[
-                {'label': 'All States and Union Territories', 'value' : 'all'} if view == 'table' else null,
-                {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
-                {'label': '7 Small States', 'value' : 'small'},
-            ],
-            label='Change Cluster',
-            value=cluster,
-            query='cluster'
-           )
-        }}
+<sl-dialog label="Change Indicator" id="changeIndicatorDialog">
+    {% for pillar, indicators in indicators_by_pillars.items() %}
+    <div class="pillar-indicators">
+        <label>{{ pillar }}</label>
+        {%- for indicator in indicators -%}
+        <a href="/indicator/{{ indicator.value }}">
+            {{ indicator.label }}
+        </a>
+        {%- endfor -%}
     </div>
-    <sl-button onclick="show_how_to_read()" size="small" variant="text">
-        How to read this page?
-    </sl-button>
-</div>
+    {% endfor %}
+</sl-dialog>
 
 {%- if view == 'map' -%}
 <div class="mt-2">
@@ -84,20 +79,15 @@ no_cache: 1
         <div class="ranking-table-container">
             {%- with state_rankings=indicator_data,
                     score_field='ijr_score',
-                    rank_field='ijr_score',
+                    rank_field='indicator_rank',
                     delta_field='ijr_score_delta',
                     color_field='ijr_score_color' -%}
             {% include "templates/includes/ranking_table.html" %}
             {%- endwith -%}
         </div>
 
-        <div class="color-legend-container d-md-none">
-            <div>Best</div>
-            <div class="color-legend" style="background-color: var(--best)"></div>
-            <div class="color-legend" style="background-color: var(--middle)"></div>
-            <div class="color-legend" style="background-color: var(--worst)"></div>
-            <div>Worst</div>
-        </div>
+        {{ m.color_legend(class='d-md-none') }}
+
         <div class="map-container">
             {% set hover_html %}
             <div class="font-size-sm">
@@ -146,6 +136,25 @@ no_cache: 1
     </div>
 </div>
 {%- endif -%}
+
+<div class="mt-6 bottom-toolbar">
+    <div>
+        <sl-button size="small" variant="text">
+            Notes
+        </sl-button>
+        <sl-button size="small" variant="text">
+            Download Data
+        </sl-button>
+    </div>
+
+    <div class="flex align-items-center">
+        <sl-icon-button name="twitter" label="Share on Twitter"></sl-icon-button>
+        <sl-icon-button name="linkedin" label="Share on LinkedIn"></sl-icon-button>
+        <sl-button onclick="show_how_to_read()" size="small" variant="text">
+            How to read this page?
+        </sl-button>
+    </div>
+</div>
 
 <script>
     let raw_data = {{ as_json(raw_data, indent = None) }};
