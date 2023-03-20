@@ -81,7 +81,8 @@ no_cache: 1
                     score_field='ijr_score',
                     rank_field='indicator_rank',
                     delta_field='ijr_score_delta',
-                    color_field='ijr_score_color' -%}
+                    color_field='ijr_score_color',
+                    hide_arrows=true -%}
             {% include "templates/includes/ranking_table.html" %}
             {%- endwith -%}
         </div>
@@ -98,9 +99,9 @@ no_cache: 1
                         <tr>
                             <th>Metric</th>
                             <th>Unit</th>
-                            <th>IJR 1</th>
-                            <th>IJR 2</th>
-                            <th>IJR 3</th>
+                            <th class="text-right">IJR 1</th>
+                            <th class="text-right">IJR 2</th>
+                            <th class="text-right">IJR 3</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,9 +110,9 @@ no_cache: 1
                                 <tr>
                                     <td>${d.raw_data_name}</td>
                                     <td>${d.raw_data_unit}</td>
-                                    <td>${d.ijr_1_value}</td>
-                                    <td>${d.ijr_2_value}</td>
-                                    <td>${d.ijr_3_value}</td>
+                                    <td class="text-right">${d.ijr_1_value}</td>
+                                    <td class="text-right">${d.ijr_2_value}</td>
+                                    <td class="text-right">${d.ijr_3_value}</td>
                                 </tr>
                             `
                         }).join('')}

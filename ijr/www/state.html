@@ -44,7 +44,7 @@ no_cache: 1
     </div>
 </div>
 
-<div class="flex mt-4">
+<div class="flex mt-6">
     <!-- Sidebar -->
     <div class="sidebar-nav d-none d-md-flex">
         {% macro sidebar_item(label, value) %}
@@ -89,7 +89,7 @@ no_cache: 1
         </div>
     </div>
 
-    <div class="mt-2 featured-table-container">
+    <div class="featured-table-container">
     <!-- #region Overall -->
     <div class="flex items-start justify-between">
         <div>
@@ -249,7 +249,7 @@ no_cache: 1
     {% endif %}
 
 {% else %}
-    <div class="mt-2 featured-table-container">
+    <div class="featured-table-container">
     {%- set columns = [
     {
         'label': 'Indicator',
@@ -367,17 +367,17 @@ no_cache: 1
             header = `
                 <th>Metric Name</th>
                 <th>Unit</th>
-                <th>IJR 1</th>
-                <th>IJR 2</th>
-                <th>IJR 3</th>
+                <th class="text-right">IJR 1</th>
+                <th class="text-right">IJR 2</th>
+                <th class="text-right">IJR 3</th>
             `;
             rows = data.map(row => {
                 return `<tr>
                     <td>${row.raw_data_name}</td>
                     <td>${row.raw_data_unit}</td>
-                    <td>${row.ijr_1_value}</td>
-                    <td>${row.ijr_2_value}</td>
-                    <td>${row.ijr_3_value}</td>
+                    <td class="text-right">${row.ijr_1_value}</td>
+                    <td class="text-right">${row.ijr_2_value}</td>
+                    <td class="text-right">${row.ijr_3_value}</td>
                 </tr>`
             }).join('');
         }

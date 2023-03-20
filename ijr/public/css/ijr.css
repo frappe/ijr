@@ -212,7 +212,7 @@ a:hover {
 
 .title-toolbar {
     display: flex;
-    align-items: start;
+    align-items: end;
     justify-content: space-between;
 }
 
@@ -338,7 +338,7 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
 }
 
 #india-map {
-    /* height: 500px; */
+    max-height: 700px;
 }
 
 #india-map path {
@@ -430,7 +430,7 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
 }
 
 .featured-table th {
-    padding: 1px 10px;
+    padding: 4px 10px;
     line-height: 1.15;
     font-weight: 500;
 }
@@ -438,6 +438,10 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
 .featured-table td {
     padding: 7px 10px;
     line-height: 1.15;
+}
+
+.featured-table sl-icon-button::part(base) {
+    padding: 4px;
 }
 
 /* table indicator raw data */

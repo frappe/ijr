@@ -119,7 +119,11 @@ def get_raw_data_by_indicator(state_code):
 			data = raw_data_by_indicator.get(key)
 			if not data:
 				data = raw_data_by_indicator[key] = r
-			data[f'ijr_{r.ijr_number}_value'] = r.raw_data_value
+			raw_data_value = format_value(r.raw_data_value, {
+				'fieldtype': 'Float',
+				'precision': r.raw_data_value_decimals or None
+			})
+			data[f'ijr_{r.ijr_number}_value'] = raw_data_value
 			if r.ijr_number == 1:
 				raw_data_with_all_ijrs.setdefault(r.indicator_id, []).append(data)
 	return raw_data_with_all_ijrs

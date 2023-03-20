@@ -1,4 +1,4 @@
-<!-- variables: state_rankings, score_field, rank_field, delta_field, color_field -->
+<!-- variables: state_rankings, score_field, rank_field, delta_field, color_field, hide_arrows -->
 
 <table class="table-ranking">
   <thead>
@@ -20,7 +20,7 @@
       <td width="200">
         <a href="/state/{{ d.region_code }}" style="font-weight:500">{{ d.state }}</a>
       </td>
-      <td title="{{ '+' if delta > 0 else '' }}{{ delta }}">
+      <td>
         <div class="d-flex align-items-center">
           <div class="rank-bar-container mr-5">
             <div class="rank-bar" style="
@@ -28,12 +28,14 @@
                 background-color: {{ d[color_field] }};
               "></div>
           </div>
+          {% if not hide_arrows %}
           <div class="text-center" style="width: 16px;">
             <span class="{% if delta == 0 %} delta-same {% elif delta > 0 %} delta-increase {% else %} delta-decrease {% endif %}">
               {% if delta == 0 %} &ndash; {% elif delta > 0 %} ↑ {% else %} ↓ {% endif %}
             </span>
           </div>
-          <div class="pl-1" style="font-variant-numeric: tabular-nums;">
+          {% endif %}
+          <div class="pl-1 flex-fill text-right" style="font-variant-numeric: tabular-nums;">
             {% if score is not none %}
             {{ "%.2f" % frappe.utils.rounded(score, 2) }}
             {% endif %}

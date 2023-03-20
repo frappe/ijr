@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 import frappe
-
+from frappe.utils.formatters import format_value
 
 def get_context(context):
 	view = frappe.form_dict.view or 'map'
@@ -46,7 +46,7 @@ def get_context(context):
 			{'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': True},
 			{'label': 'Year', 'id': 'year'},
 			{'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'center', 'hide_condition': cluster == 'all'},
-			{'label': 'Indicator Value', 'id': 'indicator_value', 'align': 'center'},
+			# {'label': 'Indicator Value', 'id': 'indicator_value', 'align': 'center'},
 			{'label': 'Indicator Unit', 'id': 'indicator_unit', 'align': 'center'},
 		]
 		if context.indicator_data:
@@ -59,7 +59,11 @@ def get_context(context):
 				})
 			for row in context.indicator_data:
 				for d in row.raw_data:
-					row[d.raw_data_name] = f'{d.raw_data_value}'
+					row[d.raw_data_name] = d.raw_data_value
+					row[d.raw_data_name + '_formatted'] = format_value(d.raw_data_value, {
+						'fieldtype': 'Float',
+						'precision': d.raw_data_value_decimals or 4
+					})
 
 	indicator = frappe.get_doc('State Indicator', indicator_id)
 
@@ -120,7 +124,12 @@ def get_raw_data_by_state(indicator_id):
 		data = raw_data_by_state.get(key)
 		if not data:
 			data = raw_data_by_state[key] = r
-		data[f'ijr_{r.ijr_number}_value'] = r.raw_data_value
+
+		raw_data_value = format_value(r.raw_data_value, {
+			'fieldtype': 'Float',
+			'precision': r.raw_data_value_decimals or None
+		})
+		data[f'ijr_{r.ijr_number}_value'] = raw_data_value
 		if r.ijr_number == 1:
 			raw_data_with_all_ijrs.setdefault(r.state, []).append(data)
 	return raw_data_with_all_ijrs

@@ -55,14 +55,14 @@ no_cache: 1
     </div>
 </div>
 
-<div class="d-flex justify-content-between mb-4 mt-2">
+<div class="d-flex justify-content-between mt-2">
     <div class="d-none d-md-block">
         {{ description }}
     </div>
     {{ m.color_legend(class='d-none d-md-flex') }}
 </div>
 
-<div class="flex mt-4">
+<div class="flex mt-6">
 
 
 <!-- Sidebar -->
@@ -157,7 +157,7 @@ no_cache: 1
 {%- endif -%}
 
 {%- if view == 'table' -%}
-<div class="mt-2 featured-table-container">
+<div class="featured-table-container">
     {%- if table_view == 'pillars' -%}
     {%- set columns = [
         {
