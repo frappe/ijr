@@ -1,6 +1,7 @@
 :root {
     --font-stack: 'Public Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     --sl-font-sans: var(--font-stack);
+    --sl-font-serif: 'Spectral', Georgia, 'Times New Roman', Times, serif;
 
     --worst: #F1D68F;
     --middle: #A8D8B4;
@@ -8,6 +9,10 @@
     --brand-color: #0043EE;
     --data-hover-color: var(--brand-color);
     --border-radius: 3px;
+}
+
+.font-serif {
+    font-family: var(--sl-font-serif);
 }
 
 html, body {
@@ -536,6 +541,86 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
     text-decoration: none;
     background-color: var(--sl-color-gray-100);
 }
+
+/* homepage styles start */
+
+.homepage header {
+    background-color: var(--brand-color);
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.homepage header a {
+    color: white;
+}
+
+.homepage header nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.homepage .navbar-brand img {
+    height: 3rem;
+}
+
+.homepage h1 {
+    color: white;
+    font-size: 3rem;
+    font-weight: 700;
+    max-width: 20ch;
+    line-height: 1.1;
+    margin-top: 4.5rem;
+}
+
+.homepage-stat {
+    padding: 8rem 0;
+}
+
+.homepage-stat h2 {
+    font-family: var(--sl-font-serif);
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+    color: var(--brand-color);
+    line-height: 1.15;
+    letter-spacing: 0.05em;
+}
+
+.homepage-stat .title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--sl-color-gray-900);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-top: 1rem;
+}
+
+.homepage-stat .stat {
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--brand-color);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-top: 0.75rem;
+}
+
+.homepage-stat .subtitle {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--sl-color-gray-700);
+    line-height: 1.45;
+    letter-spacing: 0.005em;
+    margin-top: 0.5rem;
+}
+
+.homepage-stat .link {
+    font-size: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+/* homepage styles end */
 
 /* styles for mobile view */
 @media (max-width: 767px) {
