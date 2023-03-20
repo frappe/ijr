@@ -660,4 +660,25 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
     .w-full-desktop {
         width: unset;
     }
+
+    .homepage h1 {
+        font-size: 2rem;
+        padding: 0 1rem;
+    }
+
+    .homepage-stat {
+        padding: 4rem 0;
+    }
+
+    .homepage-stat .stat {
+        font-size: 4rem;
+    }
+
+    .homepage-stat .title {
+        font-size: 1.5rem;
+    }
+
+    .homepage-stat .subtitle {
+        font-size: 1.25rem;
+    }
 }
