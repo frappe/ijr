@@ -8,22 +8,13 @@ no_cache: 1
 <div class="title-toolbar">
     <div>
         <div class="d-flex align-items-center">
-            <h1>
-                <span class="sr-only">
-                    {{ state.name }}
-                </span>
-                <select class="state-select pl-0" onchange="window.location.href = '/state/' + this.value">
-                        {% for cluster in states_by_cluster %}
-                        <optgroup label="{{ cluster }}">
-                        {% set states = states_by_cluster[cluster] %}
-                        {% for _state in states %}
-                        <option value="{{ _state.code }}" {{ 'selected' if state.code == _state.code }}>
-                            {{ _state.name }}
-                        </option>
-                        {% endfor %}
-                        </optgroup>
-                        {% endfor %}
-                </select>
+            <h1 class="indicator-heading">
+                <sl-tooltip content="Change State">
+                    <button onclick="changeStateDialog.show()">
+                        {{ state.name }}
+                        <sl-icon name="chevron-down" class="font-size-sm" aria-hidden="true"></sl-icon>
+                    </button>
+                </sl-tooltip>
             </h1>
         </div>
 
@@ -43,6 +34,20 @@ no_cache: 1
         {{ m.color_legend(class='d-none d-md-flex') }}
     </div>
 </div>
+
+<sl-dialog label="Change State" id="changeStateDialog">
+    {% for cluster in states_by_cluster %}
+    <div class="pillar-indicators">
+        <label>{{ cluster }}</label>
+        {% set states = states_by_cluster[cluster] %}
+        {% for _state in states %}
+        <a href="/state/{{ _state.code }}">
+            {{ _state.name }}
+        </a>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</sl-dialog>
 
 <div class="flex mt-6">
     <!-- Sidebar -->
