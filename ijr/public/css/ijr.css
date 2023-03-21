@@ -6,7 +6,7 @@
     --worst: #F1D68F;
     --middle: #A8D8B4;
     --best: #63BDBB;
-    --brand-color: #0043EE;
+    --brand-color: #0043EE !important;
     --data-hover-color: var(--brand-color);
     --border-radius: 3px;
 }
@@ -123,6 +123,7 @@ a:hover {
 .ijr-select, .state-select {
     appearance: none;
     border: none;
+    background-color: transparent;
     font-weight: 600;
     color: var(--brand-color);
     font-size: 16px;
@@ -621,6 +622,49 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
 }
 
 /* homepage styles end */
+
+/* styles for markdown pages */
+[source-content-type=Markdown] h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+[source-content-type=Markdown] h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+[source-content-type=Markdown] h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+[source-content-type=Markdown] h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+[source-content-type=Markdown] .web-page-content {
+    width: 65ch;
+    color: var(--sl-color-gray-800);
+    margin: 0 auto;
+}
 
 /* styles for mobile view */
 @media (max-width: 767px) {
