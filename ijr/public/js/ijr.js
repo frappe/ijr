@@ -1,35 +1,28 @@
-frappe.ready(() => {
-  link_with_query_params();
+window.addEventListener('DOMContentLoaded', () => {
+    link_with_query_params();
 });
 
 function link_with_query_params() {
-  $(document).on("click", "a", (e) => {
-    let $a = $(e.target);
-    let query = $a.attr("query");
-    if (!query) {
-      return;
-    }
-    let [key, value] = query.split("=");
-    if (key && value) {
-      e.preventDefault();
-      set_query_params(key, value);
-    }
-  });
-
   [
-    {event: 'sl-change', selector: 'sl-select'},
-    {event: 'change', selector: 'select'},
+    {event: 'sl-change', selector: 'sl-select[query]'},
+    {event: 'change', selector: 'select[query]'},
+    {event: 'click', selector: 'a[query]'},
   ].forEach(({event, selector}) => {
       $(document).on(event, selector, (e) => {
         let $el = $(e.target);
+        let is_link = $el.is("a");
         let query = $el.attr("query");
         if (!query) {
           return;
         }
         let key = query;
         let value = e.target.value;
+        if (is_link) {
+            [key, value] = query.split("=");
+        }
         if (key && value) {
-          set_query_params(key, value);
+            e.preventDefault();
+            set_query_params(key, value);
         }
       });
   });

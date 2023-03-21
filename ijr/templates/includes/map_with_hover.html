@@ -17,7 +17,7 @@
   let state_rankings = JSON.parse(`{{ as_json(state_rankings, indent=None) }}`);
   let ranked_states = JSON.parse(`{{ as_json(ranked_states, indent=None) }}`);
 
-  frappe.ready(() => {
+  document.addEventListener('DOMContentLoaded', () => {
     let $state_paths = $("#india-map path");
     let $infobox = $(".info-box");
     let $popup = document.getElementById("map-popup");

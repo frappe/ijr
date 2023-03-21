@@ -202,7 +202,7 @@
 
 {% if state %}
 <script>
-    frappe.ready(() => {
+    window.addEventListener('DOMContentLoaded', () => {
         let $path = $('#india-map path#{{ state }}');
         let { x, y, width, height } = $path.get(0).getBBox();
         $path
