@@ -29,10 +29,10 @@
 {%- endblock -%}
 
 {% block base_scripts %}
-{% if doctype == 'Web Form' %}
-{{ super() }}
-{% else %}
+{% if skip_frappe_bundle %}
 <script defer src="https://code.jquery.com/jquery-3.6.4.slim.min.js"></script>
+{% else %}
+{{ super() }}
 {% endif %}
-<script>window.frappe_bundle_loaded = {{ 'true' if doctype == 'Web Form' else 'false' }}</script>
+<script>window.frappe_bundle_loaded = !Boolean({{ json.dumps(skip_frappe_bundle or false) }})</script>
 {% endblock %}
