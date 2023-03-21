@@ -14,10 +14,10 @@ no_cache: 1
             &nbsp;
             <select class="ijr-select" name="ijr_number" query="ijr_number">
                 {%- set ijr_options = [
-                    {'label': 'All IJRs', 'value' : '0'} if view == 'table' else null,
-                    {'label': 'IJR 1 (2019)', 'value' : '1'},
-                    {'label': 'IJR 2 (2020)', 'value' : '2'},
-                    {'label': 'IJR 3 (2022)', 'value' : '3'},
+                    {'label': 'All IJRs', 'value' : 0} if view == 'table' else null,
+                    {'label': 'IJR 1 (2019)', 'value' : 1},
+                    {'label': 'IJR 2 (2020)', 'value' : 2},
+                    {'label': 'IJR 3 (2022)', 'value' : 3},
                 ] -%}
                 {% for option in ijr_options %}
                 {% if option %}
@@ -173,7 +173,7 @@ no_cache: 1
             'align': 'center',
             'width': 80,
             'filter': true,
-            'hide_condition': ijr_number != '0'
+            'hide_condition': ijr_number != 0
         },
         {
             'label': 'Overall',
@@ -220,7 +220,7 @@ no_cache: 1
             'align': 'center',
             'width': 80,
             'filter': true,
-            'hide_condition': ijr_number != '0'
+            'hide_condition': ijr_number != 0
         },
         {
             'label': 'Human Resources',

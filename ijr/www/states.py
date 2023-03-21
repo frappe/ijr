@@ -3,15 +3,17 @@
 
 from __future__ import unicode_literals
 import frappe
+from frappe.utils import cint
 
 
 def get_context(context):
 	view = frappe.form_dict.view or 'map'
 	table_view = frappe.form_dict.table_view or 'pillars'
 	rank_by = frappe.form_dict.rank_by or 'overall'
-	ijr_number = frappe.form_dict.ijr_number or '3'
+	default_ijr = 3 if view == 'map' else 0
+	ijr_number = cint(frappe.form_dict.ijr_number or default_ijr)
 
-	if view == 'map' and ijr_number in ['0', 0]:
+	if view == 'map' and ijr_number == 0:
 		ijr_number = 3
 
 	cluster = frappe.form_dict.cluster or 'large-mid'
@@ -55,8 +57,6 @@ def get_context(context):
 
 
 def state_rankings_data(ijr_number, cluster, rank_by):
-	ijr_number = frappe.utils.cint(ijr_number)
-
 	if cluster == 'large-mid':
 		cluster = 'Large and mid-sized states'
 	if cluster == 'small':
@@ -90,12 +90,6 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 		for d in prev_ijr_data:
 			prev_ijr_data_by_state[d.state] = d
 
-	color_map = {
-		1: 'var(--best)',
-		2: 'var(--middle)',
-		3: 'var(--worst)'
-	}
-
 	i = 0
 	for d in data:
 		for k in ['overall', 'police', 'prisons', 'judiciary', 'legal_aid', 'hr', 'diversity', 'trends']:
@@ -126,7 +120,7 @@ def get_theme(slug=None):
 	return frappe.db.get_value('Theme', {'slug': slug}, '*', as_dict=True)
 
 def get_color(color_code):
-	color_code = frappe.utils.cint(color_code)
+	color_code = cint(color_code)
 	color_map = {
 		1: 'var(--best)',
 		2: 'var(--middle)',
