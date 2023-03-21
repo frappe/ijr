@@ -34,4 +34,5 @@
 {% else %}
 <script defer src="https://code.jquery.com/jquery-3.6.4.slim.min.js"></script>
 {% endif %}
+<script>window.frappe_bundle_loaded = {{ 'true' if doctype == 'Web Form' else 'false' }}</script>
 {% endblock %}

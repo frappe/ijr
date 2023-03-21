@@ -661,7 +661,7 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
 }
 
 [source-content-type=Markdown] .web-page-content {
-    width: 65ch;
+    max-width: 65ch;
     color: var(--sl-color-gray-800);
     margin: 0 auto;
 }

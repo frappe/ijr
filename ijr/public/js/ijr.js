@@ -1,5 +1,13 @@
 window.addEventListener('DOMContentLoaded', () => {
     link_with_query_params();
+
+    if (!window.frappe_bundle_loaded) {
+        $(document).on('click', 'button[data-toggle=collapse]', (e) => {
+            let $el = $(e.currentTarget);
+            let $target = $($el.attr('data-target'));
+            $target.toggleClass('show');
+        })
+    }
 });
 
 function link_with_query_params() {
