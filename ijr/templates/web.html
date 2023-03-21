@@ -26,8 +26,12 @@
   crossorigin="anonymous"
 ></script>
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-<script defer src="https://code.jquery.com/jquery-3.6.4.slim.min.js"></script>
 {%- endblock -%}
 
 {% block base_scripts %}
+{% if doctype == 'Web Form' %}
+{{ super() }}
+{% else %}
+<script defer src="https://code.jquery.com/jquery-3.6.4.slim.min.js"></script>
+{% endif %}
 {% endblock %}
