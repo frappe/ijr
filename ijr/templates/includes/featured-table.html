@@ -100,7 +100,7 @@
                         <div x-text="column.label"></div>
                         <div class="ml-auto flex-shrink-0">
                             <template x-if="column.sort">
-                                <sl-tooltip content="Sort">
+                                <sl-tooltip :content="sortByColumn == column.id ? sortOrder == 'asc' ? 'Sort descending' : 'Reset sorting' : 'Sort ascending'">
                                     <sl-icon-button @click="sortBy(column.id)"
                                         :name="sortByColumn == column.id
                                             ? sortOrder == 'asc' ? 'sort-up-alt' : 'sort-down-alt'

@@ -130,6 +130,7 @@ no_cache: 1
 
 {%- if view == 'table' -%}
 <div class="mt-2 featured-table-container">
+    {{ m.featured_table_help_text() }}
     <div>
         {%- with columns=columns, data=indicator_data -%}
         {% include "templates/includes/featured-table.html" %}

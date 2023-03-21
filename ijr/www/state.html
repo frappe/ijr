@@ -250,6 +250,7 @@ no_cache: 1
 
 {% else %}
     <div class="featured-table-container">
+    {{ m.featured_table_help_text() }}
     {%- set columns = [
     {
         'label': 'Indicator',

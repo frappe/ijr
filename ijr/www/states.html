@@ -158,6 +158,7 @@ no_cache: 1
 
 {%- if view == 'table' -%}
 <div class="featured-table-container">
+    {{ m.featured_table_help_text() }}
     {%- if table_view == 'pillars' -%}
     {%- set columns = [
         {
