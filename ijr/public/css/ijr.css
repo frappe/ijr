@@ -82,17 +82,16 @@ a:hover {
 
 .sidebar-nav {
     display: flex;
-    flex-direction: column;
     gap: 0.5rem;
-    flex-shrink: 0;
-    width: 142px;
-    margin-right: 2rem;
+    overflow: auto;
 }
 
 .sidebar-nav-item {
     display: flex;
+    flex-shrink: 0;
     padding: 7px 10px;
     line-height: 1.2;
+    border: 1px solid var(--sl-color-gray-200);
     border-radius: var(--border-radius);
     cursor: pointer;
     color: var(--sl-color-gray-900);
@@ -108,6 +107,7 @@ a:hover {
 
 .sidebar-nav-item.active {
     background-color: var(--brand-color);
+    border-color: var(--brand-color);
     color: white;
 }
 
@@ -120,22 +120,23 @@ a:hover {
     font-weight: 500;
 }
 
-.ijr-select, .state-select {
+.ijr-select {
     appearance: none;
     border: none;
     background-color: transparent;
     font-weight: 600;
+    line-height: 1;
     color: var(--brand-color);
     font-size: 16px;
     transform: scale(1.375);
     transform-origin: left;
+    border-bottom: 1px dashed;
 
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230043EE' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
+    background-position: right 0rem center;
     background-repeat: no-repeat;
     background-size: 1.5em 1.5em;
-    padding-left: 0.5rem;
-    padding-right: 2.5rem;
+    padding: 0 1.2em 0 0;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
 }
@@ -192,6 +193,19 @@ a:hover {
 
 .view-switcher button:focus-visible {
     outline: auto;
+}
+
+.ijr-breadcrumb {
+    padding: 0;
+}
+
+.ijr-badge {
+    border-radius: var(--border-radius);
+    background-color: var(--sl-color-gray-100);
+    color: var(--sl-color-gray-600);
+    padding: 7px 10px;
+    font-size: var(--sl-font-size-small);
+    line-height: 1;
 }
 
 .color-legend-container {
@@ -514,11 +528,22 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
     font-size: 22px;
     font-weight: 600;
     color: var(--brand-color);
+    border-bottom: 1px dashed;
 }
 
 .indicator-heading button {
     all: inherit;
     cursor: pointer;
+}
+
+.change-indicator {
+    appearance: none;
+    border: none;
+    color: var(--sl-color-gray-700);
+    background-color: var(--sl-color-gray-100);
+    border-radius: var(--border-radius);
+    font-size: var(--sl-font-size-small);
+    line-height: 1;
 }
 
 .pillar-indicators {

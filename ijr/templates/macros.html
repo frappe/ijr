@@ -52,3 +52,23 @@
     Click icons <sl-icon style="margin-bottom: -2px;" name="list-nested"></sl-icon> <sl-icon style="margin-bottom: -2px;" name="filter-circle"></sl-icon> in the column headers to quickly sort and filter rows.
 </p>
 {% endmacro %}
+
+{% macro breadcrumbs(items) %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb ijr-breadcrumb">
+        {% for item in items %}
+        <li class="{{ resolve_class(['breadcrumb-item', 'active' if item.active else '']) }}"
+            {% if item.active %}aria-current="page"{% endif %}
+        >
+            {% if item.active %}
+            {{ item.label }}
+            {% else %}
+            <a {% if item.href %}href="{{item.href}}"{% endif %}>
+                {{ item.label }}
+            </a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</nav>
+{% endmacro %}

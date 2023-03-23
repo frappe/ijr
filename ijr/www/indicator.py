@@ -69,9 +69,11 @@ def get_context(context):
 
 	context.title = indicator.indicator_name
 	context.description = indicator.description
+	context.indicator_pillar = indicator.pillar
+	context.indicator_pillar_slug = frappe.db.get_value('Pillar', indicator.pillar, 'slug')
 	context.raw_data = get_raw_data_by_state(indicator_id)
 	context.indicator_id = indicator_id
-	context.indicators_by_pillars = get_indicators_by_pillars()
+	context.indicators_by_pillars_and_themes = get_indicators_by_pillars_and_themes()
 	context.view = view
 	context.ijr_number = ijr_number
 	context.cluster = cluster
@@ -134,12 +136,19 @@ def get_raw_data_by_state(indicator_id):
 			raw_data_with_all_ijrs.setdefault(r.state, []).append(data)
 	return raw_data_with_all_ijrs
 
-def get_indicators_by_pillars():
+def get_indicators_by_pillars_and_themes():
 	indicators = frappe.db.get_all('State Indicator Data',
-		fields=['distinct(`indicator_id`) as value', 'indicator_name as label', 'pillar'],
+		fields=['distinct(`indicator_id`) as value', 'indicator_name as label', 'pillar', 'theme'],
 		order_by='indicator_id asc'
 	)
 	indicators_by_pillars = {}
 	for i in indicators:
 		indicators_by_pillars.setdefault(i.pillar, []).append(i)
-	return indicators_by_pillars
+
+	indicators_by_pillars_and_themes = {}
+	for pillar, indicators in indicators_by_pillars.items():
+		indicators_by_pillars_and_themes[pillar] = {}
+		for i in indicators:
+			indicators_by_pillars_and_themes[pillar].setdefault(i.theme, []).append(i)
+
+	return indicators_by_pillars_and_themes

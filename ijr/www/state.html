@@ -6,6 +6,12 @@ skip_frappe_bundle: 1
 
 {% import "templates/macros.html" as m %}
 
+{{ m.breadcrumbs([
+    {'label': 'States Ranking', 'href': '/states'},
+    {'label': state.name, 'href': '/state/' + state.code},
+    {'label': active_tab, 'active': 1},
+]) }}
+
 <div class="title-toolbar">
     <div>
         <div class="d-flex align-items-center">
@@ -17,12 +23,20 @@ skip_frappe_bundle: 1
                     </button>
                 </sl-tooltip>
             </h1>
+            {%- if current_ranking -%}
+            <div class="ml-8 ijr-badge">
+                {{ active_tab }} Rank: <strong>{{ active_tab_rank }}</strong>
+            </div>
+            <div class="ml-2 ijr-badge">
+                {{ active_tab }} Score: <strong>{{ active_tab_score }}</strong>
+            </div>
+            {%- endif -%}
         </div>
 
-        <div class="mt-2">{{ description }}</div>
+        <div class="mt-1">{{ description }}</div>
     </div>
     <div class="text-right">
-        {% if active_tab == 'Overall' %}
+        {% if active_tab == 'Overall' and current_ranking %}
         <div class="view-switcher mb-2" x-data="toggleScoreData">
             <button @click="toggleScore('Rank')" :class="currentValue == 'Rank' && 'active'">
                 Rank
@@ -50,29 +64,27 @@ skip_frappe_bundle: 1
     {% endfor %}
 </sl-dialog>
 
-<div class="flex mt-6">
-    <!-- Sidebar -->
-    <div class="sidebar-nav d-none d-md-flex">
-        {% macro sidebar_item(label, value) %}
-        <a
-            class="sidebar-nav-item {{ 'active' if active_tab == label else '' }}"
-            href="/state/{{ state.code }}?{{ value }}"
-        >
-            {{ label }}
-        </a>
-        {% endmacro %}
+<div class="sidebar-nav d-none d-md-flex mt-3">
+    {% macro sidebar_item(label, value) %}
+    <a
+        class="sidebar-nav-item {{ 'active' if active_tab == label else '' }}"
+        href="/state/{{ state.code }}?{{ value }}"
+    >
+        {{ label }}
+    </a>
+    {% endmacro %}
 
-        {{ sidebar_item('Overall', '') }}
-        <label class="sidebar-nav-label">Pillars</label>
-        {{ sidebar_item('Police', 'pillar=police') }}
-        {{ sidebar_item('Prisons', 'pillar=prisons') }}
-        {{ sidebar_item('Judiciary', 'pillar=judiciary') }}
-        {{ sidebar_item('Legal Aid', 'pillar=legal_aid') }}
-        <label class="sidebar-nav-label">Ranked Themes</label>
-        {{ sidebar_item('Human Resources', 'theme=hr') }}
-        {{ sidebar_item('Diversity', 'theme=diversity') }}
-        {{ sidebar_item('Trends', 'theme=trends') }}
-    </div>
+    {{ sidebar_item('Overall', '') }}
+    {{ sidebar_item('Police', 'pillar=police') }}
+    {{ sidebar_item('Prisons', 'pillar=prisons') }}
+    {{ sidebar_item('Judiciary', 'pillar=judiciary') }}
+    {{ sidebar_item('Legal Aid', 'pillar=legal_aid') }}
+    {{ sidebar_item('Human Resources', 'theme=hr') }}
+    {{ sidebar_item('Diversity', 'theme=diversity') }}
+    {{ sidebar_item('Trends', 'theme=trends') }}
+</div>
+
+<div class="flex mt-6">
 
 <div class="w-100">
 <!-- Main Content -->
@@ -84,40 +96,43 @@ skip_frappe_bundle: 1
 
 {% if active_tab == 'Overall' %}
     {% if current_ranking %}
-    <div class="flex">
-        <div class="state-rank-number">
-            <div class="title">{{ current_ranking.overall_rank }}</div>
-            <div class="description">IJR {{ current_ranking.ijr_number }} Rank</div>
-        </div>
-        <div class="state-rank-number ml-8">
-            <div class="title">{{ current_ranking.overall_score }}</div>
-            <div class="description">IJR {{ current_ranking.ijr_number }} score</div>
-        </div>
-    </div>
-
     <div class="featured-table-container">
     <!-- #region Overall -->
     <div class="flex items-start justify-between">
         <div>
+            {%- set columns = [
+                {
+                    'label': 'IJR #',
+                    'id': 'ijr_number',
+                    'width': 100,
+                    'format': '''IJR ${d.ijr_number}'''
+                },
+                {
+                    'label': 'Overall',
+                    'id': 'overall_rank',
+                    'align': 'center',
+                    'width': 120
+                },
+                {
+                    'label': 'Overall',
+                    'id': 'overall_score',
+                    'align': 'center',
+                    'width': 120
+                },
+            ] -%}
+            {%- with data=all_rankings, columns=columns, class="overall-tab-table" -%}
+            <div class="mb-2 d-flex align-items-center justify-between">
+                <h2 class="pl-6 pl-md-0">Overall Ranks</h2>
+            </div>
+            {% include "templates/includes/featured-table.html" %}
+            {%- endwith -%}
 
             {%- set columns = [
             {
-                'label': 'IJR',
+                'label': 'IJR #',
                 'id': 'ijr_number',
                 'width': 100,
                 'format': '''IJR ${d.ijr_number}'''
-            },
-            {
-                'label': 'Overall',
-                'id': 'overall_rank',
-                'align': 'center',
-                'width': 120
-            },
-            {
-                'label': 'Overall',
-                'id': 'overall_score',
-                'align': 'center',
-                'width': 120
             },
             {
                 'label': 'Police',
@@ -169,25 +184,27 @@ skip_frappe_bundle: 1
             },
             ] -%}
             {%- with data=all_rankings, columns=columns, class="overall-tab-table" -%}
-            <h2 class="mt-8 mb-2 pl-6 pl-md-0">Pillar Ranks</h2>
+            <div class="mt-8 mb-2 d-flex align-items-center justify-between">
+                <h2 class="pl-6 pl-md-0">Pillar Ranks</h2>
+            </div>
             {% include "templates/includes/featured-table.html" %}
             {%- endwith -%}
 
             {%- set columns = [
                 {
-                    'label': 'IJR',
+                    'label': 'IJR #',
                     'id': 'ijr_number',
                     'width': 100,
                     'format': '''IJR ${d.ijr_number}'''
                 },
                 {
-                    'label': 'Human Resources',
+                    'label': 'HR',
                     'id': 'hr_rank',
                     'align': 'center',
                     'width': 120
                 },
                 {
-                    'label': 'Human Resources',
+                    'label': 'HR',
                     'id': 'hr_score',
                     'align': 'center',
                     'width': 120

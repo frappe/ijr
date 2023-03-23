@@ -6,13 +6,20 @@ skip_frappe_bundle: 1
 
 {% import "templates/macros.html" as m %}
 
+{{ m.breadcrumbs([
+    {'label': 'States Ranking', 'href': '/states'},
+    {'label': rank_by_title, 'active': true},
+]) }}
+
 <div class="title-toolbar">
     <div>
-        <div class="d-flex align-items-center">
+        <div class="d-inline d-md-flex align-items-center">
             <h1>
                 States Ranked by {{ rank_by_title }} score in
             </h1>
-            &nbsp;
+            <span class="d-none d-md-inline">
+                &nbsp;
+            </span>
             <select class="ijr-select" name="ijr_number" query="ijr_number">
                 {%- set ijr_options = [
                     {'label': 'All IJRs', 'value' : 0} if view == 'table' else null,
@@ -29,7 +36,7 @@ skip_frappe_bundle: 1
                 {% endfor %}
             </select>
         </div>
-        <div class="d-md-none">
+        <div class="d-md-none mt-2">
             {{ description }}
         </div>
     </div>
@@ -56,33 +63,28 @@ skip_frappe_bundle: 1
     </div>
 </div>
 
-<div class="d-flex justify-content-between mt-2">
+<div class="d-flex justify-content-between mt-1">
     <div class="d-none d-md-block">
         {{ description }}
     </div>
-    {{ m.color_legend(class='d-none d-md-flex') }}
 </div>
 
-<div class="flex mt-6">
-
-
-<!-- Sidebar -->
-<div class="sidebar-nav d-none d-md-flex">
+<div class="sidebar-nav mt-3">
     {% macro sidebar_item(label, value) %}
     <a href="#" query="rank_by={{ value }}" class="sidebar-nav-item {{ 'active' if rank_by == value else '' }}">{{ label }}</a>
     {% endmacro %}
 
     {{ sidebar_item('Overall', 'overall') }}
-    <label class="sidebar-nav-label">Pillars</label>
     {{ sidebar_item('Police', 'police') }}
     {{ sidebar_item('Prisons', 'prisons') }}
     {{ sidebar_item('Judiciary', 'judiciary') }}
     {{ sidebar_item('Legal Aid', 'legal_aid') }}
-    <label class="sidebar-nav-label">Ranked Themes</label>
     {{ sidebar_item('Human Resources', 'hr') }}
     {{ sidebar_item('Diversity', 'diversity') }}
     {{ sidebar_item('Trends', 'trends') }}
 </div>
+
+<div class="flex mt-6">
 
 <div class="w-100">
 <!-- Main content -->
@@ -99,9 +101,8 @@ skip_frappe_bundle: 1
             {%- endwith -%}
         </div>
 
-        {{ m.color_legend(class='d-md-none') }}
-
         <div class="map-container">
+            {{ m.color_legend(class='position-absolute') }}
             {% set hover_html %}
             <div>
                 {% set max_rank = '18' if cluster == 'large-mid' else '7' %}
@@ -158,8 +159,8 @@ skip_frappe_bundle: 1
 {%- endif -%}
 
 {%- if view == 'table' -%}
+{{ m.featured_table_help_text() }}
 <div class="featured-table-container">
-    {{ m.featured_table_help_text() }}
     {%- if table_view == 'pillars' -%}
     {%- set columns = [
         {

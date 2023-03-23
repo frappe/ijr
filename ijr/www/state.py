@@ -86,6 +86,10 @@ def get_context(context):
 	elif theme:
 		context.active_tab = theme
 
+	active_tab_field = _pillar.slug if _pillar else _theme.slug if _theme else 'overall'
+	context.active_tab_rank = current_ranking.get(f'{active_tab_field}_rank') if current_ranking else None
+	context.active_tab_score = current_ranking.get(f'{active_tab_field}_score') if current_ranking else None
+
 def get_value_color(value, max_value):
 	one_third = frappe.utils.cint(max_value / 3)
 	best_values = one_third

@@ -6,17 +6,22 @@ skip_frappe_bundle: 1
 
 {% import "templates/macros.html" as m %}
 
+{{ m.breadcrumbs([
+    {'label': 'States Ranking', 'href': '/states'},
+    {'label': indicator_pillar, 'href': '/states?rank_by=' + indicator_pillar_slug},
+    {'label': indicator_name, 'active': true},
+]) }}
+
 <div class="title-toolbar">
     <div>
-        <div class="d-flex align-items-center">
-            <h1 class="indicator-heading">
-                <sl-tooltip content="Change Indicator">
-                    <button onclick="changeIndicatorDialog.show()">
-                        {{ indicator_name }}
-                    </button>
-                </sl-tooltip>
+        <div class="d-inline d-md-flex align-items-center">
+            <h1>
+                <button class="indicator-heading" onclick="indicatorInfoDialog.show()">
+                    {{ indicator_name }}
+                </button>
                 in
             </h1>
+            &nbsp;
             <select class="ijr-select" name="ijr_number" query="ijr_number">
                 {%- set ijr_options = [
                     {'label': 'All IJRs', 'value' : '0'} if view == 'table' else null,
@@ -38,7 +43,10 @@ skip_frappe_bundle: 1
 
     <div class="d-flex flex-column align-items-end">
         <div class="d-flex mt-4 mt-md-0">
-            <select class="cluster-select" name="cluster" query="cluster">
+            <button class="change-indicator" onclick="changeIndicatorDialog.show()">
+                Change Indicator
+            </button>
+            <select class="ml-2 cluster-select" name="cluster" query="cluster">
             {%- set cluster_options = [
                 {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
                 {'label': '7 Small States' + ('&nbsp;' * 20), 'value' : 'small'},
@@ -62,20 +70,31 @@ skip_frappe_bundle: 1
 </div>
 
 <sl-dialog label="Change Indicator" id="changeIndicatorDialog">
-    {% for pillar, indicators in indicators_by_pillars.items() %}
+    {% for pillar, indicators_by_themes in indicators_by_pillars_and_themes.items() %}
     <div class="pillar-indicators">
         <label>{{ pillar }}</label>
-        {%- for indicator in indicators -%}
-        <a href="/indicator/{{ indicator.value }}">
-            {{ indicator.label }}
-        </a>
+        {% for theme, indicators in indicators_by_themes.items() %}
+        <div class="mb-2 ml-4">
+            <label style="--sl-font-size-medium: 14px">{{ theme }}</label>
+            {%- for indicator in indicators -%}
+            <a href="/indicator/{{ indicator.value }}">
+                {{ indicator.label }}
+            </a>
+            {%- endfor -%}
+        </div>
         {%- endfor -%}
     </div>
     {% endfor %}
 </sl-dialog>
 
+<sl-dialog label="{{ indicator_name }}" id="indicatorInfoDialog">
+    <div>
+        {{ description }}
+    </div>
+</sl-dialog>
+
 {%- if view == 'map' -%}
-<div class="mt-2">
+<div class="mt-6">
     <div class="d-flex flex-column flex-md-row justify-between" style="gap: 2rem;">
         <div class="ranking-table-container">
             {%- with state_rankings=indicator_data,
@@ -130,8 +149,10 @@ skip_frappe_bundle: 1
 {%- endif -%}
 
 {%- if view == 'table' -%}
-<div class="mt-2 featured-table-container">
+<div class="mt-6">
     {{ m.featured_table_help_text() }}
+</div>
+<div class="featured-table-container">
     <div>
         {%- with columns=columns, data=indicator_data -%}
         {% include "templates/includes/featured-table.html" %}
