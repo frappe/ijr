@@ -18,43 +18,38 @@ skip_frappe_bundle: 1
         </div>
 
         <h1 class="mx-auto">India Justice Report Ranks States on Police, Judiciary, Prisons and Legal Aid</h1>
-
-        <nav class="mt-10">
-            <a href="/states">State Rankings</a>
-            <a href="/about">About</a>
-        </nav>
+        <div class="container">
+            <div class="homepage-nav mt-10">
+                {% include "templates/includes/navbar/navbar_items.html" %}
+            </div>
+        </div>
     </header>
+
+    {% macro image_block(fact, class=None) %}
+    <div class="col-sm-6 text-center {{ resolve_class(class) }}">
+        {% if fact.image %}
+        <img src="{{ fact.image }}" alt="{{ fact.title }}" style="width: 70%;">
+        {% endif %}
+    </div>
+    {% endmacro %}
+
+    {% for fact in facts %}
     <section class="homepage-stat">
         <div class="container">
             <div class="row align-items-center">
+                {{ image_block(fact, 'mt-6 mt-sm-0' if fact.image_on_left else 'mb-6 mb-sm-0 order-1') }}
                 <div class="col-sm-6">
-                    <h2>Women in police</h2>
-                    <p class="title">Number of years it would take the country to have at least 33% women in police</p>
-                    <p class="stat">33 years</p>
-                    <p class="subtitle">Nine states will take more than 100 years to reach this target, and 17 states will take more than fifty years to reach this target.</p>
-                    <a class="link" href="/states?rank_by=police">Explore Police Data →</a>
-                </div>
-                <div class="col-sm-6 mt-6 mt-sm-0 text-center">
-                    <img src="/assets/ijr/images/women-in-police.png" alt="Women in police" style="width: 70%;">
+                    <h2>{{ fact.section_title or '' }}</h2>
+                    <p class="title">{{ fact.title or '' }}</p>
+                    <p class="stat">{{ fact.highlight_stat or '' }}</p>
+                    <p class="subtitle">{{ fact.subtitle or '' }}</p>
+                    {% if fact.url and fact.url_title %}
+                    <a class="link" href="{{ fact.url }}">{{ fact.url_title }}</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </section>
-    <section class="homepage-stat">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-sm-6 text-center mb-6 mb-sm-0">
-                    <img src="/assets/ijr/images/inhuman-jails.png" alt="Inhuman jails" style="width: 70%;">
-                </div>
-                <div class="col-sm-6">
-                    <h2>Inhuman jails</h2>
-                    <p class="title">Percentage of people in jail awaiting trials or in other words who haven’t been found guilty yet</p>
-                    <p class="stat">80%</p>
-                    <p class="subtitle">Of the more than 5 lakh total inmates 65% are either illiterate or haven’t finished school. Only 20% or so are convicts.</p>
-                    <a class="link" href="/states?rank_by=prisons">Explore Prison Data →</a>
-                </div>
-            </div>
-        </div>
-    </section>
+    {% endfor %}
 </div>
 {%- endblock -%}
