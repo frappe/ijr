@@ -3,42 +3,48 @@
   "description": null,
   "docstatus": 0,
   "doctype": "Theme",
-  "modified": "2023-01-02 12:40:06.494517",
-  "name": "Budgets"
+  "modified": "2023-03-23 15:01:00.019780",
+  "name": "Budgets",
+  "slug": "budgets"
+ },
+ {
+  "description": "Performance on key Human Resources metrics across four pillars",
+  "docstatus": 0,
+  "doctype": "Theme",
+  "modified": "2023-03-23 15:00:50.375754",
+  "name": "Human Resources",
+  "slug": "hr"
+ },
+ {
+  "description": "Performance on Women/SC/ST/OBC metrics across four pillars",
+  "docstatus": 0,
+  "doctype": "Theme",
+  "modified": "2023-03-23 15:00:41.781153",
+  "name": "Diversity",
+  "slug": "diversity"
  },
  {
   "description": null,
   "docstatus": 0,
   "doctype": "Theme",
-  "modified": "2023-01-02 12:40:14.317508",
-  "name": "Human Resources"
+  "modified": "2023-03-23 15:00:32.780082",
+  "name": "Infrastructure",
+  "slug": "infrastructure"
+ },
+ {
+  "description": "Performance on comparable metrics across pillars over 5-years",
+  "docstatus": 0,
+  "doctype": "Theme",
+  "modified": "2023-03-23 15:00:18.407978",
+  "name": "Trends",
+  "slug": "trends"
  },
  {
   "description": null,
   "docstatus": 0,
   "doctype": "Theme",
-  "modified": "2023-01-02 12:40:18.591700",
-  "name": "Diversity"
- },
- {
-  "description": null,
-  "docstatus": 0,
-  "doctype": "Theme",
-  "modified": "2023-01-02 12:40:24.934446",
-  "name": "Infrastructure"
- },
- {
-  "description": null,
-  "docstatus": 0,
-  "doctype": "Theme",
-  "modified": "2023-01-02 12:40:29.788843",
-  "name": "Trends"
- },
- {
-  "description": null,
-  "docstatus": 0,
-  "doctype": "Theme",
-  "modified": "2023-01-02 12:40:46.829436",
-  "name": "Workload"
+  "modified": "2023-03-23 15:00:12.209369",
+  "name": "Workload",
+  "slug": "workload"
  }
 ]

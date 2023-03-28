@@ -1,30 +1,34 @@
 [
  {
-  "description": null,
+  "description": "Measures performance on capacity metrics in police department",
   "docstatus": 0,
   "doctype": "Pillar",
-  "modified": "2023-01-02 12:38:21.381998",
-  "name": "Police"
+  "modified": "2023-03-23 14:59:47.938248",
+  "name": "Police",
+  "slug": "police"
  },
  {
-  "description": null,
+  "description": "Measures performance on capacity metrics in prisons",
   "docstatus": 0,
   "doctype": "Pillar",
-  "modified": "2023-01-02 12:38:48.064916",
-  "name": "Prisons"
+  "modified": "2023-03-23 14:59:37.063881",
+  "name": "Prisons",
+  "slug": "prisons"
  },
  {
-  "description": null,
+  "description": "Measures performance on capacity metrics in judiciary",
   "docstatus": 0,
   "doctype": "Pillar",
-  "modified": "2023-01-02 12:38:57.855209",
-  "name": "Judiciary"
+  "modified": "2023-03-23 14:59:10.355698",
+  "name": "Judiciary",
+  "slug": "judiciary"
  },
  {
-  "description": null,
+  "description": "Measures performance on capacity metrics in legal aid",
   "docstatus": 0,
   "doctype": "Pillar",
-  "modified": "2023-01-02 12:39:09.405886",
-  "name": "Legal aid"
+  "modified": "2023-03-23 14:59:02.451590",
+  "name": "Legal Aid",
+  "slug": "legal_aid"
  }
 ]
