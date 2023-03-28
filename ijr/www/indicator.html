@@ -6,11 +6,25 @@ skip_frappe_bundle: 1
 
 {% import "templates/macros.html" as m %}
 
-{{ m.breadcrumbs([
-    {'label': 'States Ranking', 'href': '/states'},
-    {'label': indicator_pillar, 'href': '/states?rank_by=' + indicator_pillar_slug},
-    {'label': indicator_name, 'active': true},
-]) }}
+{% include "templates/secondary-nav.html" %}
+
+<div class="row">
+    <div class="col-sm-2">
+        <div class="vertical-nav">
+            {% macro sidebar_item(label, value) %}
+            <a class="sidebar-nav-item {{ 'active' if indicator.pillar == label else '' }}" href="/indicator?pillar={{ value }}">
+                {{ label }}
+            </a>
+            {% endmacro %}
+
+            {{ sidebar_item('Police', 'police') }}
+            {{ sidebar_item('Prisons', 'prisons') }}
+            {{ sidebar_item('Judiciary', 'judiciary') }}
+            {{ sidebar_item('Legal Aid', 'legal_aid') }}
+        </div>
+    </div>
+    <div class="col">
+
 
 <div class="title-toolbar">
     <div>
@@ -19,26 +33,11 @@ skip_frappe_bundle: 1
                 <button class="indicator-heading" onclick="indicatorInfoDialog.show()">
                     {{ indicator_name }}
                 </button>
-                in
             </h1>
-            &nbsp;
-            <select class="ijr-select" name="ijr_number" query="ijr_number">
-                {%- set ijr_options = [
-                    {'label': 'All IJRs', 'value' : '0'} if view == 'table' else null,
-                    {'label': 'IJR 1 (2019)', 'value' : 1},
-                    {'label': 'IJR 2 (2020)', 'value' : 2},
-                    {'label': 'IJR 3 (2022)', 'value' : 3},
-                ] -%}
-                {% for option in ijr_options %}
-                {% if option %}
-                <option value="{{ option.value }}" {{ "selected" if option.value == ijr_number else "" }}>
-                    {{ option.label }}
-                </option>
-                {% endif %}
-                {% endfor %}
-            </select>
         </div>
-        <div class="mt-2">{{ description }}</div>
+        <div class="mt-2">
+            {{ description }}
+        </div>
     </div>
 
     <div class="d-flex flex-column align-items-end">
@@ -66,26 +65,7 @@ skip_frappe_bundle: 1
         </div>
         {{ m.color_legend('d-none d-md-flex mt-2') }}
     </div>
-
 </div>
-
-<sl-dialog label="Change Indicator" id="changeIndicatorDialog">
-    {% for pillar, indicators_by_themes in indicators_by_pillars_and_themes.items() %}
-    <div class="pillar-indicators">
-        <label>{{ pillar }}</label>
-        {% for theme, indicators in indicators_by_themes.items() %}
-        <div class="mb-2 ml-4">
-            <label style="--sl-font-size-medium: 14px">{{ theme }}</label>
-            {%- for indicator in indicators -%}
-            <a href="/indicator/{{ indicator.value }}">
-                {{ indicator.label }}
-            </a>
-            {%- endfor -%}
-        </div>
-        {%- endfor -%}
-    </div>
-    {% endfor %}
-</sl-dialog>
 
 <sl-dialog label="{{ indicator_name }}" id="indicatorInfoDialog">
     <div>
@@ -161,23 +141,7 @@ skip_frappe_bundle: 1
 </div>
 {%- endif -%}
 
-<div class="mt-6 bottom-toolbar">
-    <div>
-        <sl-button size="small" variant="text">
-            Notes
-        </sl-button>
-        <sl-button size="small" variant="text">
-            Download Data
-        </sl-button>
-    </div>
-
-    <div class="flex align-items-center">
-        <sl-icon-button name="twitter" label="Share on Twitter"></sl-icon-button>
-        <sl-icon-button name="linkedin" label="Share on LinkedIn"></sl-icon-button>
-        <sl-button onclick="show_how_to_read()" size="small" variant="text">
-            How to read this page?
-        </sl-button>
-    </div>
+</div>
 </div>
 
 <script>

@@ -1,0 +1,71 @@
+<div class="secondary-nav">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-sm-2">
+                <select class="ijr-select" name="ijr_number" query="ijr_number">
+                    {%- set ijr_options = [
+                        {'label': 'All IJRs', 'value' : 0} if view == 'table' else null,
+                        {'label': 'IJR 1 (2019)', 'value' : 1},
+                        {'label': 'IJR 2 (2020)', 'value' : 2},
+                        {'label': 'IJR 3 (2022)', 'value' : 3},
+                    ] -%}
+                    {% for option in ijr_options %}
+                    {% if option %}
+                    <option value="{{ option.value }}" {{ "selected" if option.value == ijr_number else "" }}>
+                        {{ option.label }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <div class="secondary-nav-items">
+                    <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('rankings')}) }}" href="/rankings">Rankings</a>
+                    <button onclick="changeStateDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('state/')}) }}">States</button>
+                    <button onclick="changeIndicatorDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('indicator/')}) }}">Indicators</button>
+                    <div class="ml-auto">
+                        <button class="secondary-nav-link">How to read this page?</button>
+                        <button class="secondary-nav-link">Notes</button>
+                        <button class="secondary-nav-link">Downloads</button>
+                        <button class="secondary-nav-link" href="">Share</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<sl-dialog label="Select State" id="changeStateDialog">
+    {%- set states_by_cluster = get_states_by_cluster() -%}
+    {% for cluster in states_by_cluster %}
+    <div class="pillar-indicators">
+        <label>{{ cluster }}</label>
+        {% set states = states_by_cluster[cluster] %}
+        {% for _state in states %}
+        <a href="/state/{{ _state.code }}">
+            {{ _state.name }}
+        </a>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</sl-dialog>
+
+<sl-dialog label="Select Indicator" id="changeIndicatorDialog">
+    {%- set indicators_by_pillars_and_themes = get_indicators_by_pillars_and_themes() -%}
+    {% for pillar, indicators_by_themes in indicators_by_pillars_and_themes.items() %}
+    <div class="pillar-indicators">
+        <label>{{ pillar }}</label>
+        {% for theme, indicators in indicators_by_themes.items() %}
+        <div class="mb-2 ml-4">
+            <label style="--sl-font-size-medium: 14px">{{ theme }}</label>
+            {%- for indicator in indicators -%}
+            <a href="/indicator/{{ indicator.value }}">
+                {{ indicator.label }}
+            </a>
+            {%- endfor -%}
+        </div>
+        {%- endfor -%}
+    </div>
+    {% endfor %}
+</sl-dialog>

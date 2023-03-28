@@ -6,24 +6,45 @@ skip_frappe_bundle: 1
 
 {% import "templates/macros.html" as m %}
 
-{{ m.breadcrumbs([
-    {'label': 'States Ranking', 'href': '/states'},
-    {'label': state.name, 'href': '/state/' + state.code},
-    {'label': active_tab, 'active': 1},
-]) }}
+{% include "templates/secondary-nav.html" %}
+
+<div class="row">
+    <div class="col-sm-2">
+        <div class="vertical-nav">
+            {% macro sidebar_item(label, value) %}
+            <a
+                class="sidebar-nav-item {{ 'active' if active_tab == label else '' }}"
+                href="/state/{{ state.code }}?{{ value }}"
+            >
+                {{ label }}
+            </a>
+            {% endmacro %}
+
+            {{ sidebar_item('Overall', '') }}
+            <label class="sidebar-nav-label">Pillar</label>
+            {{ sidebar_item('Police', 'pillar=police') }}
+            {{ sidebar_item('Prisons', 'pillar=prisons') }}
+            {{ sidebar_item('Judiciary', 'pillar=judiciary') }}
+            {{ sidebar_item('Legal Aid', 'pillar=legal_aid') }}
+            <label class="sidebar-nav-label">Ranked Themes</label>
+            {{ sidebar_item('Human Resources', 'theme=hr') }}
+            {{ sidebar_item('Diversity', 'theme=diversity') }}
+            {{ sidebar_item('Trends', 'theme=trends') }}
+        </div>
+    </div>
+    <div class="col">
+<!-- main content -->
 
 <div class="title-toolbar">
     <div>
         <div class="d-flex align-items-center">
             <h1 class="indicator-heading">
-                <sl-tooltip content="Change State">
-                    <button onclick="changeStateDialog.show()">
-                        {{ state.name }}
-                        <sl-icon name="chevron-down" class="font-size-sm" aria-hidden="true"></sl-icon>
-                    </button>
-                </sl-tooltip>
+                <button onclick="changeStateDialog.show()">
+                    {{ state.name }}
+                    <sl-icon name="chevron-down" class="font-size-sm" aria-hidden="true"></sl-icon>
+                </button>
             </h1>
-            {%- if current_ranking -%}
+            {%- if current_ranking and 0-%}
             <div class="ml-8 ijr-badge">
                 {{ active_tab }} Rank: <strong>{{ active_tab_rank }}</strong>
             </div>
@@ -50,39 +71,32 @@ skip_frappe_bundle: 1
     </div>
 </div>
 
-<sl-dialog label="Change State" id="changeStateDialog">
-    {% for cluster in states_by_cluster %}
-    <div class="pillar-indicators">
-        <label>{{ cluster }}</label>
-        {% set states = states_by_cluster[cluster] %}
-        {% for _state in states %}
-        <a href="/state/{{ _state.code }}">
-            {{ _state.name }}
-        </a>
-        {% endfor %}
+{% macro state_overview() %}
+<div class="state-overview mb-6">
+    <div class="state-overview-stat">
+        <span class="label">{{ active_tab }} Score</span>
+        <div class="stat" style="background-color: {{ get_color(active_tab_color) }};">
+            {{ active_tab_score }}
+        </div>
     </div>
-    {% endfor %}
-</sl-dialog>
-
-<div class="sidebar-nav d-none d-md-flex mt-3">
-    {% macro sidebar_item(label, value) %}
-    <a
-        class="sidebar-nav-item {{ 'active' if active_tab == label else '' }}"
-        href="/state/{{ state.code }}?{{ value }}"
-    >
-        {{ label }}
-    </a>
-    {% endmacro %}
-
-    {{ sidebar_item('Overall', '') }}
-    {{ sidebar_item('Police', 'pillar=police') }}
-    {{ sidebar_item('Prisons', 'pillar=prisons') }}
-    {{ sidebar_item('Judiciary', 'pillar=judiciary') }}
-    {{ sidebar_item('Legal Aid', 'pillar=legal_aid') }}
-    {{ sidebar_item('Human Resources', 'theme=hr') }}
-    {{ sidebar_item('Diversity', 'theme=diversity') }}
-    {{ sidebar_item('Trends', 'theme=trends') }}
+    {% if active_tab_score_delta %}
+    <div class="state-overview-stat">
+        <span class="label">{{ active_tab }} Score Change</span>
+        <div class="stat">{{ '+' if active_tab_score_delta > 0 else ''}}{{ active_tab_score_delta }}</div>
+    </div>
+    {% endif %}
+    <div class="state-overview-stat">
+        <span class="label">{{ active_tab }} Rank</span>
+        <div class="stat">{{ active_tab_rank }}</div>
+    </div>
+    {% if active_tab_rank_delta %}
+    <div class="state-overview-stat">
+        <span class="label">{{ active_tab }} Rank Change</span>
+        <div class="stat">{{ '+' if active_tab_rank_delta > 0 else ''}}{{ active_tab_rank_delta }}</div>
+    </div>
+    {% endif %}
 </div>
+{% endmacro %}
 
 <div class="flex mt-6">
 
@@ -99,7 +113,9 @@ skip_frappe_bundle: 1
     <div class="featured-table-container">
     <!-- #region Overall -->
     <div class="flex items-start justify-between">
-        <div>
+        <div class="flex-1 w-100 mr-4">
+            {{ state_overview() }}
+
             {%- set columns = [
                 {
                     'label': 'IJR #',
@@ -272,6 +288,7 @@ skip_frappe_bundle: 1
     {% endif %}
 
 {% else %}
+    {{ state_overview() }}
     <div class="featured-table-container">
     {{ m.featured_table_help_text() }}
     {%- set columns = [
@@ -320,23 +337,7 @@ skip_frappe_bundle: 1
 
 </div>
 
-<div class="mt-6 bottom-toolbar">
-    <div>
-        <sl-button size="small" variant="text">
-            Notes
-        </sl-button>
-        <sl-button size="small" variant="text">
-            Download Data
-        </sl-button>
-    </div>
-
-    <div class="flex align-items-center">
-        <sl-icon-button name="twitter" label="Share on Twitter"></sl-icon-button>
-        <sl-icon-button name="linkedin" label="Share on LinkedIn"></sl-icon-button>
-        <sl-button onclick="show_how_to_read()" size="small" variant="text">
-            How to read this page?
-        </sl-button>
-    </div>
+</div>
 </div>
 
 <script>

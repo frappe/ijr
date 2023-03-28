@@ -31,6 +31,14 @@ def get_context(context):
 	if cluster_value:
 		filters['cluster'] = cluster_value
 
+	if not indicator_id and frappe.form_dict.pillar:
+		result = frappe.qb.get_query('State Indicator', filters={'pillar.slug': frappe.form_dict.pillar}, fields=['name']).run(as_dict=1)
+		indicator_id = result[0].name if result else None
+
+		if indicator_id:
+			frappe.flags.redirect_location = f'/indicator/{indicator_id}'
+			raise frappe.Redirect
+
 	context.indicator_data = indicator_rankings_data(filters, order_by)
 	if context.indicator_data:
 		context.indicator_name = context.indicator_data[0].indicator_name
@@ -67,13 +75,13 @@ def get_context(context):
 
 	indicator = frappe.get_doc('State Indicator', indicator_id)
 
+	context.indicator = indicator
 	context.title = indicator.indicator_name
 	context.description = indicator.description
 	context.indicator_pillar = indicator.pillar
 	context.indicator_pillar_slug = frappe.db.get_value('Pillar', indicator.pillar, 'slug')
 	context.raw_data = get_raw_data_by_state(indicator_id)
 	context.indicator_id = indicator_id
-	context.indicators_by_pillars_and_themes = get_indicators_by_pillars_and_themes()
 	context.view = view
 	context.ijr_number = ijr_number
 	context.cluster = cluster
@@ -135,20 +143,3 @@ def get_raw_data_by_state(indicator_id):
 		if r.ijr_number == 1:
 			raw_data_with_all_ijrs.setdefault(r.state, []).append(data)
 	return raw_data_with_all_ijrs
-
-def get_indicators_by_pillars_and_themes():
-	indicators = frappe.db.get_all('State Indicator Data',
-		fields=['distinct(`indicator_id`) as value', 'indicator_name as label', 'pillar', 'theme'],
-		order_by='indicator_id asc'
-	)
-	indicators_by_pillars = {}
-	for i in indicators:
-		indicators_by_pillars.setdefault(i.pillar, []).append(i)
-
-	indicators_by_pillars_and_themes = {}
-	for pillar, indicators in indicators_by_pillars.items():
-		indicators_by_pillars_and_themes[pillar] = {}
-		for i in indicators:
-			indicators_by_pillars_and_themes[pillar].setdefault(i.theme, []).append(i)
-
-	return indicators_by_pillars_and_themes

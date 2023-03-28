@@ -60,10 +60,9 @@ website_route_rules = [
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-#	"methods": "ijr.utils.jinja_methods",
-#	"filters": "ijr.utils.jinja_filters"
-# }
+jinja = {
+	"methods": "ijr.jinja_helpers"
+}
 
 # Installation
 # ------------
