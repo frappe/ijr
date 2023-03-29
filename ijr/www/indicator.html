@@ -30,8 +30,9 @@ skip_frappe_bundle: 1
     <div>
         <div class="d-inline d-md-flex align-items-center">
             <h1>
-                <button class="indicator-heading" onclick="indicatorInfoDialog.show()">
+                <button class="indicator-heading" onclick="changeIndicatorDialog.show()">
                     {{ indicator_name }}
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 1.5rem; color: var(--accent-color)" aria-hidden="true" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 8l4 4 4-4"/></svg>
                 </button>
             </h1>
         </div>
@@ -42,8 +43,11 @@ skip_frappe_bundle: 1
 
     <div class="d-flex flex-column align-items-end">
         <div class="d-flex mt-4 mt-md-0">
-            <button class="change-indicator" onclick="changeIndicatorDialog.show()">
-                Change Indicator
+            <button class="change-indicator" onclick="indicatorInfoDialog.show()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1rem">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                </svg>
+                Learn More
             </button>
             <select class="ml-2 cluster-select" name="cluster" query="cluster">
             {%- set cluster_options = [
@@ -67,9 +71,9 @@ skip_frappe_bundle: 1
     </div>
 </div>
 
-<sl-dialog label="{{ indicator_name }}" id="indicatorInfoDialog">
+<sl-dialog label="{{ indicator.indicator_name }}" id="indicatorInfoDialog">
     <div>
-        {{ description }}
+        {{ indicator.long_description or indicator.description }}
     </div>
 </sl-dialog>
 

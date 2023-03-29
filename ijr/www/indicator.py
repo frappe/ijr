@@ -76,7 +76,7 @@ def get_context(context):
 	indicator = frappe.get_doc('State Indicator', indicator_id)
 
 	context.indicator = indicator
-	context.title = indicator.indicator_name
+	context.title = f'{indicator.indicator_name} | India Justice Report'
 	context.description = indicator.description
 	context.indicator_pillar = indicator.pillar
 	context.indicator_pillar_slug = frappe.db.get_value('Pillar', indicator.pillar, 'slug')

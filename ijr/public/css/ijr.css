@@ -49,7 +49,13 @@ a {
 }
 
 a:hover {
-    color: var(--brand-color);
+    color: var(--accent-color);
+}
+
+a.accent-link:hover {
+    text-decoration: none;
+    color: var(--accent-color);
+    border-bottom: 1px dashed var(--accent-color);
 }
 
 .flex-between {
@@ -217,6 +223,7 @@ a:hover {
     border-radius: var(--border-radius);
     font-size: var(--sl-font-size-small);
     line-height: 1;
+    cursor: pointer;
 
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a1a1aa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.5rem center;
@@ -586,6 +593,10 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
     color: var(--brand-color);
 }
 
+sl-dialog {
+    --body-spacing: 0 1.25rem 1.25rem 1.25rem;
+}
+
 .w-full-mobile {
     width: unset;
 }
@@ -617,6 +628,10 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
     border-radius: var(--border-radius);
     font-size: var(--sl-font-size-small);
     line-height: 1;
+    padding: 0 10px 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .pillar-indicators {
@@ -624,8 +639,9 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
 }
 
 .pillar-indicators label {
-    font-size: var(--sl-font-size-medium);
-    color: var(--sl-color-gray-800);
+    font-size: var(--sl-font-size-small);
+    font-weight: 500;
+    color: var(--sl-color-gray-900);
     margin-bottom: 0.5rem;
 }
 
@@ -634,10 +650,17 @@ sl-icon-button::part(base):hover, sl-icon-button::part(base):focus {
     padding: 7px 10px;
     font-size: var(--sl-font-size-small);
     border-radius: var(--border-radius);
+    color: var(--sl-color-gray-600);
+    text-decoration: none;
 }
 
-.pillar-indicators a:hover {
-    text-decoration: none;
+.pillar-indicators a.active {
+    color: var(--accent-color);
+    background-color: var(--sl-color-gray-100);
+}
+
+.pillar-indicators a:hover:not(.active) {
+    color: var(--sl-color-gray-900);
     background-color: var(--sl-color-gray-100);
 }
 

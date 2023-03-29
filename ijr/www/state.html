@@ -41,7 +41,7 @@ skip_frappe_bundle: 1
             <h1 class="indicator-heading">
                 <button onclick="changeStateDialog.show()">
                     {{ state.name }}
-                    <sl-icon name="chevron-down" class="font-size-sm" aria-hidden="true"></sl-icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 1.5rem; color: var(--accent-color)" aria-hidden="true" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 8l4 4 4-4"/></svg>
                 </button>
             </h1>
             {%- if current_ranking and 0-%}
@@ -79,12 +79,6 @@ skip_frappe_bundle: 1
             {{ active_tab_score }}
         </div>
     </div>
-    {% if active_tab_score_delta %}
-    <div class="state-overview-stat">
-        <span class="label">{{ active_tab }} Score Change</span>
-        <div class="stat">{{ '+' if active_tab_score_delta > 0 else ''}}{{ active_tab_score_delta }}</div>
-    </div>
-    {% endif %}
     <div class="state-overview-stat">
         <span class="label">{{ active_tab }} Rank</span>
         <div class="stat">{{ active_tab_rank }}</div>
@@ -326,7 +320,7 @@ skip_frappe_bundle: 1
         {%- endwith -%}
     </div>
 
-    <sl-dialog label="Calculations" id="calculationsDialog" style="--width: max-content; --body-spacing: 0 1.25rem 1.25rem 1.25rem">
+    <sl-dialog label="Calculations" id="calculationsDialog" style="--width: max-content">
         <sl-button slot="footer" variant="primary">Close</sl-button>
     </sl-dialog>
     </div>

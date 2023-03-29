@@ -8,7 +8,6 @@ from frappe.utils import cint
 
 def get_context(context):
 	view = frappe.form_dict.view or 'map'
-	table_view = frappe.form_dict.table_view or 'pillars'
 	rank_by = frappe.form_dict.rank_by or 'overall'
 	default_ijr = 3 if view == 'map' else 0
 	ijr_number = cint(frappe.form_dict.ijr_number or default_ijr)
@@ -25,23 +24,25 @@ def get_context(context):
 
 	state_rankings = state_rankings_data(ijr_number=ijr_number, cluster=cluster_filter, rank_by=rank_by)
 
-	title = 'IJR Insights'
-	if view == 'table':
-		title = title + f' | {table_view.title()} Table View'
-	if view == 'map':
-		title = title + ' | Overall Ranking | Map View'
-
+	title = 'Overall State Rankings'
 	rank_by_title = 'Overall'
 	description = 'Performance across police, prisons, judiciary and legal aid'
+	_pillar = None
+	_theme = None
+	table_view = 'pillars'
 	if rank_by != 'overall':
 		if _pillar := get_pillar(rank_by):
 			rank_by_title = _pillar.name
 			description = _pillar.description
+			title = f'State Rankings by {_pillar.name}'
+			table_view = 'pillars'
 		elif _theme := get_theme(rank_by):
 			rank_by_title = _theme.name
 			description = _theme.description
+			title = f'State Rankings by {_theme.name}'
+			table_view = 'themes'
 
-	context.title = title
+	context.title = f'{title} | India Justice Report'
 	context.description = description
 	context.rank_by_title = rank_by_title
 	context.state_rankings = state_rankings

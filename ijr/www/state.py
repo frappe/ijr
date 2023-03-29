@@ -78,7 +78,7 @@ def get_context(context):
 
 	context.raw_data = get_raw_data_by_indicator(state_code)
 	context.state = state
-	context.title = f'{context.state.name} | State Analysis | India Justice Report'
+	context.title = f'{context.state.name} State Analysis | India Justice Report'
 	context.description = description
 	context.current_ranking = current_ranking
 	context.previous_ranking = previous_ranking

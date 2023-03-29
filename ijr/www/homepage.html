@@ -1,6 +1,8 @@
 ---
 no_cache: 1
 skip_frappe_bundle: 1
+title: India Justice Report
+description: India Justice Report ranks 18 large and 7 small states according to their capacity to deliver justice to all
 ---
 
 {%- extends "templates/web.html" -%}
@@ -33,7 +35,7 @@ skip_frappe_bundle: 1
     </div>
     {% endmacro %}
 
-    {% for fact in facts %}
+    {% for fact in frappe.db.get_all('IJR Homepage Fact', filters={'published': 1}, fields=['*'], order_by='creation asc, `order` asc') %}
     <section class="homepage-stat">
         <div class="container">
             <div class="row align-items-center">

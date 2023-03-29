@@ -23,10 +23,10 @@
                     <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('rankings')}) }}" href="/rankings">Rankings</a>
                     <button onclick="changeStateDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('state/')}) }}">States</button>
                     <button onclick="changeIndicatorDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('indicator/')}) }}">Indicators</button>
+                    <!-- <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('methodology')}) }}" href="/methodology">Methodology</a> -->
                     <div class="ml-auto">
                         <button class="secondary-nav-link">How to read this page?</button>
-                        <button class="secondary-nav-link">Notes</button>
-                        <button class="secondary-nav-link">Downloads</button>
+                        <button class="secondary-nav-link" onclick="downloadsDialog.show()">Downloads</button>
                         <button class="secondary-nav-link" href="">Share</button>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
         <label>{{ cluster }}</label>
         {% set states = states_by_cluster[cluster] %}
         {% for _state in states %}
-        <a href="/state/{{ _state.code }}">
+        <a href="/state/{{ _state.code }}" class="{{ resolve_class({'active': state and state.code == _state.code }) }}">
             {{ _state.name }}
         </a>
         {% endfor %}
@@ -54,18 +54,41 @@
 <sl-dialog label="Select Indicator" id="changeIndicatorDialog">
     {%- set indicators_by_pillars_and_themes = get_indicators_by_pillars_and_themes() -%}
     {% for pillar, indicators_by_themes in indicators_by_pillars_and_themes.items() %}
+    {% if not pathname.startswith('indicator/') or pillar == indicator.pillar %}
     <div class="pillar-indicators">
         <label>{{ pillar }}</label>
         {% for theme, indicators in indicators_by_themes.items() %}
         <div class="mb-2 ml-4">
             <label style="--sl-font-size-medium: 14px">{{ theme }}</label>
-            {%- for indicator in indicators -%}
-            <a href="/indicator/{{ indicator.value }}">
-                {{ indicator.label }}
+            {%- for _indicator in indicators -%}
+            <a href="/indicator/{{ _indicator.value }}" class="{{ resolve_class({'active': indicator and indicator.name == _indicator.value }) }}">
+                {{ _indicator.label }}
             </a>
             {%- endfor -%}
         </div>
         {%- endfor -%}
     </div>
+    {% endif %}
     {% endfor %}
+</sl-dialog>
+
+<sl-dialog label="Downloads" id="downloadsDialog">
+{%- for file in frappe.db.get_all('IJR File', {'published': 1, 'file': ('is', 'set')}, '*', order_by='`order` asc') -%}
+<div class="mb-2">
+    <a href="/api/method/ijr.api.download?file_id={{ file.name }}" download
+        class="accent-link d-inline-flex align-items-center" style="gap: 0.5rem">
+        {% if file.file.endswith('.csv') %}
+        <sl-icon name="filetype-csv"></sl-icon>
+        {% elif file.file.endswith('.pdf') %}
+        <sl-icon name="filetype-pdf"></sl-icon>
+        {% elif file.file.endswith('.xlsx') %}
+        <sl-icon name="filetype-xlsx"></sl-icon>
+        {% else %}
+        <sl-icon name="file-earmark"></sl-icon>
+        {% endif %}
+
+        {{ file.title }}
+    </a>
+</div>
+{%- endfor -%}
 </sl-dialog>

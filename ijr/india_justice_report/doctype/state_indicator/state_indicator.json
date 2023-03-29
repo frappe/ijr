@@ -12,7 +12,8 @@
   "indicator_name",
   "pillar",
   "theme",
-  "description"
+  "description",
+  "long_description"
  ],
  "fields": [
   {
@@ -45,11 +46,16 @@
    "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Description"
+  },
+  {
+   "fieldname": "long_description",
+   "fieldtype": "Text Editor",
+   "label": "Long Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-15 16:57:54.991192",
+ "modified": "2023-03-29 14:01:21.075324",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "State Indicator",
