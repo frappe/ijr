@@ -37,3 +37,6 @@ def get_color(color_code):
 		3: 'var(--worst)'
 	}
 	return color_map.get(color_code)
+
+def get_current_url():
+	return frappe.local.request.url

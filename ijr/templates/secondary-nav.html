@@ -27,7 +27,7 @@
                     <div class="ml-auto">
                         <button class="secondary-nav-link">How to read this page?</button>
                         <button class="secondary-nav-link" onclick="downloadsDialog.show()">Downloads</button>
-                        <button class="secondary-nav-link" href="">Share</button>
+                        <button class="secondary-nav-link" onclick="shareDialog.show()">Share</button>
                     </div>
                 </div>
             </div>
@@ -91,4 +91,24 @@
     </a>
 </div>
 {%- endfor -%}
+</sl-dialog>
+
+
+<!-- share dialog with twitter and facebook share links -->
+<sl-dialog label="Share" id="shareDialog">
+    {%- set text = title | urlencode -%}
+    {%- set url = get_current_url() | urlencode -%}
+    {%- set links = [
+        {'label': 'Share on Twitter', 'url': "https://twitter.com/intent/tweet?url={url}&text={text}".format(url=url, text=text), 'icon': 'twitter'},
+        {'label': 'Share on Facebook', 'url': "https://www.facebook.com/sharer/sharer.php?u={url}".format(url=url), 'icon': 'facebook'},
+        {'label': 'Share on WhatsApp', 'url': "https://wa.me/?text={text}".format(text=text), 'icon': 'whatsapp'},
+    ] -%}
+    {%- for link in links -%}
+    <div class="mb-2">
+        <a href="{{ link.url }}" target="_blank" class="accent-link d-inline-flex align-items-center" style="gap: 0.5rem">
+            <sl-icon name="{{ link.icon }}"></sl-icon>
+            {{ link.label }}
+        </a>
+    </div>
+    {%- endfor -%}
 </sl-dialog>
