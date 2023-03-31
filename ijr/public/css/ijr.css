@@ -70,8 +70,8 @@ a.accent-link:hover {
 
 .navbar.navbar-light {
     background-color: var(--brand-color);
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
     border-bottom: none;
 }
 
@@ -85,7 +85,7 @@ a.accent-link:hover {
 
 .navbar-brand img {
     max-height: unset;
-    height: 32px;
+    height: 45px;
 }
 
 .navbar .navbar-nav .nav-link {
