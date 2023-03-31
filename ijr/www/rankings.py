@@ -4,9 +4,15 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.utils import cint
+from ijr.jinja_helpers import rankings_url
 
 
 def get_context(context):
+	if not frappe.form_dict:
+		url = rankings_url(defaults_only=True)
+		frappe.local.flags.redirect_location = url
+		raise frappe.Redirect
+
 	view = frappe.form_dict.view or 'map'
 	rank_by = frappe.form_dict.rank_by or 'overall'
 	default_ijr = 3 if view == 'map' else 0
@@ -15,14 +21,9 @@ def get_context(context):
 	if view == 'map' and ijr_number == 0:
 		ijr_number = 3
 
-	cluster = frappe.form_dict.cluster or 'large-mid'
-	cluster_filter = None
-	if cluster == 'large-mid':
-		cluster_filter = 'Large and mid-sized states'
-	if cluster == 'small':
-		cluster_filter = 'Small states'
+	cluster = frappe.form_dict.cluster or 'large-states'
 
-	state_rankings = state_rankings_data(ijr_number=ijr_number, cluster=cluster_filter, rank_by=rank_by)
+	state_rankings = state_rankings_data(ijr_number=ijr_number, cluster=cluster, rank_by=rank_by)
 
 	title = 'Overall State Rankings'
 	rank_by_title = 'Overall'
@@ -58,9 +59,9 @@ def get_context(context):
 
 
 def state_rankings_data(ijr_number, cluster, rank_by):
-	if cluster == 'large-mid':
+	if cluster == 'large-states':
 		cluster = 'Large and mid-sized states'
-	if cluster == 'small':
+	if cluster == 'small-states':
 		cluster = 'Small states'
 
 	filters = {'cluster': cluster}

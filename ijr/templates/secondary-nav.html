@@ -2,16 +2,16 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-sm-2">
-                <select class="ijr-select" name="ijr_number" query="ijr_number">
+                <select class="ijr-select" name="ijr_number" onchange="window.location.href = this.value">
                     {%- set ijr_options = [
-                        {'label': 'All IJRs', 'value' : 0} if view == 'table' else null,
+                        {'label': 'All IJRs', 'value' : 0} if view == 'table' and pathname.startswith('rankings') else null,
                         {'label': 'IJR 1 (2019)', 'value' : 1},
                         {'label': 'IJR 2 (2020)', 'value' : 2},
                         {'label': 'IJR 3 (2022)', 'value' : 3},
                     ] -%}
                     {% for option in ijr_options %}
                     {% if option %}
-                    <option value="{{ option.value }}" {{ "selected" if option.value == ijr_number else "" }}>
+                    <option value="{{ get_current_page_url(ijr_number=option.value) }}" {{ "selected" if option.value == ijr_number else "" }}>
                         {{ option.label }}
                     </option>
                     {% endif %}
@@ -20,7 +20,7 @@
             </div>
             <div class="col">
                 <div class="secondary-nav-items">
-                    <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('rankings')}) }}" href="/rankings">Rankings</a>
+                    <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('rankings')}) }}" href="{{ rankings_url(defaults_only=1) }}">Rankings</a>
                     <button onclick="changeStateDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('state/')}) }}">States</button>
                     <button onclick="changeIndicatorDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('indicator/')}) }}">Indicators</button>
                     <!-- <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('methodology')}) }}" href="/methodology">Methodology</a> -->
@@ -43,7 +43,7 @@
         <label>{{ cluster }}</label>
         {% set states = states_by_cluster[cluster] %}
         {% for _state in states %}
-        <a href="/state/{{ _state.code }}" class="{{ resolve_class({'active': state and state.code == _state.code }) }}">
+        <a href="{{ state_url(state=_state.code) }}" class="{{ resolve_class({'active': state and state.code == _state.code }) }}">
             {{ _state.name }}
         </a>
         {% endfor %}

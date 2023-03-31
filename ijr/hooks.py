@@ -52,8 +52,14 @@ web_include_js = "/assets/ijr/js/ijr.js"
 # website_generators = ["Web Page"]
 
 website_route_rules = [
+    {"from_route": "/rankings/ijr-<int:ijr_number>/<rank_by>/<cluster>/<view>", "to_route": "rankings"},
+
 	{"from_route": "/state/<state>", "to_route": "state"},
+	{"from_route": "/state/<state>/ijr-<int:ijr_number>", "to_route": "state"},
+	{"from_route": "/state/<state>/ijr-<int:ijr_number>/<pillar_or_theme>", "to_route": "state"},
+
 	{"from_route": "/indicator/<indicator_id>", "to_route": "indicator"},
+	{"from_route": "/indicator/<indicator_id>/ijr-<int:ijr_number>/<cluster>/<view>", "to_route": "indicator"},
 ]
 
 # Jinja

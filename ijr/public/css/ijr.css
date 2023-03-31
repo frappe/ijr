@@ -628,7 +628,7 @@ sl-dialog {
     border-radius: var(--border-radius);
     font-size: var(--sl-font-size-small);
     line-height: 1;
-    padding: 0 10px 0 8px;
+    padding: 4px;
     display: flex;
     align-items: center;
     gap: 6px;

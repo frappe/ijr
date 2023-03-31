@@ -14,22 +14,22 @@ skip_frappe_bundle: 1
             {% macro sidebar_item(label, value) %}
             <a
                 class="sidebar-nav-item {{ 'active' if active_tab == label else '' }}"
-                href="/state/{{ state.code }}?{{ value }}"
+                href="{{ state_url(pillar_or_theme=value) }}"
             >
                 {{ label }}
             </a>
             {% endmacro %}
 
-            {{ sidebar_item('Overall', '') }}
+            {{ sidebar_item('Overall', 'overall') }}
             <label class="sidebar-nav-label">Pillar</label>
-            {{ sidebar_item('Police', 'pillar=police') }}
-            {{ sidebar_item('Prisons', 'pillar=prisons') }}
-            {{ sidebar_item('Judiciary', 'pillar=judiciary') }}
-            {{ sidebar_item('Legal Aid', 'pillar=legal_aid') }}
+            {{ sidebar_item('Police', 'police') }}
+            {{ sidebar_item('Prisons', 'prisons') }}
+            {{ sidebar_item('Judiciary', 'judiciary') }}
+            {{ sidebar_item('Legal Aid', 'legal_aid') }}
             <label class="sidebar-nav-label">Ranked Themes</label>
-            {{ sidebar_item('Human Resources', 'theme=hr') }}
-            {{ sidebar_item('Diversity', 'theme=diversity') }}
-            {{ sidebar_item('Trends', 'theme=trends') }}
+            {{ sidebar_item('Human Resources', 'hr') }}
+            {{ sidebar_item('Diversity', 'diversity') }}
+            {{ sidebar_item('Trends', 'trends') }}
         </div>
     </div>
     <div class="col">
@@ -44,14 +44,6 @@ skip_frappe_bundle: 1
                     <svg xmlns="http://www.w3.org/2000/svg" style="width: 1.5rem; color: var(--accent-color)" aria-hidden="true" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 8l4 4 4-4"/></svg>
                 </button>
             </h1>
-            {%- if current_ranking and 0-%}
-            <div class="ml-8 ijr-badge">
-                {{ active_tab }} Rank: <strong>{{ active_tab_rank }}</strong>
-            </div>
-            <div class="ml-2 ijr-badge">
-                {{ active_tab }} Score: <strong>{{ active_tab_score }}</strong>
-            </div>
-            {%- endif -%}
         </div>
 
         <div class="mt-1">{{ description }}</div>
@@ -282,6 +274,7 @@ skip_frappe_bundle: 1
     {% endif %}
 
 {% else %}
+    <!-- Pillar/Theme view -->
     {{ state_overview() }}
     <div class="featured-table-container">
     {{ m.featured_table_help_text() }}
@@ -293,7 +286,8 @@ skip_frappe_bundle: 1
         'width': 310,
         'filter': true
     },
-    { 'label': 'Theme', 'id': 'theme', 'width': 150, 'filter': true } if frappe.form_dict.pillar else { 'label': 'Pillar', 'id': 'pillar', 'filter': true },
+    { 'label': 'Theme', 'id': 'theme', 'width': 150, 'filter': true, 'hide_condition': ijr_theme },
+    { 'label': 'Pillar', 'id': 'pillar', 'width': 150, 'filter': true, 'hide_condition': ijr_pillar },
     { 'label': 'IJR', 'id': 'ijr_number', 'width': 100, 'align': 'center', 'filter': true },
     { 'label': 'Score', 'id': 'ijr_score', 'width': 100, 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'right' },
     { 'label': 'Value', 'id': 'indicator_value', 'width': 100, 'align': 'right' },

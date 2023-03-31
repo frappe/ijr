@@ -4,20 +4,39 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.utils.formatters import format_value
+from ijr.jinja_helpers import indicator_url
 
 def get_context(context):
+	if not frappe.form_dict.indicator_id and frappe.form_dict.pillar:
+		result = frappe.qb.get_query('State Indicator', filters={'pillar.slug': frappe.form_dict.pillar}, fields=['name']).run(as_dict=1)
+		indicator_id = result[0].name if result else None
+
+		if indicator_id:
+			frappe.flags.redirect_location = f'/indicator/{indicator_id}'
+			raise frappe.Redirect
+
+	if not frappe.form_dict.indicator_id:
+		frappe.throw('Indicator not found', frappe.PageDoesNotExistError)
+
+	if frappe.form_dict.indicator_id and not frappe.db.exists('State Indicator', frappe.form_dict.indicator_id):
+		frappe.throw('Indicator not found', frappe.PageDoesNotExistError)
+
+
+	if not (frappe.form_dict.ijr_number or frappe.form_dict.view or frappe.form_dict.cluster):
+		url = indicator_url(
+			indicator_id=frappe.form_dict.indicator_id,
+			ijr_number=3,
+			cluster='large-states',
+			view='map'
+		)
+		frappe.flags.redirect_location = url
+		raise frappe.Redirect
+
 	view = frappe.form_dict.view or 'map'
 	indicator_id = frappe.form_dict.indicator_id
 	ijr_number = frappe.utils.cint(frappe.form_dict.ijr_number or '3')
-	default_cluster = 'large-mid' if view == 'map' else 'all'
+	default_cluster = 'large-states' if view == 'map' else 'all'
 	cluster = frappe.form_dict.cluster or default_cluster
-	cluster_value = None
-	if cluster == 'large-mid':
-		cluster_value = 'Large and mid-sized states'
-	if cluster == 'small':
-		cluster_value = 'Small states'
-	if cluster == 'all':
-		cluster_value = ''
 
 	order_by = ''
 	filters = {}
@@ -28,16 +47,12 @@ def get_context(context):
 		filters = {'indicator_id': indicator_id, 'ijr_number': ijr_number}
 		order_by = 'ijr_score desc, `order` asc'
 
-	if cluster_value:
-		filters['cluster'] = cluster_value
-
-	if not indicator_id and frappe.form_dict.pillar:
-		result = frappe.qb.get_query('State Indicator', filters={'pillar.slug': frappe.form_dict.pillar}, fields=['name']).run(as_dict=1)
-		indicator_id = result[0].name if result else None
-
-		if indicator_id:
-			frappe.flags.redirect_location = f'/indicator/{indicator_id}'
-			raise frappe.Redirect
+	if cluster == 'large-states':
+		filters['cluster'] = 'Large and mid-sized states'
+	if cluster == 'small-states':
+		filters['cluster'] = 'Small states'
+	# if cluster == 'all':
+	# 	filters['cluster'] = None
 
 	context.indicator_data = indicator_rankings_data(filters, order_by)
 	if context.indicator_data:

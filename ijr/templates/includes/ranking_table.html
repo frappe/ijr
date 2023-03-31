@@ -15,10 +15,19 @@
     {% set delta = (d[delta_field] or 0) * -1 %}
     <tr data-state="{{ d.region_code }}">
       <td align="center">
-        <div class="rank-circle">{{ rank }}</div>
+        <div class="d-flex align-items-center">
+            <div class="rank-circle">{{ rank }}</div>
+            {% if not hide_arrows %}
+              <div class="text-center ml-1" style="width: 16px;">
+                <span class="{% if delta == 0 %} delta-same {% elif delta > 0 %} delta-increase {% else %} delta-decrease {% endif %}">
+                  {% if delta == 0 %} &ndash; {% elif delta > 0 %} ↑ {% else %} ↓ {% endif %}
+                </span>
+              </div>
+            {% endif %}
+        </div>
       </td>
       <td width="200">
-        <a href="/state/{{ d.region_code }}" style="font-weight:500">{{ d.state }}</a>
+        <a href="{{ state_url(state=d.region_code, pillar_or_theme='overall') }}" style="font-weight:500">{{ d.state }}</a>
       </td>
       <td>
         <div class="d-flex align-items-center">
@@ -28,14 +37,7 @@
                 background-color: {{ d[color_field] }};
               "></div>
           </div>
-          {% if not hide_arrows %}
-          <div class="text-center" style="width: 16px;">
-            <span class="{% if delta == 0 %} delta-same {% elif delta > 0 %} delta-increase {% else %} delta-decrease {% endif %}">
-              {% if delta == 0 %} &ndash; {% elif delta > 0 %} ↑ {% else %} ↓ {% endif %}
-            </span>
-          </div>
-          {% endif %}
-          <div class="pl-1 flex-fill text-right" style="font-variant-numeric: tabular-nums;">
+          <div class="flex-fill text-right" style="font-variant-numeric: tabular-nums;">
             {% if score is not none %}
             {{ "%.2f" % frappe.utils.rounded(score, 2) }}
             {% endif %}

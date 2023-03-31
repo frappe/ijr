@@ -35,6 +35,13 @@ skip_frappe_bundle: 1
                     <svg xmlns="http://www.w3.org/2000/svg" style="width: 1.5rem; color: var(--accent-color)" aria-hidden="true" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 8l4 4 4-4"/></svg>
                 </button>
             </h1>
+            <sl-tooltip content="About this indicator">
+                <button class="change-indicator ml-2" onclick="indicatorInfoDialog.show()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.2rem">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                    </svg>
+                </button>
+            </sl-tooltip>
         </div>
         <div class="mt-2">
             {{ description }}
@@ -43,19 +50,13 @@ skip_frappe_bundle: 1
 
     <div class="d-flex flex-column align-items-end">
         <div class="d-flex mt-4 mt-md-0">
-            <button class="change-indicator" onclick="indicatorInfoDialog.show()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1rem">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-                </svg>
-                Learn More
-            </button>
-            <select class="ml-2 cluster-select" name="cluster" query="cluster">
+            <select class="ml-2 cluster-select" name="cluster" onchange="window.location.href = this.value">
             {%- set cluster_options = [
-                {'label': '18 Large and Mid Size States', 'value' : 'large-mid'},
-                {'label': '7 Small States' + ('&nbsp;' * 20), 'value' : 'small'},
+                {'label': '18 Large and mid-sized states', 'value' : 'large-states'},
+                {'label': '7 Small States' + ('&nbsp;' * 20), 'value' : 'small-states'},
             ] -%}
             {% for option in cluster_options %}
-            <option value="{{ option.value }}" {{ "selected" if option.value == cluster else "" }}>
+            <option value="{{ indicator_url(cluster=option.value) }}" {{ "selected" if option.value == cluster else "" }}>
                 {{ option.label }}
             </option>
             {% endfor %}
@@ -63,7 +64,7 @@ skip_frappe_bundle: 1
 
             <div class="ml-2 view-switcher">
                 {% for option in [['Map', 'map'], ['Table', 'table']] %}
-                <a href="#" query="view={{ option[1] }}" class="{{ 'active' if option[1] == view else '' }}">{{ option[0] }}</a>
+                <a href="{{ indicator_url(view=option[1]) }}" class="{{ 'active' if option[1] == view else '' }}">{{ option[0] }}</a>
                 {% endfor %}
             </div>
         </div>

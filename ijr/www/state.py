@@ -4,25 +4,47 @@
 from __future__ import unicode_literals
 import frappe
 from ijr.www.rankings import get_color, get_pillar, get_theme
+from ijr.jinja_helpers import state_url
 from frappe.utils import cint
 from frappe.utils.formatters import format_value
 
 
 def get_context(context):
+	if not frappe.form_dict.state:
+		frappe.throw('State not found', exc=frappe.PageDoesNotExistError)
+
+	if frappe.form_dict.state and not frappe.db.exists('State', {'code': frappe.form_dict.state}):
+		frappe.throw('State not found', exc=frappe.PageDoesNotExistError)
+
+	redirect = None
+	if not frappe.form_dict.pillar_or_theme:
+		frappe.form_dict.pillar_or_theme = 'overall'
+		redirect = True
+	if not frappe.form_dict.ijr_number:
+		frappe.form_dict.ijr_number = 3
+		redirect = True
+
+	if redirect:
+		url = state_url(
+			state=frappe.form_dict.state,
+			ijr_number=frappe.form_dict.ijr_number,
+			pillar_or_theme=frappe.form_dict.pillar_or_theme,
+		)
+		frappe.local.flags.redirect_location = url
+		raise frappe.Redirect
+
 	state_code = frappe.form_dict.state
-	pillar = frappe.form_dict.pillar or None
-	theme = frappe.form_dict.theme or None
+	pillar_or_theme = frappe.form_dict.pillar_or_theme
 	ijr_number = cint(frappe.form_dict.ijr_number or 3)
 
-	_pillar = get_pillar(pillar)
-	_theme = get_theme(theme)
-	description = 'Performance across police, prisons, judiciary and legal aid'
-	if _pillar:
-		pillar = _pillar.name
-		description = _pillar.description
-	elif _theme:
-		theme = _theme.name
-		description = _theme.description
+	pillar, theme = None, None
+
+	if pillar := get_pillar(pillar_or_theme):
+		description = pillar.description
+	elif theme := get_theme(pillar_or_theme):
+		description = theme.description
+	else:
+		description = 'Performance across police, prisons, judiciary and legal aid'
 
 	state = frappe.get_doc('State', {'code': state_code})
 	current_ranking = None
@@ -55,9 +77,9 @@ def get_context(context):
 	# indicators data
 	indicator_filters = {'region_code': state_code}
 	if pillar:
-		indicator_filters['pillar'] = pillar
+		indicator_filters['pillar'] = pillar.name
 	if theme:
-		indicator_filters['theme'] = theme
+		indicator_filters['theme'] = theme.name
 
 	indicators_data = frappe.db.get_all('State Indicator Data',
 		filters=indicator_filters,
@@ -85,14 +107,16 @@ def get_context(context):
 	context.all_rankings = all_rankings
 	context.indicators_data = indicators_data
 	context.ijr_number = ijr_number
+	context.ijr_pillar = pillar
+	context.ijr_theme = theme
 
 	context.active_tab = 'Overall'
 	if pillar:
-		context.active_tab = pillar
+		context.active_tab = pillar.name
 	elif theme:
-		context.active_tab = theme
+		context.active_tab = theme.name
 
-	active_tab_field = _pillar.slug if _pillar else _theme.slug if _theme else 'overall'
+	active_tab_field = pillar.slug if pillar else theme.slug if theme else 'overall'
 	context.active_tab_field = active_tab_field
 	context.active_tab_rank = current_ranking.get(f'{active_tab_field}_rank') if current_ranking else None
 	context.active_tab_score = current_ranking.get(f'{active_tab_field}_score') if current_ranking else None
