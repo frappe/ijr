@@ -434,7 +434,7 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
     position: relative;
     flex: 1;
     display: flex;
-    justify-content: end;
+    justify-content: center;
 }
 
 #india-map {
@@ -503,6 +503,7 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
     border-collapse: separate;
     font-size: 14px;
     border-spacing: 1px;
+    position: relative;
 }
 
 .featured-table thead tr {
@@ -533,6 +534,9 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
     padding: 4px 10px;
     line-height: 1.15;
     font-weight: 500;
+    position: sticky;
+    top: 0;
+    background-color: var(--sl-color-gray-100);
 }
 
 .featured-table td {
@@ -603,6 +607,14 @@ sl-dialog {
 
 .w-full-desktop {
     width: 100%;
+}
+
+.right-0 {
+    right: 0;
+}
+
+.left-0 {
+    left: 0;
 }
 
 .indicator-heading {

@@ -137,7 +137,7 @@ skip_frappe_bundle: 1
 <div class="mt-6">
     {{ m.featured_table_help_text() }}
 </div>
-<div class="featured-table-container">
+<div class="featured-table-container fill-height-scroll horizontal-breakout">
     <div>
         {%- with columns=columns, data=indicator_data -%}
         {% include "templates/includes/featured-table.html" %}

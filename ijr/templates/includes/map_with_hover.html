@@ -47,8 +47,8 @@
       show_state_info(state_code);
       $(`.table-ranking tr[data-state="${state_code}"]`).addClass("highlight");
 
+      $popup.anchorEl = e.target;
       $popup.setAttribute('active', true);
-      $popup.setAttribute('anchor', state_code);
       $popup.reposition();
     });
     $state_paths.on("mouseleave", (e) => {

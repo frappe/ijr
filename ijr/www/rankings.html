@@ -91,7 +91,7 @@ skip_frappe_bundle: 1
         </div>
 
         <div class="map-container">
-            {{ m.color_legend(class='position-absolute') }}
+            {{ m.color_legend(class='position-absolute right-0') }}
             {% set hover_html %}
             <div>
                 {% set max_rank = '18' if cluster == 'large-states' else '7' %}
@@ -149,7 +149,7 @@ skip_frappe_bundle: 1
 
 {%- if view == 'table' -%}
 {{ m.featured_table_help_text() }}
-<div class="featured-table-container">
+<div class="featured-table-container fill-height-scroll">
     {%- if table_view == 'pillars' -%}
     {%- set columns = [
         {

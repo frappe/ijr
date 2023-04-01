@@ -100,7 +100,7 @@
                         <div x-text="column.label"></div>
                         <div class="ml-auto flex-shrink-0">
                             <template x-if="column.sort">
-                                <sl-tooltip :content="sortByColumn == column.id ? sortOrder == 'asc' ? 'Sort descending' : 'Reset sorting' : 'Sort ascending'">
+                                <sl-tooltip :content="sortByColumn == column.id ? sortOrder == 'asc' ? 'Sort descending' : 'Reset sorting' : 'Sort ascending'" hoist>
                                     <sl-icon-button @click="sortBy(column.id)"
                                         :name="sortByColumn == column.id
                                             ? sortOrder == 'asc' ? 'sort-up-alt' : 'sort-down-alt'
@@ -109,7 +109,7 @@
                                 </sl-tooltip>
                             </template>
                             <template x-if="column.filter">
-                                <sl-tooltip content="Filter">
+                                <sl-tooltip content="Filter" hoist>
                                     <sl-icon-button @click="showFilters = !showFilters" name="filter-circle"
                                         :label="'Filter by ' + column.label">
                                     </sl-icon-button>

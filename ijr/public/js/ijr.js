@@ -8,6 +8,26 @@ window.addEventListener('DOMContentLoaded', () => {
             $target.toggleClass('show');
         })
     }
+
+    // fill remaining hieght available in viewport scroll for featured-table
+    $('.fill-height-scroll, .fill-height').each((i, el) => {
+        let top = $(el).offset().top;
+        $(el).css('max-height', `calc(100vh - ${top + 5}px)`);
+    });
+    $(document).on('mouseenter', '.fill-height-scroll', (e) => {
+        $(document.body).css('overflow', 'hidden');
+    })
+    $(document).on('mouseleave', '.fill-height-scroll', (e) => {
+        $(document.body).css('overflow', 'auto');
+    });
+
+    // horizontal breakout from container for featured-table
+    $('.horizontal-breakout').each((i, el) => {
+        let right = el.getBoundingClientRect().right;
+        let windowWidth = $(window).width();
+        console.log(right, windowWidth);
+        $(el).css('margin-right', -1 * (windowWidth - right));
+    })
 });
 
 function link_with_query_params() {
