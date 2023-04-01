@@ -278,11 +278,12 @@ skip_frappe_bundle: 1
     {{ state_overview() }}
     <div class="featured-table-container">
     {{ m.featured_table_help_text() }}
+    {%- set indicator_url_template = indicator_url(indicator_id='101', ijr_number=ijr_number, cluster=cluster, view=view).replace('101', '${d.indicator_id}') -%}
     {%- set columns = [
     {
         'label': 'Indicator',
         'id': 'indicator_name',
-        'format': '''<a href="/indicator/${d.indicator_id}">${d.indicator_name}</a>''',
+        'format': '<a href="' + indicator_url_template + '">${d.indicator_name}</a>',
         'width': 310,
         'filter': true
     },

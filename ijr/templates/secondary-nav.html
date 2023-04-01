@@ -61,7 +61,7 @@
         <div class="mb-2 ml-4">
             <label style="--sl-font-size-medium: 14px">{{ theme }}</label>
             {%- for _indicator in indicators -%}
-            <a href="/indicator/{{ _indicator.value }}" class="{{ resolve_class({'active': indicator and indicator.name == _indicator.value }) }}">
+            <a href="{{ indicator_url(indicator_id=_indicator.value) }}" class="{{ resolve_class({'active': indicator and indicator.name == _indicator.value }) }}">
                 {{ _indicator.label }}
             </a>
             {%- endfor -%}

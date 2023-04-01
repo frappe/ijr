@@ -12,7 +12,12 @@ def get_context(context):
 		indicator_id = result[0].name if result else None
 
 		if indicator_id:
-			frappe.flags.redirect_location = f'/indicator/{indicator_id}'
+			frappe.flags.redirect_location = indicator_url(
+				indicator_id=indicator_id,
+				ijr_number=3,
+				cluster='large-states',
+				view='map'
+			)
 			raise frappe.Redirect
 
 	if not frappe.form_dict.indicator_id:
@@ -39,12 +44,13 @@ def get_context(context):
 	cluster = frappe.form_dict.cluster or default_cluster
 
 	order_by = ''
-	filters = {}
+	filters = {'ijr_score': ['is', 'set']}
 	if view == 'table':
-		filters = {'indicator_id': indicator_id}
+		filters['indicator_id'] = indicator_id
 		order_by = 'state asc, ijr_number asc'
 	elif view == 'map':
-		filters = {'indicator_id': indicator_id, 'ijr_number': ijr_number}
+		filters['indicator_id'] = indicator_id
+		filters['ijr_number'] = ijr_number
 		order_by = 'ijr_score desc, `order` asc'
 
 	if cluster == 'large-states':
@@ -69,8 +75,6 @@ def get_context(context):
 			{'label': 'IJR', 'id': 'ijr_number', 'align': 'center', 'filter': True},
 			{'label': 'Year', 'id': 'year'},
 			{'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'center', 'hide_condition': cluster == 'all'},
-			# {'label': 'Indicator Value', 'id': 'indicator_value', 'align': 'center'},
-			{'label': 'Indicator Unit', 'id': 'indicator_unit', 'align': 'center'},
 		]
 		if context.indicator_data:
 			for d in context.indicator_data[0].raw_data:
