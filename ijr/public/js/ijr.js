@@ -25,7 +25,6 @@ window.addEventListener('DOMContentLoaded', () => {
     $('.horizontal-breakout').each((i, el) => {
         let right = el.getBoundingClientRect().right;
         let windowWidth = $(window).width();
-        console.log(right, windowWidth);
         $(el).css('margin-right', -1 * (windowWidth - right));
     })
 });

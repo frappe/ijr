@@ -87,7 +87,7 @@ def indicator_url(**kwargs):
 	meta = {
 		'indicator_id': { 'default': '', 'values': indicator_ids },
 		'ijr_number': { 'default': 3, 'values': [0, 1, 2, 3] },
-		'cluster': { 'default': 'large-states', 'values': ['large-states', 'small-states'] },
+		'cluster': { 'default': 'large-states', 'values': ['large-states', 'small-states', 'all-states'] },
 		'view': { 'default': 'map', 'values': ['map', 'table'] }
 	}
 

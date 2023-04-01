@@ -52,19 +52,26 @@ skip_frappe_bundle: 1
         <div class="d-flex mt-4 mt-md-0">
             <select class="ml-2 cluster-select" name="cluster" onchange="window.location.href = this.value">
             {%- set cluster_options = [
+                {'label': 'All states', 'value' : 'all-states'} if view == 'table' else null,
                 {'label': '18 Large and mid-sized states', 'value' : 'large-states'},
                 {'label': '7 Small States' + ('&nbsp;' * 20), 'value' : 'small-states'},
             ] -%}
             {% for option in cluster_options %}
+            {% if option %}
             <option value="{{ indicator_url(cluster=option.value) }}" {{ "selected" if option.value == cluster else "" }}>
                 {{ option.label }}
             </option>
+            {% endif %}
             {% endfor %}
             </select>
 
             <div class="ml-2 view-switcher">
-                {% for option in [['Map', 'map'], ['Table', 'table']] %}
-                <a href="{{ indicator_url(view=option[1]) }}" class="{{ 'active' if option[1] == view else '' }}">{{ option[0] }}</a>
+                {%- set options = [
+                    ['Map', {'view': 'map', 'cluster': 'large-states' }],
+                    ['Table', {'view': 'table', 'cluster': 'all-states' }]
+                ] -%}
+                {% for option in options %}
+                <a href="{{ indicator_url(**option[1]) }}" class="{{ 'active' if option[1].view == view else '' }}">{{ option[0] }}</a>
                 {% endfor %}
             </div>
         </div>

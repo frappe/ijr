@@ -442,7 +442,7 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
 }
 
 #india-map path {
-    fill: var(--sl-color-gray-100);
+    fill: var(--sl-color-gray-200);
     stroke: white;
     stroke-width: 1;
     cursor: pointer;

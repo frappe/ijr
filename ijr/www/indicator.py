@@ -39,7 +39,7 @@ def get_context(context):
 
 	view = frappe.form_dict.view or 'map'
 	indicator_id = frappe.form_dict.indicator_id
-	ijr_number = frappe.utils.cint(frappe.form_dict.ijr_number or '3')
+	ijr_number = frappe.form_dict.ijr_number
 	default_cluster = 'large-states' if view == 'map' else 'all'
 	cluster = frappe.form_dict.cluster or default_cluster
 
@@ -50,15 +50,18 @@ def get_context(context):
 		order_by = 'state asc, ijr_number asc'
 	elif view == 'map':
 		filters['indicator_id'] = indicator_id
-		filters['ijr_number'] = ijr_number
 		order_by = 'ijr_score desc, `order` asc'
+
+	if ijr_number:
+		filters['ijr_number'] = ijr_number
 
 	if cluster == 'large-states':
 		filters['cluster'] = 'Large and mid-sized states'
 	if cluster == 'small-states':
 		filters['cluster'] = 'Small states'
-	# if cluster == 'all':
-	# 	filters['cluster'] = None
+	if cluster == 'all-states':
+		# filters['cluster'] = None
+		pass
 
 	context.indicator_data = indicator_rankings_data(filters, order_by)
 	if context.indicator_data:
