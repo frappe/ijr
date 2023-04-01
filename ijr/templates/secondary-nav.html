@@ -9,6 +9,9 @@
                         {'label': 'IJR 2 (2020)', 'value' : 2},
                         {'label': 'IJR 3 (2022)', 'value' : 3},
                     ] -%}
+                    {%- if pathname.startswith('methodology') -%}
+                    {%- set ijr_options = [{'label': 'All IJRs', 'value' : 0}] -%}
+                    {%- endif -%}
                     {% for option in ijr_options %}
                     {% if option %}
                     <option value="{{ get_current_page_url(ijr_number=option.value) }}" {{ "selected" if option.value == ijr_number else "" }}>
@@ -23,7 +26,7 @@
                     <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('rankings')}) }}" href="{{ rankings_url(defaults_only=1) }}">Rankings</a>
                     <button onclick="changeStateDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('state/')}) }}">States</button>
                     <button onclick="changeIndicatorDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('indicator/')}) }}">Indicators</button>
-                    <!-- <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('methodology')}) }}" href="/methodology">Methodology</a> -->
+                    <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('methodology')}) }}" href="/methodology">Methodology</a>
                     <div class="ml-auto">
                         <button class="secondary-nav-link">How to read this page?</button>
                         <button class="secondary-nav-link" onclick="downloadsDialog.show()">Downloads</button>

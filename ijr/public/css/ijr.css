@@ -713,6 +713,11 @@ sl-dialog {
     margin-bottom: 1rem;
 }
 
+[source-content-type=Markdown] .table th, [source-content-type=Markdown] .table td {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+}
+
 [source-content-type=Markdown] .web-page-content {
     max-width: 65ch;
     color: var(--sl-color-gray-800);

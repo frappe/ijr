@@ -1,0 +1,13 @@
+---
+base_template: 'templates/web.html'
+skip_frappe_bundle: 1
+---
+
+{% import "templates/macros.html" as m %}
+{% include "templates/secondary-nav.html" %}
+
+<div source-content-type="Markdown">
+    <div class="web-page-content">
+        {{ frappe.utils.md_to_html(content) }}
+    </div>
+</div>
