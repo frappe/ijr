@@ -109,13 +109,15 @@ def get_context(context):
 						'precision': d.indicator_value_decimals or None
 					})
 			if indicator.theme != 'Trends':
+				raw_data_columns = []
 				for d in context.indicator_data[0].raw_data:
-					context.columns.append({
+					raw_data_columns.append({
 						'label': f'{d.raw_data_name} ({d.raw_data_unit})',
 						'id': d.raw_data_name,
 						'align': 'center',
 						'wrapText': 1
 					})
+				context.columns += ([raw_data_columns[-1]] + raw_data_columns[:-1])
 			for row in context.indicator_data:
 				for d in row.raw_data:
 					row[d.raw_data_name] = d.raw_data_value
