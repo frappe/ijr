@@ -10,16 +10,18 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // fill remaining hieght available in viewport scroll for featured-table
-    $('.fill-height-scroll, .fill-height').each((i, el) => {
-        let top = $(el).offset().top;
-        $(el).css('max-height', `calc(100vh - ${top + 5}px)`);
-    });
-    $(document).on('mouseenter', '.fill-height-scroll', (e) => {
-        $(document.body).css('overflow', 'hidden');
-    })
-    $(document).on('mouseleave', '.fill-height-scroll', (e) => {
-        $(document.body).css('overflow', 'auto');
-    });
+    if (window.innerWidth > 400) {
+        $('.fill-height-scroll, .fill-height').each((i, el) => {
+            let top = $(el).offset().top;
+            $(el).css('max-height', `calc(100vh - ${top + 5}px)`);
+        });
+        $(document).on('mouseenter', '.fill-height-scroll', (e) => {
+            $(document.body).css('overflow', 'hidden');
+        })
+        $(document).on('mouseleave', '.fill-height-scroll', (e) => {
+            $(document.body).css('overflow', '');
+        });
+    }
 
     // horizontal breakout from container for featured-table
     $('.horizontal-breakout').each((i, el) => {

@@ -9,7 +9,7 @@ skip_frappe_bundle: 1
 {% include "templates/secondary-nav.html" %}
 
 <div class="row">
-    <div class="col-sm-2">
+    <div class="col-sm-2 d-none d-sm-block">
         <div class="vertical-nav">
             {% macro sidebar_item(label, value) %}
             <a
@@ -31,6 +31,25 @@ skip_frappe_bundle: 1
             {{ sidebar_item('Diversity', 'diversity') }}
             {{ sidebar_item('Trends', 'trends') }}
         </div>
+    </div>
+    <div class="col-12 d-sm-none mb-6 mt-4">
+        <select class="cluster-select w-100" onchange="window.location.href = this.value">
+            {% macro option(label, value) %}
+            <option value="{{ state_url(pillar_or_theme=value) }}" {{ 'selected' if active_tab == label else '' }}>{{ label }}</option>
+            {% endmacro %}
+            {{ option('Overall', 'overall') }}
+            <optgroup label="Rank by Pillars">
+            {{ option('Police', 'police') }}
+            {{ option('Prisons', 'prisons') }}
+            {{ option('Judiciary', 'judiciary') }}
+            {{ option('Legal Aid', 'legal_aid') }}
+            </optgroup>
+            <optgroup label="Rank by Themees">
+                {{ option('Human Resources', 'hr') }}
+                {{ option('Diversity', 'diversity') }}
+                {{ option('Trends', 'trends') }}
+            </optgroup>
+        </select>
     </div>
     <div class="col">
 <!-- main content -->

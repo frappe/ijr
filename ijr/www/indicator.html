@@ -9,7 +9,7 @@ skip_frappe_bundle: 1
 {% include "templates/secondary-nav.html" %}
 
 <div class="row">
-    <div class="col-sm-2">
+    <div class="col-sm-2 d-none d-sm-block">
         <div class="vertical-nav">
             {% macro sidebar_item(label, value) %}
             <a class="sidebar-nav-item {{ 'active' if indicator.pillar == label else '' }}" href="/indicator?pillar={{ value }}">
@@ -23,12 +23,23 @@ skip_frappe_bundle: 1
             {{ sidebar_item('Legal Aid', 'legal_aid') }}
         </div>
     </div>
+    <div class="col-12 d-sm-none mb-6 mt-4">
+        <select class="cluster-select w-100" onchange="window.location.href = this.value">
+            {% macro option(label, value) %}
+            <option value="/indicator?pillar={{ value }}" {{ 'selected' if indicator.pillar == label else '' }}>{{ label }}</option>
+            {% endmacro %}
+            {{ option('Police', 'police') }}
+            {{ option('Prisons', 'prisons') }}
+            {{ option('Judiciary', 'judiciary') }}
+            {{ option('Legal Aid', 'legal_aid') }}
+        </select>
+    </div>
     <div class="col">
 
 
-<div class="title-toolbar">
+<div class="title-toolbar flex-column flex-sm-row">
     <div>
-        <div class="d-inline d-md-flex align-items-center">
+        <div class="d-flex align-items-center">
             <h1>
                 <button class="indicator-heading" onclick="changeIndicatorDialog.show()">
                     {{ indicator_name }}
@@ -156,7 +167,64 @@ skip_frappe_bundle: 1
 </div>
 </div>
 
+<sl-dialog label="Calculations" id="calculationsDialog" style="--width: max-content">
+    <sl-button slot="footer" variant="primary">Close</sl-button>
+</sl-dialog>
+
 <script>
     let raw_data = {{ as_json(raw_data, indent = None) }};
-    window.raw_data = raw_data
+    let raw_data_trends = {{ as_json(raw_data_trends, indent = None) }};
+    window.raw_data = raw_data;
+
+    function show_calculations(state) {
+        let data = raw_data_trends[state];
+
+        let title = data[0].state
+        let description = `${data[0].state}: ${data[0].indicator_name}`
+
+        let dialog = window.calculationsDialog;
+        dialog.label = description || 'Calculations';
+        let header = ''
+        let rows = ''
+        let table_class = ''
+
+        let trends_years = [];
+        let trends_data = {};
+        for (let row of data) {
+            if (!trends_years.includes(row.year)) {
+                trends_years.push(row.year);
+            }
+            trends_data[row.year] = trends_data[row.year] || {};
+            trends_data[row.year][row.raw_data_name] = row.raw_data_value;
+        }
+
+        let sequences = [...new Set(data.map(d => d.raw_data_sequence))];
+        let raw_data_headers = sequences.map(seq => {
+            let d = data.find(d => d.raw_data_sequence == seq)
+            return `<th>${d.raw_data_name} (${d.raw_data_unit})</th>`
+        }).join('');
+        header = `
+            <th>Year</th>
+            ${raw_data_headers}
+        `;
+        rows = trends_years.map(year => {
+            return `<tr>
+                <td>${year}</td>
+                ${sequences.map(seq => {
+                    let d = data.find(d => d.raw_data_sequence == seq)
+                    return `<td>${trends_data[year][d.raw_data_name]}</td>`
+                }).join('')}
+            </tr>`
+        }).join('');
+
+        dialog.innerHTML = `
+            <table class="table table-bordered table-calculations mb-0 table-calculations-trends">
+                <thead>
+                    ${header}
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        `;
+        dialog.show();
+    }
 </script>

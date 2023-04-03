@@ -1,41 +1,54 @@
-<div class="secondary-nav">
+{% macro ijr_select() %}
+<select class="ijr-select" name="ijr_number" onchange="window.location.href = this.value">
+    {%- set ijr_options = [
+        {'label': 'All IJRs', 'value' : 0} if (view == 'table' and pathname.startswith(('rankings', 'indicator'))) or (pathname.startswith('state') and active_tab == 'Overall') else null,
+        {'label': 'IJR 1 (2019)', 'value' : 1},
+        {'label': 'IJR 2 (2020)', 'value' : 2},
+        {'label': 'IJR 3 (2022)', 'value' : 3},
+    ] -%}
+    {%- if pathname.startswith('methodology') -%}
+    {%- set ijr_options = [{'label': 'All IJRs', 'value' : 0}] -%}
+    {%- endif -%}
+    {% for option in ijr_options %}
+    {% if option %}
+    <option value="{{ get_current_page_url(ijr_number=option.value) }}" {{ "selected" if option.value == ijr_number else "" }}>
+        {{ option.label }}
+    </option>
+    {% endif %}
+    {% endfor %}
+</select>
+{% endmacro %}
+
+{% macro nav() %}
+<div class="secondary-nav-items">
+    <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('rankings')}) }}" href="{{ rankings_url(defaults_only=1) }}">Rankings</a>
+    <button onclick="changeStateDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('state/')}) }}">States</button>
+    <button onclick="changeIndicatorDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('indicator/')}) }}">Indicators</button>
+    <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('methodology')}) }}" href="/methodology">Methodology</a>
+    <div class="ml-auto">
+        <button class="secondary-nav-link">How to read this page?</button>
+        <button class="secondary-nav-link" onclick="downloadsDialog.show()">Downloads</button>
+        <button class="secondary-nav-link" onclick="shareDialog.show()">Share</button>
+    </div>
+</div>
+{% endmacro %}
+
+<div class="d-none d-sm-block secondary-nav">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-sm-2">
-                <select class="ijr-select" name="ijr_number" onchange="window.location.href = this.value">
-                    {%- set ijr_options = [
-                        {'label': 'All IJRs', 'value' : 0} if (view == 'table' and pathname.startswith(('rankings', 'indicator'))) or (pathname.startswith('state') and active_tab == 'Overall') else null,
-                        {'label': 'IJR 1 (2019)', 'value' : 1},
-                        {'label': 'IJR 2 (2020)', 'value' : 2},
-                        {'label': 'IJR 3 (2022)', 'value' : 3},
-                    ] -%}
-                    {%- if pathname.startswith('methodology') -%}
-                    {%- set ijr_options = [{'label': 'All IJRs', 'value' : 0}] -%}
-                    {%- endif -%}
-                    {% for option in ijr_options %}
-                    {% if option %}
-                    <option value="{{ get_current_page_url(ijr_number=option.value) }}" {{ "selected" if option.value == ijr_number else "" }}>
-                        {{ option.label }}
-                    </option>
-                    {% endif %}
-                    {% endfor %}
-                </select>
+                {{ ijr_select() }}
             </div>
             <div class="col">
-                <div class="secondary-nav-items">
-                    <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('rankings')}) }}" href="{{ rankings_url(defaults_only=1) }}">Rankings</a>
-                    <button onclick="changeStateDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('state/')}) }}">States</button>
-                    <button onclick="changeIndicatorDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('indicator/')}) }}">Indicators</button>
-                    <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('methodology')}) }}" href="/methodology">Methodology</a>
-                    <div class="ml-auto">
-                        <button class="secondary-nav-link">How to read this page?</button>
-                        <button class="secondary-nav-link" onclick="downloadsDialog.show()">Downloads</button>
-                        <button class="secondary-nav-link" onclick="shareDialog.show()">Share</button>
-                    </div>
-                </div>
+                {{ nav() }}
             </div>
         </div>
     </div>
+</div>
+
+<div class="d-block d-sm-none">
+    <div>{{ ijr_select() }}</div>
+    <div class="mt-2">{{ nav() }}</div>
 </div>
 
 <sl-dialog label="Select State" id="changeStateDialog">
@@ -98,12 +111,12 @@
 
 <!-- share dialog with twitter and facebook share links -->
 <sl-dialog label="Share" id="shareDialog">
-    {%- set text = title | urlencode -%}
+    {%- set text = (title + '\n') | urlencode -%}
     {%- set url = get_current_url() | urlencode -%}
     {%- set links = [
         {'label': 'Share on Twitter', 'url': "https://twitter.com/intent/tweet?url={url}&text={text}".format(url=url, text=text), 'icon': 'twitter'},
         {'label': 'Share on Facebook', 'url': "https://www.facebook.com/sharer/sharer.php?u={url}".format(url=url), 'icon': 'facebook'},
-        {'label': 'Share on WhatsApp', 'url': "https://wa.me/?text={text}".format(text=text), 'icon': 'whatsapp'},
+        {'label': 'Share on WhatsApp', 'url': "https://wa.me/?text={text}".format(text=text+url), 'icon': 'whatsapp'},
     ] -%}
     {%- for link in links -%}
     <div class="mb-2">
