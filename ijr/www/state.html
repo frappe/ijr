@@ -21,7 +21,7 @@ skip_frappe_bundle: 1
             {% endmacro %}
 
             {{ sidebar_item('Overall', 'overall') }}
-            <label class="sidebar-nav-label">Pillar</label>
+            <label class="sidebar-nav-label">Pillars</label>
             {{ sidebar_item('Police', 'police') }}
             {{ sidebar_item('Prisons', 'prisons') }}
             {{ sidebar_item('Judiciary', 'judiciary') }}
@@ -45,9 +45,12 @@ skip_frappe_bundle: 1
                 </button>
             </h1>
         </div>
+        <div class="mt-1">
+            Cluster: {{ state.cluster }}
+        </div>
     </div>
     <div class="text-right">
-        {% if active_tab == 'Overall' and current_ranking %}
+        {% if active_tab == 'Overall' and current_ranking and ijr_number == 0 %}
         <div class="view-switcher mb-2" x-data="toggleScoreData">
             <button @click="toggleScore('Rank')" :class="currentValue == 'Rank' && 'active'">
                 Rank
@@ -61,24 +64,29 @@ skip_frappe_bundle: 1
     </div>
 </div>
 
-{% macro state_overview() %}
-<div class="state-overview mb-6">
+{% macro state_overview(dimension, label) %}
+<div class="state-overview mb-6" style="--color: {{ get_color(current_ranking.get(dimension + '_color')) or 'var(--sl-color-gray-100)' }};">
     <div class="state-overview-stat">
-        <span class="label">{{ active_tab }} Score</span>
-        <div class="stat" style="background-color: {{ get_color(active_tab_color) }};">
-            {{ active_tab_score }}
+        <span class="label">{{ label }} Rank</span>
+        <div class="stat" style="background-color: var(--color)">{{ current_ranking.get(dimension + '_rank') }}</div>
+    </div>
+    {%- if current_ranking and previous_ranking -%}
+    {%- set current_rank = current_ranking.get(dimension + '_rank') -%}
+    {%- set previous_rank = previous_ranking.get(dimension + '_rank') -%}
+    {%- if current_rank and previous_rank -%}
+    {%- set delta = current_rank - previous_rank -%}
+    <div class="state-overview-stat">
+        <span class="label">{{ label }} Rank Change</span>
+        <div class="stat">{{ '+' if delta > 0 else ''}}{{ delta }}</div>
+    </div>
+    {%- endif -%}
+    {%- endif -%}
+    <div class="state-overview-stat">
+        <span class="label">{{ label }} Score</span>
+        <div class="stat" style="background-color: var(--color)">
+            {{ current_ranking.get(dimension + '_score') }}
         </div>
     </div>
-    <div class="state-overview-stat">
-        <span class="label">{{ active_tab }} Rank</span>
-        <div class="stat">{{ active_tab_rank }}</div>
-    </div>
-    {% if active_tab_rank_delta %}
-    <div class="state-overview-stat">
-        <span class="label">{{ active_tab }} Rank Change</span>
-        <div class="stat">{{ '+' if active_tab_rank_delta > 0 else ''}}{{ active_tab_rank_delta }}</div>
-    </div>
-    {% endif %}
 </div>
 {% endmacro %}
 
@@ -98,8 +106,48 @@ skip_frappe_bundle: 1
     <!-- #region Overall -->
     <div class="flex items-start justify-between">
         <div class="flex-1 w-100 mr-4">
-            {{ state_overview() }}
-
+            {%- if ijr_number > 0 -%}
+            {%- set rank_out_of = 18 if 'Large' in state.cluster else 7 -%}
+            <table class="featured-table featured-table-lg">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th align="center">Rank (out of {{ rank_out_of }})</th>
+                        <th align="center">Rank Change</th>
+                        <th align="center">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-weight-bold">Overall</td>
+                        <td align="center" style="background-color: {{ get_key_color(current_ranking, 'overall') }}">
+                            {{ current_ranking.get('overall_rank') }}</td>
+                        <td align="center">{{ current_ranking.get('overall_rank_delta') }}</td>
+                        <td align="center">{{ current_ranking.get('overall_score') }}</td>
+                    </tr>
+                    <tr><td colspan="4" class="font-weight-bold">Pillars</td></tr>
+                    {%- for title, key in [['Police', 'police'], ['Prison', 'prisons'], ['Judiciary', 'judiciary'], ['Legal Aid', 'legal_aid']] -%}
+                    <tr>
+                        <td>{{ title }}</td>
+                        <td align="center" style="background-color: {{ get_key_color(current_ranking, key) }}">
+                            {{ current_ranking.get(key + '_rank') }}</td>
+                        <td align="center">{{ current_ranking.get(key + '_rank_delta') }}</td>
+                        <td align="center">{{ current_ranking.get(key + '_score') }}</td>
+                    </tr>
+                    {%- endfor -%}
+                    <tr><td colspan="4" class="font-weight-bold">Ranked Themes</td></tr>
+                    {%- for title, key in [['Human Resources', 'hr'], ['Diversity', 'diversity'], ['Trends', 'trends']] -%}
+                    <tr>
+                        <td>{{ title }}</td>
+                        <td align="center" style="background-color: {{ get_key_color(current_ranking, key) }}">{{ current_ranking.get(key + '_rank') }}</td>
+                        <td align="center">{{ current_ranking.get(key + '_rank_delta') }}</td>
+                        <td align="center">{{ current_ranking.get(key + '_score') }}</td>
+                    </tr>
+                    {%- endfor -%}
+                </tbody>
+            </table>
+            {%- else -%}
+            <!-- show comparison tables across ijrs -->
             {%- set columns = [
                 {
                     'label': 'IJR #',
@@ -257,10 +305,11 @@ skip_frappe_bundle: 1
                     }))
                 })
             </script>
+            {%- endif -%}
         </div>
 
         <div class="flex-shrink-0 d-none d-md-block">
-            {%- with state=state.code -%}
+            {%- with state=state.code, color_code=current_ranking.overall_color -%}
             {% include "templates/includes/india_map.html" %}
             {%- endwith -%}
         </div>
@@ -268,7 +317,7 @@ skip_frappe_bundle: 1
     <!-- endregion -->
     </div>
     {% else %}
-    State not ranked in IJR
+    Not ranked in IJR
     {% endif %}
 
 {% else %}

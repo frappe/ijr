@@ -38,6 +38,9 @@ def get_color(color_code):
 	}
 	return color_map.get(color_code)
 
+def get_key_color(d, key):
+	return get_color(d.get(key + '_color'))
+
 def get_current_url():
 	return frappe.local.request.url
 

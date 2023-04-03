@@ -4,7 +4,7 @@
             <div class="col-sm-2">
                 <select class="ijr-select" name="ijr_number" onchange="window.location.href = this.value">
                     {%- set ijr_options = [
-                        {'label': 'All IJRs', 'value' : 0} if view == 'table' and pathname.startswith(('rankings', 'indicator')) else null,
+                        {'label': 'All IJRs', 'value' : 0} if (view == 'table' and pathname.startswith(('rankings', 'indicator'))) or (pathname.startswith('state') and active_tab == 'Overall') else null,
                         {'label': 'IJR 1 (2019)', 'value' : 1},
                         {'label': 'IJR 2 (2020)', 'value' : 2},
                         {'label': 'IJR 3 (2022)', 'value' : 3},

@@ -68,7 +68,7 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 	if ijr_number:
 		filters['ijr_number'] = ijr_number
 
-	order_by = f'{rank_by}_score desc'
+	order_by = f'{rank_by}_rank asc'
 	if ijr_number == 0:
 		order_by = 'state asc, ijr_number asc'
 
@@ -82,17 +82,17 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 	prev_ijr_number = ijr_number - 1 if ijr_number > 1 else None
 
 	if prev_ijr_number:
-		prev_ijr_filters = filters.copy().update({'ijr_number': prev_ijr_number})
+		prev_ijr_filters = filters.copy()
+		prev_ijr_filters.update({'ijr_number': prev_ijr_number})
 		prev_ijr_data = frappe.get_all('State Ranking',
 			filters=prev_ijr_filters,
 			fields=['*'],
-			order_by=f'{rank_by}_score desc'
+			order_by=f'{rank_by}_rank asc'
 		)
 		prev_ijr_data_by_state = {}
 		for d in prev_ijr_data:
 			prev_ijr_data_by_state[d.state] = d
 
-	i = 0
 	for d in data:
 		for k in ['overall', 'police', 'prisons', 'judiciary', 'legal_aid', 'hr', 'diversity', 'trends']:
 			color_code = d[f'{k}_color']
@@ -108,8 +108,6 @@ def state_rankings_data(ijr_number, cluster, rank_by):
 			d.hr_rank_delta = d.hr_rank - prev_ijr_data_by_state[d.state].hr_rank
 			d.diversity_rank_delta = d.diversity_rank - prev_ijr_data_by_state[d.state].diversity_rank
 			d.trends_rank_delta = d.trends_rank - prev_ijr_data_by_state[d.state].trends_rank
-
-		i = i + 1
 
 	return data
 

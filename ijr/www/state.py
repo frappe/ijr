@@ -20,7 +20,7 @@ def get_context(context):
 	if not frappe.form_dict.pillar_or_theme:
 		frappe.form_dict.pillar_or_theme = 'overall'
 		redirect = True
-	if not frappe.form_dict.ijr_number:
+	if frappe.form_dict.ijr_number is None:
 		frappe.form_dict.ijr_number = 3
 		redirect = True
 
@@ -35,7 +35,7 @@ def get_context(context):
 
 	state_code = frappe.form_dict.state
 	pillar_or_theme = frappe.form_dict.pillar_or_theme
-	ijr_number = cint(frappe.form_dict.ijr_number or 3)
+	ijr_number = frappe.form_dict.ijr_number
 
 	pillar, theme = None, None
 
@@ -49,9 +49,9 @@ def get_context(context):
 	state = frappe.get_doc('State', {'code': state_code})
 	current_ranking = None
 	previous_ranking = None
-	if frappe.db.exists('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number }):
-		current_ranking = frappe.get_doc('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number })
-		previous_ijr_number = ijr_number - 1
+	if frappe.db.exists('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number or 3 }):
+		current_ranking = frappe.get_doc('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number or 3 })
+		previous_ijr_number = (ijr_number or 3) - 1
 		if frappe.db.exists('State Ranking', {'region_code': state_code, 'ijr_number': previous_ijr_number }):
 			previous_ranking = frappe.get_doc('State Ranking', {'region_code': state_code, 'ijr_number': previous_ijr_number })
 
@@ -102,7 +102,7 @@ def get_context(context):
 	context.state = state
 	context.title = f'{context.state.name} State Analysis | India Justice Report'
 	context.description = description
-	context.current_ranking = current_ranking
+	context.current_ranking = current_ranking.as_dict() if current_ranking else None
 	context.previous_ranking = previous_ranking
 	context.all_rankings = all_rankings
 	context.indicators_data = indicators_data
@@ -116,15 +116,12 @@ def get_context(context):
 	elif theme:
 		context.active_tab = theme.name
 
-	active_tab_field = pillar.slug if pillar else theme.slug if theme else 'overall'
-	context.active_tab_field = active_tab_field
-	context.active_tab_rank = current_ranking.get(f'{active_tab_field}_rank') if current_ranking else None
-	context.active_tab_score = current_ranking.get(f'{active_tab_field}_score') if current_ranking else None
-	context.active_tab_color = current_ranking.get(f'{active_tab_field}_color') if current_ranking else None
 	if current_ranking and previous_ranking:
-		context.active_tab_score_delta = current_ranking.get(f'{active_tab_field}_score') - previous_ranking.get(f'{active_tab_field}_score')
-		context.active_tab_score_delta = round(context.active_tab_score_delta, 2)
-		context.active_tab_rank_delta = current_ranking.get(f'{active_tab_field}_rank') - previous_ranking.get(f'{active_tab_field}_rank')
+		for key in ['overall', 'police', 'prisons', 'judiciary', 'legal_aid', 'hr', 'diversity', 'trends']:
+			current_rank = current_ranking.get(f'{key}_rank')
+			previous_rank = previous_ranking.get(f'{key}_rank')
+			if current_rank and previous_rank:
+				context.current_ranking[f'{key}_rank_delta'] = current_rank - previous_rank
 
 def get_raw_data_by_indicator(state_code):
 	raw_data = frappe.db.get_all('State Indicator Raw Data',

@@ -548,6 +548,10 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
     padding: 4px;
 }
 
+.featured-table-lg th, .featured-table-lg td {
+    padding: 10px 15px;
+}
+
 /* table indicator raw data */
 .table-indicator-raw-data {
     table-layout: fixed;

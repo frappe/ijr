@@ -12,9 +12,10 @@
     {% for d in state_rankings %}
     {% set score = d[score_field] %}
     {% set rank = d[rank_field] %}
-    {% set delta = (d[delta_field] or 0) * -1 %}
+    {% set delta = d.get(delta_field, 0) * -1 %}
     <tr data-state="{{ d.region_code }}">
       <td align="center">
+        {% if not hide_arrows %}<sl-tooltip content="{% if delta != 0 %}{{ '+' if delta > 0 else '' }}{{ delta }}{% else %}No change{% endif %} ">{% endif %}
         <div class="d-flex align-items-center">
             <div class="rank-circle">{{ rank }}</div>
             {% if not hide_arrows %}
@@ -25,6 +26,7 @@
               </div>
             {% endif %}
         </div>
+        {% if not hide_arrows %}</sl-tooltip>{% endif %}
       </td>
       <td width="200">
         <a href="{{ state_url(state=d.region_code, pillar_or_theme='overall') }}" style="font-weight:500">{{ d.state }}</a>

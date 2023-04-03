@@ -205,14 +205,13 @@
 <script>
     window.addEventListener('DOMContentLoaded', () => {
         let $path = $('#india-map path#{{ state }}');
+        let color_code = '{{ color_code }}';
         let { x, y, width, height } = $path.get(0).getBBox();
+        let color = ['', 'var(--best)', 'var(--middle)', 'var(--worst)'][color_code];
         $path
             .attr('stroke', 'white')
             .attr('stroke-width', 1)
-            .css({
-                opacity: 1,
-                fill: 'var(--middle)'
-            });
+            .css({ opacity: 1, fill: color });
 
         $('svg#india-map')
             .attr('viewBox', `${x - 10} ${y - 10} ${width + 10} ${height + 10}`)
