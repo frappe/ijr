@@ -101,7 +101,14 @@ def get_context(context):
 	context.raw_data = get_raw_data_by_indicator(state_code)
 	context.state = state
 	context.title = f'{context.state.name} State Analysis | India Justice Report'
-	context.description = description
+	if state.cluster == 'Large and mid-sized states':
+		context.description = f'{state.name} ranks {current_ranking.overall_rank} out of {len(states_by_cluster[state.cluster])} large states in the {ijr_number}rd edition of the India Justice Report'
+	elif state.cluster == 'Small states':
+		context.description = f'{state.name} ranks {current_ranking.overall_rank} out of {len(states_by_cluster[state.cluster])} small states in the {ijr_number}rd edition of the India Justice Report'
+	if not current_ranking:
+		context.description = f'{state.name}\'s indicator-wise performance across pillars and themes in {ijr_number}rd edition of the India Justice Report'
+
+	context.image = state.meta_image
 	context.current_ranking = current_ranking.as_dict() if current_ranking else None
 	context.previous_ranking = previous_ranking
 	context.all_rankings = all_rankings
