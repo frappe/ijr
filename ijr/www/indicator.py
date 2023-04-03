@@ -63,6 +63,7 @@ def get_context(context):
 		# filters['cluster'] = None
 		pass
 
+	indicator = frappe.get_doc('State Indicator', indicator_id)
 	context.indicator_data = indicator_rankings_data(filters, order_by)
 	if context.indicator_data:
 		context.indicator_name = context.indicator_data[0].indicator_name
@@ -79,14 +80,42 @@ def get_context(context):
 			{'label': 'Year', 'id': 'year'},
 			{'label': 'Score', 'id': 'ijr_score', 'format': '''return Number(d.ijr_score).toFixed(2)''', 'align': 'center', 'hide_condition': cluster == 'all'},
 		]
+
 		if context.indicator_data:
-			for d in context.indicator_data[0].raw_data:
+			if indicator.theme == 'Trends':
+				unit = context.indicator_data[0].indicator_unit
 				context.columns.append({
-					'label': f'{d.raw_data_name} ({d.raw_data_unit})',
-					'id': d.raw_data_name,
-					'align': 'center',
-					'wrapText': 1
+					'label': f'Value ({unit})',
+					'id': 'indicator_value',
+					'align': 'right'
 				})
+				context.columns.append({
+					'label': 'Calculation',
+					'id': 'calculation',
+					'width': 100,
+					'sort': False,
+					'format': '''
+						if (d.raw_data) {
+							return `<a onclick="event.preventDefault(); show_calculations('${d.state}');" class="" href="#">
+								Calculation
+							</a>`
+						}
+						return ""
+					'''
+				})
+				for d in context.indicator_data:
+					d['indicator_value_formatted'] = format_value(d.indicator_value, {
+						'fieldtype': 'Float',
+						'precision': d.indicator_value_decimals or None
+					})
+			if indicator.theme != 'Trends':
+				for d in context.indicator_data[0].raw_data:
+					context.columns.append({
+						'label': f'{d.raw_data_name} ({d.raw_data_unit})',
+						'id': d.raw_data_name,
+						'align': 'center',
+						'wrapText': 1
+					})
 			for row in context.indicator_data:
 				for d in row.raw_data:
 					row[d.raw_data_name] = d.raw_data_value
@@ -95,14 +124,13 @@ def get_context(context):
 						'precision': d.raw_data_value_decimals or 4
 					})
 
-	indicator = frappe.get_doc('State Indicator', indicator_id)
-
 	context.indicator = indicator
 	context.title = f'{indicator.indicator_name} | India Justice Report'
 	context.description = indicator.description
 	context.indicator_pillar = indicator.pillar
 	context.indicator_pillar_slug = frappe.db.get_value('Pillar', indicator.pillar, 'slug')
-	context.raw_data = get_raw_data_by_state(indicator_id)
+	context.raw_data = get_raw_data_by_state(indicator)
+	context.raw_data_trends = get_raw_data(indicator_id, ijr_number)
 	context.indicator_id = indicator_id
 	context.view = view
 	context.ijr_number = ijr_number
@@ -138,15 +166,56 @@ def indicator_rankings_data(filters, order_by):
 		d.raw_data = frappe.db.get_all('State Indicator Raw Data',
 			filters={'ijr_number': d.ijr_number, 'state': d.state, 'indicator_id': d.indicator_id},
 			fields=['*'],
-			order_by='raw_data_sequence asc'
+			order_by='raw_data_sequence asc, year asc'
 		)
 
 	return data
 
-def get_raw_data_by_state(indicator_id):
+def get_raw_data(indicator_id, ijr_number):
 	raw_data = frappe.db.get_all('State Indicator Raw Data',
 		fields='*',
-		filters={'indicator_id': indicator_id},
+		filters={'indicator_id': indicator_id, 'ijr_number': ijr_number},
+		order_by='raw_data_sequence asc, ijr_number asc, year asc',
+	)
+	raw_data_by_state = {}
+	for r in raw_data:
+		key = r.state
+		raw_data_by_state.setdefault(key, []).append(r)
+	return raw_data_by_state
+
+def get_raw_data_by_state_for_trends(indicator):
+	data = frappe.db.get_all('State Indicator Data', '*', {
+		'indicator_id': indicator.name,
+	}, order_by='ijr_number asc, state asc')
+
+	raw_data_by_state = {}
+	raw_data_with_all_ijrs = {}
+	for d in data:
+		key = d.state
+		data = raw_data_by_state.get(key)
+		if not data:
+			data = raw_data_by_state[key] = d
+
+		value = format_value(d.indicator_value, {
+			'fieldtype': 'Float',
+			'precision': d.indicator_value_decimals or None
+		})
+		data[f'ijr_{d.ijr_number}_value'] = value
+
+		if d.ijr_number == 1:
+			data.raw_data_name = d.indicator_name
+			data.raw_data_unit = d.indicator_unit
+			raw_data_with_all_ijrs.setdefault(d.state, []).append(data)
+
+	return raw_data_with_all_ijrs
+
+def get_raw_data_by_state(indicator):
+	if indicator.theme == 'Trends':
+		return get_raw_data_by_state_for_trends(indicator)
+
+	raw_data = frappe.db.get_all('State Indicator Raw Data',
+		fields='*',
+		filters={'indicator_id': indicator.name},
 		order_by='raw_data_sequence asc, ijr_number asc'
 	)
 	raw_data_by_state = {}

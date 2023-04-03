@@ -490,6 +490,15 @@ tr[data-state].highlight .rank-circle, tr[data-state]:hover .rank-circle {
     color: var(--sl-color-gray-500);
 }
 
+.table-calculations th, .table-calculations td {
+    padding: 7px 10px;
+    font-size: var(--sl-font-size-small);
+}
+
+.table-calculations:not(.table-calculations-trends) tr:last-child td {
+    font-weight: bold;
+}
+
 /* Featured Table */
 
 .featured-table-container {
@@ -730,8 +739,12 @@ sl-dialog {
 
 /* styles for mobile view */
 @media (max-width: 767px) {
-    .title-toolbar {
-        flex-direction: column;
+    .secondary-nav-items {
+        display: block
+    }
+
+    .secondary-nav-link {
+        padding: 7px 0;
     }
 
     .filters-toolbar {
@@ -742,6 +755,12 @@ sl-dialog {
         flex-direction: column;
         padding-left: 6px;
         padding-right: 6px;
+    }
+
+    .ijr-select {
+        background-color: var(--sl-color-gray-100);
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
     .rank-bar-container {
