@@ -126,6 +126,46 @@ def get_context(context):
 						'precision': d.raw_data_value_decimals or 4
 					})
 
+	help_text = ''
+	if cluster == 'large-states' and view == 'map':
+		help_text = '''This page shows data for all IJR indicators, organized by pillar and theme. The visualisation
+		below shows how the cluster of 18 large and mid-sized states fare on the chosen indicator.
+		States ranked 1-6 for the indicator are shown in blue, those ranked 7-12 in light green and
+		those ranked 13-18 in light brown. Mouseover on the map to see a state’s exact values for the
+		indicator and the raw data used to calculate the indicator. To know more about the indicator,
+		click on the ‘i’ button next to the indicator name. Use the side bar and indicator dropdown to
+		navigate to other indicators across pillars and themes.'''
+	elif cluster == 'small-states' and view == 'map':
+		help_text = '''This page shows data for all IJR indicators, organized by pillar and theme. The visualisation
+		below shows how the cluster of 18 small states fare on the chosen indicator. States ranked 1-3
+		for the indicator are shown in blue, those ranked 4-5 in light green and those ranked 6-7 in light
+		brown. Mouseover on the map to see a state’s exact values for the indicator and the raw data
+		used to calculate the indicator. To know more about the indicator, click on the ‘i’ button next to
+		the indicator name. Use the side bar and indicator dropdown to navigate to other indicators
+		across pillars and themes.'''
+	elif cluster == 'large-states' and view == 'table':
+		help_text = '''This page shows data for all IJR indicators, organized by pillar and theme. The visualisation
+		below shows how the cluster of 18 large and mid-sized states fare on the chosen indicator,
+		across all 3 IJRs. States ranked 1-6 for the indicator are shown in blue, those ranked 7-12 in light
+		green and those ranked 13-18 in light brown. The table shows the indicator value as well as the
+		raw data used to calculate it.
+		Use the sort feature to sort any column in ascending or descending order. Use the filter feature
+		in the first two columns to compare states or see results for only one IJR. To know more about
+		the indicator, click on the ‘i’ button next to the indicator name. Use the side bar and indicator
+		dropdown to navigate to other indicators across pillars and themes.'''
+	elif cluster == 'small-states' and view == 'table':
+		help_text = '''This page shows data for all IJR indicators, organized by pillar and theme. The visualisation
+		below shows how the cluster of 7 small states fare on the chosen indicator, across all 3 IJRs.
+
+		States ranked 1-3 for the indicator are shown in blue, those ranked 4-5 in light green and those
+		ranked 6-7 in light brown. The table shows the indicator value as well as the raw data used to
+		calculate it.
+		Use the sort feature to sort any column in ascending or descending order. Use the filter feature
+		in the first two columns to compare states or see results for only one IJR. To know more about
+		the indicator, click on the ‘i’ button next to the indicator name. Use the side bar and indicator
+		dropdown to navigate to other indicators across pillars and themes.'''
+
+	context.help_text = help_text
 	context.indicator = indicator
 	context.title = f'{indicator.indicator_name} | India Justice Report'
 	context.description = indicator.description
@@ -138,6 +178,7 @@ def get_context(context):
 	context.ijr_number = ijr_number
 	context.cluster = cluster
 	context.no_cache = 1
+
 
 
 def indicator_rankings_data(filters, order_by):

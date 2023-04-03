@@ -79,7 +79,7 @@ skip_frappe_bundle: 1
             <div class="ml-2 view-switcher">
                 {%- set options = [
                     ['Map', {'view': 'map', 'cluster': 'large-states' }],
-                    ['Table', {'view': 'table', 'cluster': 'all-states' }]
+                    ['Table', {'view': 'table', 'cluster': 'large-states' }]
                 ] -%}
                 {% for option in options %}
                 <a href="{{ indicator_url(**option[1]) }}" class="{{ 'active' if option[1].view == view else '' }}">{{ option[0] }}</a>

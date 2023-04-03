@@ -26,7 +26,9 @@
     <button onclick="changeIndicatorDialog.show()" class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('indicator/')}) }}">Indicators</button>
     <a class="secondary-nav-link {{ resolve_class({'active': pathname.startswith('methodology')}) }}" href="/methodology">Methodology</a>
     <div class="ml-auto">
-        <button class="secondary-nav-link">How to read this page?</button>
+        {%- if help_text -%}
+        <button class="secondary-nav-link" onclick="howToReadDialog.show()">How to read this page?</button>
+        {%- endif -%}
         <button class="secondary-nav-link" onclick="downloadsDialog.show()">Downloads</button>
         <button class="secondary-nav-link" onclick="shareDialog.show()">Share</button>
     </div>
@@ -108,6 +110,13 @@
 {%- endfor -%}
 </sl-dialog>
 
+{%- if help_text -%}
+<sl-dialog label="How to read this page?" id="howToReadDialog">
+    <div>
+        {{ help_text }}
+    </div>
+</sl-dialog>
+{%- endif -%}
 
 <!-- share dialog with twitter and facebook share links -->
 <sl-dialog label="Share" id="shareDialog">

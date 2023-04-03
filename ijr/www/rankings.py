@@ -54,6 +54,35 @@ def get_context(context):
 	context.ijr_number = ijr_number
 	context.form_dict = frappe.form_dict
 
+	help_text = ''
+	if cluster == 'large-states' and view == 'map':
+		help_text = '''The visualisation shows the performance of the cluster of 18 large and mid-sized states
+		(population above 10 million) in IJR 2022. States ranked 1-6 are shown in dark green, those ranked 7-
+		12 in light green and those ranked 13-18 in light brown. The mouseover on the map shows,
+		additionally, each state’s rank across 4 pillars and 3 ranked themes. Use the dropdown on top
+		left to see performance in IJR 2019 and IJR 2020.'''
+	elif cluster == 'small-states' and view == 'map':
+		help_text = '''The visualisation shows the performance of the cluster of 7 small states (population below 10
+		million) in IJR 2022. States ranked 1-3 are shown in dark green, those ranked 4-5 in light green and
+		those ranked 6-7 in light brown. The mouseover on the map shows, additionally, each state’s
+		rank across 4 pillars and 3 ranked themes. Use the dropdown on top left to see performance in
+		IJR 2019 and IJR 2020.'''
+	elif cluster == 'large-states' and view == 'table':
+		help_text = '''The visualisation shows the performance of the cluster of 18 large and mid-sized states
+		(population above 10 million) across all three IJRs. Besides an overall ranking, states are ranked
+		by 4 pillars and 3 ranked themes. States ranked 1-6 are shown in dark green, those ranked 7-12 in
+		light green and those ranked 13-18 in light brown. The column header has sort and filter
+		features. Use the sort feature to sort any column in ascending or descending order. Use the
+		filter feature in the first two columns to compare states or see results for only one IJR.'''
+	elif cluster == 'small-states' and view == 'table':
+		help_text = '''The visualisation shows the performance of the cluster of 7 small states (population below 10
+		million) across all three IJRs. Besides an overall ranking, states are ranked by 4 pillars and 3
+		ranked themes. States ranked 1-3 are shown in dark green, those ranked 4-5 in light green and those
+		ranked 6-7 in light brown. The column header has sort and filter features. Use the sort feature
+		to sort any column in ascending or descending order. Use the filter feature in the first two
+		columns to compare states or see results for only one IJR.'''
+
+	context.help_text = help_text
 
 
 

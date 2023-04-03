@@ -123,6 +123,26 @@ def get_context(context):
 			if current_rank and previous_rank:
 				context.current_ranking[f'{key}_rank_delta'] = current_rank - previous_rank
 
+	help_text = ''
+	if state.cluster == 'Large and mid-sized states':
+		help_text = '''The visualisation shows where a state is ranked in its cluster of 18 large and mid-sized states
+		(population above 10 million) across all three IJRs. States ranked 1-6 are shown in blue, those
+		ranked 7-12 in light green and those ranked 13-18 in light brown. Besides an overall ranking,
+		states are ranked by 4 pillars and 3 ranked themes. Use the side bar to see indicator-wise
+		performance, across the pillars and themes, for the state.'''
+	elif state.cluster == 'Small states':
+		help_text = '''The visualisation shows where a state is ranked in its cluster of 7 small states (population below
+		10 million) across all three IJRs. States ranked 1-3 are shown in blue, those ranked 4-5 in light
+		green and those ranked 6-7 in light brown. Besides an overall ranking, states are ranked by 4
+		pillars and 3 ranked themes. Use the side bar to see indicator-wise performance, across the
+		pillars and themes, for the state.'''
+	if not current_ranking:
+		help_text = '''Unlike the 25 ranked states, there are 3 states and all union territories that have not been
+		ranked in IJR. While they don’t have any ranking data, use the side bar to see indicator-wise
+		performance, across the pillars and themes, for these state and union territories.'''
+
+	context.help_text = help_text
+
 def get_raw_data_by_indicator(state_code):
 	raw_data = frappe.db.get_all('State Indicator Raw Data',
 		fields='*',
