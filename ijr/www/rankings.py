@@ -45,6 +45,7 @@ def get_context(context):
 
 	context.title = f'{title} | India Justice Report'
 	context.description = description
+	context.image = frappe.db.get_single_value('IJR Settings', 'rankings_meta_image')
 	context.rank_by_title = rank_by_title
 	context.state_rankings = state_rankings
 	context.view = view

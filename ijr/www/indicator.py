@@ -169,6 +169,7 @@ def get_context(context):
 	context.indicator = indicator
 	context.title = f'{indicator.indicator_name} | India Justice Report'
 	context.description = indicator.description
+	context.image = frappe.db.get_single_value('IJR Settings', 'indicator_meta_image')
 	context.indicator_pillar = indicator.pillar
 	context.indicator_pillar_slug = frappe.db.get_value('Pillar', indicator.pillar, 'slug')
 	context.raw_data = get_raw_data_by_state(indicator)
