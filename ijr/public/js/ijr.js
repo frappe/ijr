@@ -6,7 +6,8 @@ window.addEventListener('DOMContentLoaded', () => {
             let $el = $(e.currentTarget);
             let $target = $($el.attr('data-target'));
             $target.toggleClass('show');
-        })
+        });
+        make_view_log();
     }
 
     // fill remaining hieght available in viewport scroll for featured-table
@@ -64,29 +65,53 @@ function set_query_params(key, value, clear_others = false) {
   window.location.search = searchParams.toString();
 }
 
-function generate_export_url({
-  doctype,
-  fields,
-  filters = null,
-  order_by = null,
-}) {
-  fields = fields.map((f) => `\`tab${doctype}\`.\`${f}\``);
-  let params = new URLSearchParams({
-    cmd: "frappe.desk.reportview.export_query",
-    doctype,
-    fields: JSON.stringify(fields),
-    filters: filters ? JSON.stringify(filters) : null,
-    order_by,
-    file_format_type: "CSV",
-  });
+function get_browser() {
+    let ua = navigator.userAgent;
+    let tem;
+    let M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
 
-  return params.toString();
+    if (/trident/i.test(M[1])) {
+        tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+        return { name: "IE", version: tem[1] || "" };
+    }
+    if (M[1] === "Chrome") {
+        tem = ua.match(/\bOPR|Edge\/(\d+)/);
+        if (tem != null) {
+            return { name: "Opera", version: tem[1] };
+        }
+    }
+    M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, "-?"];
+    if ((tem = ua.match(/version\/(\d+)/i)) != null) {
+        M.splice(1, 1, tem[1]);
+    }
+    return {
+        name: M[0],
+        version: M[1],
+    };
 }
 
-function download_file_from_url(url, filename) {
-  let a = document.createElement("a");
-  a.href = url;
-  a.target = "_blank";
-  a.download = filename || "download";
-  a.click();
+function make_view_log() {
+    try {
+        if (navigator.doNotTrack != 1) {
+            let browser = get_browser();
+            fetch('/api/method/frappe.website.doctype.web_page_view.web_page_view.make_view_log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    path: location.pathname,
+                    referrer: document.referrer,
+                    browser: browser.name,
+                    version: browser.version,
+                    url: location.origin,
+                    user_tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+                })
+            });
+        }
+    } catch (error) {
+        console.error(error)
+        console.log('Could not track page view');
+    }
 }
