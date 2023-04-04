@@ -27,12 +27,3 @@
 ></script>
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 {%- endblock -%}
-
-{% block base_scripts %}
-{% if skip_frappe_bundle %}
-<script defer src="https://code.jquery.com/jquery-3.6.4.slim.min.js"></script>
-{% else %}
-{{ super() }}
-{% endif %}
-<script>window.frappe_bundle_loaded = !Boolean({{ json.dumps(skip_frappe_bundle or false) }})</script>
-{% endblock %}
