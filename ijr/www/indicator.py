@@ -60,7 +60,7 @@ def get_context(context):
 	if cluster == 'small-states':
 		filters['cluster'] = 'Small states'
 	if cluster == 'all-states':
-		# filters['cluster'] = None
+		del filters['ijr_score']
 		pass
 
 	indicator = frappe.get_doc('State Indicator', indicator_id)
