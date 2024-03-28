@@ -215,7 +215,8 @@ a.accent-link:hover {
     background-color: var(--sl-color-gray-200);
 }
 
-.cluster-select {
+
+.cluster-select, .control-select {
     appearance: none;
     border: none;
     color: var(--sl-color-gray-700);
@@ -232,6 +233,11 @@ a.accent-link:hover {
     padding: 7px 2.5rem 7px 10px;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
+}
+
+option:checked {
+    background-color: var(--brand-color) !important;
+    color: white !important;
 }
 
 .view-switcher {
@@ -581,6 +587,14 @@ sl-tab::part(base) {
 
 sl-tab[active]::part(base) {
     background-color: white;
+}
+
+sl-option {
+    --sl-font-size-medium: 14px;
+    --sl-spacing-x-small: 0.25rem;
+    --sl-spacing-medium: 0.5rem;
+    --sl-color-primary-600: var(--sl-color-gray-100);
+    --sl-color-neutral-0: black;
 }
 
 sl-menu-item {
