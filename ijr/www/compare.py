@@ -10,24 +10,26 @@ import frappe
 
 def get_context(context):
     comparison_type = frappe.form_dict.type or ""
-    selected_pillar = frappe.form_dict.pillar or "police"
-    selected_indicators = frappe.form_dict.indicators or "123"
-    selected_states = frappe.form_dict.states or "MH,UP"
-    selected_ijrs = frappe.form_dict.ijrs or ""
+    selected_pillar = frappe.form_dict.pillar or ""
+    selected_indicators = frappe.form_dict.indicators or ""
+    selected_states = frappe.form_dict.states or ""
+    selected_ijrs = frappe.form_dict.ijrs or (
+        "3" if comparison_type == "two_indicator" else "*"
+    )
 
     valid_comparison_types = [
-        "indicator_by_ijr",
-        "indicator_vs_indicator",
-        "indicators_vs_states",
+        "one_indicator",
+        "two_indicator",
+        "multiple_indicator",
     ]
     if comparison_type not in valid_comparison_types:
-        frappe.local.flags.redirect_location = f"/compare?type=indicator_by_ijr&pillar={selected_pillar}&indicators={selected_indicators}&states={selected_states}&ijrs={selected_ijrs}"
+        frappe.local.flags.redirect_location = f"/compare?type=one_indicator&pillar={selected_pillar}&indicators={selected_indicators}&states={selected_states}&ijrs={selected_ijrs}"
         raise frappe.Redirect
 
     if selected_indicators:
-        if comparison_type == "indicator_by_ijr":
+        if comparison_type == "one_indicator":
             selected_indicators = selected_indicators.split(",")[0]
-        if comparison_type == "indicator_vs_indicator":
+        if comparison_type == "two_indicator":
             selected_indicators = selected_indicators.split(",")[0:2]
             selected_indicators = ",".join(selected_indicators)
 
@@ -40,14 +42,38 @@ def get_context(context):
                 "indicator_id": ["in", selected_indicators.split(",")],
                 "region_code": ["in", selected_states.split(",")],
                 "ijr_number": (
-                    ["in", selected_ijrs.split(",")] if selected_ijrs else ["is", "set"]
+                    ["in", selected_ijrs.split(",")]
+                    if selected_ijrs and selected_ijrs != "*"
+                    else ["is", "set"]
                 ),
             },
-            fields=["state", "ijr_number", "indicator_id", "sum(indicator_value) as indicator_value"],
+            fields=[
+                "state",
+                "ijr_number",
+                "indicator_id",
+                "indicator_name",
+                "indicator_unit",
+                "sum(indicator_value) as indicator_value",
+            ],
             order_by="ijr_number asc, state asc",
             group_by="state, ijr_number",
         )
         data = data
+
+    chart_title = "<chart title>"
+    if comparison_type == "one_indicator":
+        indicator_name = frappe.get_value(
+            "State Indicator", selected_indicators, "indicator_name"
+        )
+        indicator_unit = next(
+            (
+                indicator["indicator_unit"]
+                for indicator in data
+                if indicator["indicator_id"] == selected_indicators
+            ),
+            "",
+        )
+        chart_title = f"{indicator_name} ({indicator_unit})"
 
     select_options = prepare_select_options(frappe.form_dict)
     context.update(select_options)
@@ -59,7 +85,7 @@ def get_context(context):
             "selected_indicators": selected_indicators,
             "selected_states": selected_states,
             "selected_ijrs": selected_ijrs,
-            "chart_title": "State-wise Indicator Comparison",
+            "chart_title": chart_title,
             "data": json.dumps(data),
         }
     )
@@ -95,6 +121,7 @@ def prepare_select_options(form_dict):
         )
     ]
 
+    comparison_type = form_dict.get("type")
     indicator_options = [
         {"label": indicator.indicator_name, "value": indicator.name}
         for indicator in frappe.get_all(
@@ -105,7 +132,12 @@ def prepare_select_options(form_dict):
                     frappe.unscrub(form_dict.get("pillar"))
                     if form_dict.get("pillar")
                     else ["is", "set"]
-                )
+                ),
+                "theme": (
+                    ["!=", "Trends"]
+                    if comparison_type == "one_indicator"
+                    else ["is", "set"]
+                ),
             },
         )
     ]
