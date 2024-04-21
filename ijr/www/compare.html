@@ -54,6 +54,8 @@ skip_frappe_bundle: 1
 				size="small"
 				style="min-width: 160px"
 				value="{{ selected_pillar }}"
+				{% if comparison_type !="one_indicator" %} multiple {% endif %}
+				{% if comparison_type !="one_indicator" %} clearable {% endif %}
 			>
 				{% for option in pillar_options %}
 				<sl-option value="{{ option.value }}">{{ option.label }}</sl-option>
@@ -83,9 +85,9 @@ skip_frappe_bundle: 1
 				placeholder="Select States"
 				size="small"
 				style="min-width: 160px"
-				multiple
-				clearable
 				value="{{ selected_states | replace(',', ' ') }}"
+				{% if comparison_type != "two_indicator" %} multiple {% endif %}
+				{% if comparison_type != "two_indicator" %} clearable {% endif %}
 			>
 				{% for option in state_options %}
 				<sl-option value="{{ option.value }}">{{ option.label }}</sl-option>
@@ -99,11 +101,11 @@ skip_frappe_bundle: 1
 				placeholder="Select IJRs"
 				size="small"
 				style="min-width: 160px"
-				{% if comparison_type != "two_indicator" %} multiple {% endif %}
-				{% if comparison_type != "two_indicator" %} clearable {% endif %}
 				value="{{ selected_ijrs | replace(',', ' ') }}"
+				{% if comparison_type == "one_indicator" %} multiple {% endif %}
+				{% if comparison_type == "one_indicator" %} clearable {% endif %}
 			>
-				{% if comparison_type != "two_indicator" %}
+				{% if comparison_type == "one_indicator" %}
 				<sl-option value="*">All IJRs</sl-option>
 				{% endif %}
 				{% for option in ijr_options %}

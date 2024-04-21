@@ -78,22 +78,24 @@ function changeChartType(chartType) {
 
 const selectors = document.querySelectorAll("sl-select");
 selectors.forEach((selector) => {
-	// selector.addEventListener("sl-change", handleFilterChange);
 	selector.addEventListener("sl-clear", handleFilterChange);
 	selector.addEventListener("sl-after-hide", handleFilterChange);
 });
 
 function handleFilterChange() {
 	let states = $("sl-select[name=state]").val();
-	let pillar = $("sl-select[name=pillar]").val();
+	let pillars = $("sl-select[name=pillar]").val();
 	let indicators = $("sl-select[name=indicator]").val();
 	let ijrs = $("sl-select[name=ijr]").val();
 
+	if (pillars) {
+		pillars = Array.isArray(pillars) ? pillars.join(",") : pillars;
+	}
 	if (indicators) {
 		indicators = Array.isArray(indicators) ? indicators.join(",") : indicators;
 	}
 	if (states) {
-		states = states.join(",");
+		states = Array.isArray(states) ? states.join(",") : states;
 	}
 	if (ijrs && Array.isArray(ijrs)) {
 		ijrs = ijrs.join(",");
@@ -105,21 +107,12 @@ function handleFilterChange() {
 	}
 
 	if (comparison_type === "two_indicator") {
-		if (!indicators) {
-			return;
-		}
-		if (indicators.split(",").length < 2) {
-			return;
-		}
-		if (states.split(",").length < 2) {
-			return;
-		}
 		if (indicators.split(",").length > 2) {
 			indicators = indicators.split(",").slice(0, 2).join(",");
 		}
 	}
 
-	const url = `/compare?type=${comparison_type}&pillar=${pillar}&indicators=${indicators}&states=${states}&ijrs=${ijrs}`;
+	const url = `/compare?type=${comparison_type}&pillars=${pillars}&indicators=${indicators}&states=${states}&ijrs=${ijrs}`;
 	window.location.replace(url);
 }
 
