@@ -53,11 +53,27 @@ skip_frappe_bundle: 1
 				placeholder="Select Pillar"
 				size="small"
 				style="min-width: 160px"
-				value="{{ selected_pillar }}"
-				{% if comparison_type !="one_indicator" %} multiple {% endif %}
-				{% if comparison_type !="one_indicator" %} clearable {% endif %}
+				value="{{ selected_pillars | replace(',', ' ') }}"
+				{% if comparison_type != "one_indicator" %} multiple {% endif %}
+				{% if comparison_type != "one_indicator" %} clearable {% endif %}
 			>
 				{% for option in pillar_options %}
+				<sl-option value="{{ option.value }}">{{ option.label }}</sl-option>
+				{% endfor %}
+			</sl-select>
+		</div>
+		<div class="flex-1 flex-shrink-0">
+			<sl-select
+				name="theme"
+				label="Theme"
+				placeholder="Select Theme"
+				size="small"
+				style="min-width: 160px"
+				value="{{ selected_themes | replace(',', ' ') }}"
+				{% if comparison_type != "one_indicator" %} multiple {% endif %}
+				{% if comparison_type != "one_indicator" %} clearable {% endif %}
+			>
+				{% for option in theme_options %}
 				<sl-option value="{{ option.value }}">{{ option.label }}</sl-option>
 				{% endfor %}
 			</sl-select>

@@ -83,13 +83,17 @@ selectors.forEach((selector) => {
 });
 
 function handleFilterChange() {
-	let states = $("sl-select[name=state]").val();
 	let pillars = $("sl-select[name=pillar]").val();
+	let themes = $("sl-select[name=theme]").val();
 	let indicators = $("sl-select[name=indicator]").val();
+	let states = $("sl-select[name=state]").val();
 	let ijrs = $("sl-select[name=ijr]").val();
 
 	if (pillars) {
 		pillars = Array.isArray(pillars) ? pillars.join(",") : pillars;
+	}
+	if (themes) {
+		themes = Array.isArray(themes) ? themes.join(",") : themes;
 	}
 	if (indicators) {
 		indicators = Array.isArray(indicators) ? indicators.join(",") : indicators;
@@ -112,7 +116,7 @@ function handleFilterChange() {
 		}
 	}
 
-	const url = `/compare?type=${comparison_type}&pillars=${pillars}&indicators=${indicators}&states=${states}&ijrs=${ijrs}`;
+	const url = `/compare?type=${comparison_type}&pillars=${pillars}&themes=${themes}&indicators=${indicators}&states=${states}&ijrs=${ijrs}`;
 	window.location.replace(url);
 }
 
