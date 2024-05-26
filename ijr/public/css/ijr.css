@@ -703,6 +703,64 @@ sl-dialog {
     background-color: var(--sl-color-gray-100);
 }
 
+.treeselect-input {
+    min-height: 30px !important;
+    padding-left: 12px !important;
+    padding-right: 60px !important;
+    border: solid var(--sl-input-border-width) var(--sl-input-border-color) !important;
+    border-radius: 4px !important;
+}
+.treeselect-input--focused {
+    background-color: var(--sl-input-background-color-focus);
+    border-color: var(--sl-input-border-color-focus) !important;
+    box-shadow: 0 0 0 var(--sl-focus-ring-width) var(--sl-input-focus-ring-color);
+}
+.treeselect-input__operators {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    color: var(--sl-input-icon-color) !important;
+    right: 12px !important;
+}
+.treeselect-input__edit::placeholder {
+    color: var(--sl-color-gray-500) !important;
+}
+
+.treeselect-list {
+    border: solid var(--sl-input-border-width) var(--sl-input-border-color) !important;
+    border-top: none !important;
+    border-radius: 0 0 var(--sl-input-border-radius) var(--sl-input-border-radius) !important;
+    box-shadow: var(--sl-shadow-x-small);
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+}
+.treeselect-list__empty {
+    padding-left: 8px !important;
+}
+.treeselect-list__item {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    height: auto !important;
+}
+.treeselect-list__item-icon {
+    padding-left: 8px;
+}
+.treeselect-list__item-label {
+    margin-bottom: 0 !important;
+    font-size: 13px !important;
+}
+.treeselect-list__item--checked {
+    background-color: var(--sl-color-gray-100) !important;
+    color: var(--sl-color-gray-900) !important;
+}
+div.treeselect-list__item--focused {
+    color: var(--sl-color-gray-900) !important;
+    background-color: var(--sl-color-gray-50) !important;
+}
+div.treeselect-list__item--focused:hover {
+    background-color: var(--sl-color-gray-100) !important;
+}
+
 /* styles for markdown pages */
 [source-content-type=Markdown] h1 {
     font-size: 2.5rem;

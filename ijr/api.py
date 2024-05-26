@@ -22,3 +22,13 @@ def download(file_id=None):
 	frappe.response.filecontent = _file.get_content()
 	frappe.response.type = 'download'
 	return as_raw()
+
+
+@frappe.whitelist(allow_guest=True)
+def get_indicator_description(indicator_id):
+	if not isinstance(indicator_id, str):
+		frappe.throw('Invalid indicator id')
+	data = frappe.db.get_value('State Indicator', indicator_id, ['long_description', 'description'], as_dict=True)
+	return data.get('long_description') or data.get('description') or 'No description available'
+
+	

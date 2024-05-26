@@ -1,123 +1,488 @@
-const data = window.raw_data;
 const colors = ["#F1D68F", "#A8D8B4", "#63BDBB", "#8faaf1"];
+const raw_data = window.raw_data;
 
-let comparison_type = undefined;
+let cur_tab = undefined;
+let lineOrBar = "line";
+let filters = {
+	indicator_1: null,
+	indicator_2: null,
+	indicator_3: null,
+	states: [],
+	ijrs: [],
+};
+
 frappe.ready(() => {
-	comparison_type = frappe.utils.get_url_arg("type");
-	setActiveComparisonType(comparison_type);
-
-	if (!data.length) {
-		showEmptyState();
-		return;
-	}
-
-	if (comparison_type == "one_indicator") {
-		changeChartType("line");
-	} else if (comparison_type == "two_indicator") {
-		changeChartType("scatter");
-	} else {
-		renderTable(data);
-	}
+	parse_query_params();
+	set_active_tab();
+	setup_indicator_select();
+	setup_state_select();
+	setup_ijr_select();
+	render_chart_or_table();
 });
 
-function showEmptyState() {
-	document.getElementById("chart-container").innerHTML = `
-		<div class="text-muted h-[75vh] text-sm border border-dashed flex items-center justify-center">
-			Select a Pillar, Indicator, State and IJR to compare
-		</div>
-	`;
+function parse_query_params() {
+	const url = new URL(window.location.href);
+	const params = url.searchParams;
+	const tab = params.get("tab");
+	const indicators = params.get("indicators");
+	const states = params.get("states");
+	const ijrs = params.get("ijrs");
+
+	if (tab) {
+		cur_tab = tab;
+	}
+	if (indicators) {
+		const _indicators = indicators.split(",");
+		filters.indicator_1 = _indicators[0];
+		filters.indicator_2 = _indicators[1];
+		filters.indicator_3 = _indicators[2];
+	}
+	if (states) {
+		filters.states = states.split(",");
+	}
+	if (ijrs) {
+		filters.ijrs = ijrs.split(",");
+	}
 }
 
-function setActiveComparisonType(comparison_type) {
-	const ids_by_type = {
-		one_indicator: "type-1",
-		two_indicator: "type-2",
-		multiple_indicator: "type-3",
+function toggle_empty_state(show = true) {
+	const emptyState = document.getElementById("empty-state");
+	if (show) {
+		emptyState.classList.remove("hidden");
+	} else {
+		emptyState.classList.add("hidden");
+	}
+}
+
+function set_active_tab() {
+	cur_tab = frappe.utils.get_url_arg("tab") || "one_indicator";
+	const ids_by_tab = {
+		one_indicator: "tab-1",
+		two_indicator: "tab-2",
+		three_indicator: "tab-3",
 	};
-	Object.keys(ids_by_type).forEach((key) => {
-		const id = ids_by_type[key];
+	Object.keys(ids_by_tab).forEach((tab) => {
+		const id = ids_by_tab[tab];
 		const element = document.getElementById(id);
-		if (key === comparison_type) {
+		if (cur_tab === tab) {
 			element.classList.add("active");
 		} else {
 			element.classList.remove("active");
 		}
 	});
+	set_query_params();
 }
 
-function changeChartType(chartType) {
-	let chartData = null;
-	let axisLabels = { x: "", y: "" };
-	if (chartType === "line") {
-		chartData = getLineChartData(data);
-	} else if (chartType === "bar") {
-		chartData = getBarChartData(data);
-	} else if (chartType === "scatter") {
-		chartData = getScatterChartData(data);
-		axisLabels = { x: "Indicator 1", y: "Indicator 2" };
+function setup_indicator_select() {
+	const all_indicators = raw_data.reduce((acc, d) => {
+		if (!acc.find((i) => i.value === d.indicator_id)) {
+			acc.push({
+				value: d.indicator_id,
+				label: d.indicator_name,
+				pillar: d.pillar,
+				theme: d.theme,
+			});
+		}
+		return acc;
+	}, []);
+	const groupedIndicators = all_indicators.reduce((acc, indicator) => {
+		const pillar = indicator.pillar;
+		const theme = indicator.theme;
+		const indicator_id = indicator.value;
+		if (!acc[pillar])
+			acc[pillar] = { name: pillar, value: pillar, children: [] };
+		const pillarNode = acc[pillar];
+		if (!pillarNode.children.find((c) => c.name === theme)) {
+			pillarNode.children.push({
+				name: theme,
+				value: pillar + theme,
+				children: [],
+			});
+		}
+		const themeNode = pillarNode.children.find((c) => c.name === theme);
+		if (!themeNode.children.find((c) => c.name === indicator.label)) {
+			themeNode.children.push({ name: indicator.label, value: indicator_id });
+		}
+		return acc;
+	}, {});
+
+	const treeselect_options = {
+		isSingleSelect: true,
+		showTags: false,
+		disabledBranchNode: true,
+		appendToBody: true,
+		// alwaysOpen: true,
+		options: Object.values(groupedIndicators),
+		iconElements: {
+			clear: `<sl-icon name="x-circle-fill" library="system" aria-hidden="true"></sl-icon>`,
+			arrowDown: `<sl-icon library="system" name="chevron-down" aria-hidden="true"></sl-icon>`,
+			arrowRight: `<sl-icon library="system" name="chevron-right" aria-hidden="true"></sl-icon>`,
+		},
+	};
+
+	const $indicator_1 = document.querySelector("#indicator-input-1");
+	const indicator_1 = new Treeselect({
+		parentHtmlContainer: $indicator_1,
+		...treeselect_options,
+		value: filters.indicator_1,
+	});
+	const $indicator_1_label = document.querySelector(
+		"label[for=indicator-input-1]"
+	);
+	$indicator_1_label.innerHTML =
+		cur_tab === "one_indicator" ? "Indicator" : "Indicator 1";
+	indicator_1.srcElement.addEventListener("input", (e) => {
+		update_filters("indicator_1", e.detail);
+		render_chart_or_table();
+	});
+
+	if (cur_tab !== "one_indicator") {
+		document.getElementById("indicator-2-container").classList.remove("hidden");
+		const $indicator_2 = document.querySelector("#indicator-input-2");
+		const indicator_2 = new Treeselect({
+			parentHtmlContainer: $indicator_2,
+			...treeselect_options,
+			value: filters.indicator_2,
+		});
+		const $indicator_2_label = document.querySelector(
+			"label[for=indicator-input-2]"
+		);
+		$indicator_2_label.innerHTML = "Indicator 2";
+		indicator_2.srcElement.addEventListener("input", (e) => {
+			update_filters("indicator_2", e.detail);
+			render_chart_or_table();
+		});
 	}
 
-	if (!chartData || !chartData.datasets.length) {
+	if (cur_tab === "three_indicator") {
+		document.getElementById("indicator-3-container").classList.remove("hidden");
+		const $indicator_3 = document.querySelector("#indicator-input-3");
+		const indicator_3 = new Treeselect({
+			parentHtmlContainer: $indicator_3,
+			...treeselect_options,
+			value: filters.indicator_3,
+		});
+		const $indicator_3_label = document.querySelector(
+			"label[for=indicator-input-3]"
+		);
+		$indicator_3_label.innerHTML = "Indicator 3";
+		indicator_3.srcElement.addEventListener("input", (e) => {
+			update_filters("indicator_3", e.detail);
+			render_chart_or_table();
+		});
+	}
+}
+
+function setup_state_select() {
+	const stateSelect = $("sl-select[name=state]");
+
+	if (cur_tab == "one_indicator") {
+		const all_states = raw_data
+			.reduce((acc, d) => {
+				if (!acc.find((i) => i.value === d.region_code)) {
+					acc.push({ value: d.region_code, label: d.state });
+				}
+				return acc;
+			}, [])
+			.sort((a, b) => a.label.localeCompare(b.label));
+
+		stateSelect.attr("multiple", true);
+		stateSelect.html(
+			all_states.map(
+				(s) => `<sl-option value="${s.value}">${s.label}</sl-option>`
+			)
+		);
+	}
+	if (cur_tab !== "one_indicator") {
+		const clusters = [
+			{ label: "Large and mid-sized states", value: "large" },
+			{ label: "Small states", value: "small" },
+			{ label: "All states", value: "all" },
+		];
+		stateSelect.html(
+			clusters.map(
+				(s) => `<sl-option value="${s.value}">${s.label}</sl-option>`
+			)
+		);
+	}
+
+	stateSelect.attr("value", filters.states.join(" "));
+
+	stateSelect.on("sl-change", () => {
+		update_filters("states", stateSelect.val());
+		render_chart_or_table();
+	});
+}
+
+function setup_ijr_select() {
+	const all_ijrs = raw_data
+		.reduce((acc, d) => {
+			if (!acc.find((i) => i.value === d.ijr_number)) {
+				acc.push({ value: d.ijr_number, label: `IJR ${d.ijr_number}` });
+			}
+			return acc;
+		}, [])
+		.sort((a, b) => a.label.localeCompare(b.label));
+
+	const ijrSelect = $("sl-select[name=ijr]");
+	if (cur_tab == "one_indicator") {
+		ijrSelect.attr("multiple", true);
+		ijrSelect.html(
+			`<sl-option value="all">All IJRs</sl-option>` +
+				all_ijrs
+					.map((i) => `<sl-option value="${i.value}">${i.label}</sl-option>`)
+					.join("")
+		);
+		if (!filters.ijrs.length) {
+			ijrSelect.attr("value", "all");
+			filters.ijrs = ["all"];
+		}
+	}
+	if (cur_tab !== "one_indicator") {
+		ijrSelect.attr("multiple", false);
+		ijrSelect.html(
+			all_ijrs.map(
+				(i) => `<sl-option value="${i.value}">${i.label}</sl-option>`
+			)
+		);
+		if (!filters.ijrs.length) {
+			ijrSelect.attr("value", all_ijrs.at(-1).value);
+			filters.ijrs = [all_ijrs.at(-1).value];
+		}
+	}
+
+	ijrSelect.attr("value", filters.ijrs.join(" "));
+
+	ijrSelect.on("sl-change", () => {
+		update_filters("ijrs", ijrSelect.val());
+		render_chart_or_table();
+	});
+}
+
+function render_chart_or_table() {
+	toggle_empty_state(false);
+	if (cur_tab === "one_indicator" && validate_one_indicator_filters()) {
+		show_chart_type_switcher();
+		render_line_chart();
+	}
+	if (cur_tab === "two_indicator" && validate_two_indicator_filters()) {
+		render_scatter_chart();
+	}
+	if (cur_tab === "three_indicator" && validate_three_indicator_filters()) {
+		render_table(get_filtered_data());
+	}
+}
+
+function validate_one_indicator_filters() {
+	if (!filters.indicator_1) {
+		toggle_empty_state(true);
+		return false;
+	}
+	if (!filters.states?.length) {
+		toggle_empty_state(true);
+		return false;
+	}
+	return true;
+}
+
+function validate_two_indicator_filters() {
+	if (!filters.indicator_1 || !filters.indicator_2) {
+		toggle_empty_state(true);
+		return false;
+	}
+	if (filters.indicator_1 === filters.indicator_2) {
+		toggle_empty_state(true);
+		return false;
+	}
+	if (!filters.states?.length) {
+		toggle_empty_state(true);
+		return false;
+	}
+	return true;
+}
+
+function validate_three_indicator_filters() {
+	if (!filters.indicator_1 || !filters.indicator_2 || !filters.indicator_3) {
+		toggle_empty_state(true);
+		return false;
+	}
+	if (
+		filters.indicator_1 === filters.indicator_2 ||
+		filters.indicator_1 === filters.indicator_3 ||
+		filters.indicator_2 === filters.indicator_3
+	) {
+		toggle_empty_state(true);
+		return false;
+	}
+	if (!filters.states?.length) {
+		toggle_empty_state(true);
+		return false;
+	}
+	return true;
+}
+
+function render_line_chart() {
+	const filteredData = get_filtered_data();
+	const chartData = getLineChartData(filteredData);
+	renderChart(chartData, lineOrBar);
+	show_indicator_title(filteredData);
+}
+
+function render_scatter_chart() {
+	const filteredData = get_filtered_data();
+	if (!filteredData.length) {
+		toggle_empty_state(true);
 		return;
 	}
+	const chartData = getScatterChartData(filteredData);
+	renderChart(chartData, "scatter", {
+		x: filteredData.find(
+			(d) => d.indicator_id.toString() === filters.indicator_1.toString()
+		).indicator_name,
+		y: filteredData.find(
+			(d) => d.indicator_id.toString() === filters.indicator_2.toString()
+		).indicator_name,
+	});
+	show_indicator_title(filteredData);
+}
 
-	renderChart(chartData, chartType, axisLabels);
-
-	if (comparison_type == "one_indicator") {
-		const lineChartSwitcher = document.getElementById("line-chart-switcher");
-		const barChartSwitcher = document.getElementById("bar-chart-switcher");
-		if (chartType === "line") {
-			lineChartSwitcher.classList.add("active");
-			barChartSwitcher.classList.remove("active");
-		} else {
-			lineChartSwitcher.classList.remove("active");
-			barChartSwitcher.classList.add("active");
+function get_filtered_data() {
+	function match_state_cluster(state, clusters) {
+		if (clusters.includes("all")) {
+			return true;
 		}
+		if (
+			clusters.includes("large") &&
+			state.cluster.toLowerCase().includes("large")
+		) {
+			return true;
+		}
+		if (
+			clusters.includes("small") &&
+			state.cluster.toLowerCase().includes("small")
+		) {
+			return true;
+		}
+		return false;
+	}
+
+	return raw_data.filter((d) => {
+		const indicatorMatch = [
+			filters.indicator_1,
+			filters.indicator_2,
+			filters.indicator_3,
+		].includes(d.indicator_id.toString());
+
+		const stateMatch =
+			cur_tab === "one_indicator"
+				? filters.states.includes(d.region_code)
+				: match_state_cluster(d, filters.states);
+
+		const ijrMatch =
+			filters.ijrs.includes("all") ||
+			filters.ijrs.includes(d.ijr_number) ||
+			filters.ijrs.includes(d.ijr_number.toString());
+
+		return indicatorMatch && stateMatch && ijrMatch;
+	});
+}
+
+function show_indicator_title(data) {
+	const indicator_1_data = data.find(
+		(d) => d.indicator_id.toString() === filters.indicator_1.toString()
+	);
+	const indicator_id = indicator_1_data.indicator_id;
+	const indicator_name = indicator_1_data.indicator_name;
+	const indicator_unit = indicator_1_data.indicator_unit;
+
+	const indicator_1_title = document.getElementById("indicator-1-title");
+	get_indicator_info_element(indicator_id, indicator_name).then((tooltip) => {
+		indicator_1_title.innerHTML = `
+		<h2 class="text-lg font-semibold">
+			${indicator_name} (${indicator_unit})
+		</h2>
+		${tooltip}`;
+	});
+	indicator_1_title.classList.remove("hidden");
+
+	if (cur_tab === "two_indicator") {
+		const indicator_2_data = data.find(
+			(d) => d.indicator_id.toString() === filters.indicator_2.toString()
+		);
+		const indicator_id = indicator_2_data.indicator_id;
+		const indicator_name = indicator_2_data.indicator_name;
+		const indicator_unit = indicator_2_data.indicator_unit;
+
+		const indicator_2_title = document.getElementById("indicator-2-title");
+		get_indicator_info_element(indicator_id, indicator_name).then((tooltip) => {
+			indicator_2_title.innerHTML = `
+			<p class="mx-2"> vs </p>
+			<h2 class="text-lg font-semibold">
+				${indicator_name} (${indicator_unit})
+			</h2>
+			${tooltip}`;
+		});
+		indicator_2_title.classList.remove("hidden");
 	}
 }
 
-const selectors = document.querySelectorAll("sl-select");
-selectors.forEach((selector) => {
-	selector.addEventListener("sl-clear", handleFilterChange);
-	selector.addEventListener("sl-after-hide", handleFilterChange);
-});
+function get_indicator_description(indicator_id) {
+	return frappe.xcall("ijr.api.get_indicator_description", { indicator_id });
+}
 
-function handleFilterChange() {
-	let pillars = $("sl-select[name=pillar]").val();
-	let themes = $("sl-select[name=theme]").val();
-	let indicators = $("sl-select[name=indicator]").val();
-	let states = $("sl-select[name=state]").val();
-	let ijrs = $("sl-select[name=ijr]").val();
+function update_filters(key, value) {
+	filters[key] = value;
+	set_query_params();
+}
 
-	if (pillars) {
-		pillars = Array.isArray(pillars) ? pillars.join(",") : pillars;
-	}
-	if (themes) {
-		themes = Array.isArray(themes) ? themes.join(",") : themes;
-	}
-	if (indicators) {
-		indicators = Array.isArray(indicators) ? indicators.join(",") : indicators;
-	}
-	if (states) {
-		states = Array.isArray(states) ? states.join(",") : states;
-	}
-	if (ijrs && Array.isArray(ijrs)) {
-		ijrs = ijrs.join(",");
-	}
+function set_query_params() {
+	const url = new URL(window.location.href);
+	const _params = {
+		tab: cur_tab,
+		indicators: [
+			filters.indicator_1,
+			filters.indicator_2,
+			filters.indicator_3,
+		].filter(Boolean),
+		states: filters.states,
+		ijrs: filters.ijrs,
+	};
 
-	const comparison_type = frappe.utils.get_url_arg("type");
-	if (comparison_type === "one_indicator") {
-		indicators = indicators.split(",")[0];
-	}
-
-	if (comparison_type === "two_indicator") {
-		if (indicators.split(",").length > 2) {
-			indicators = indicators.split(",").slice(0, 2).join(",");
+	Object.keys(_params).forEach((key) => {
+		if (!_params[key]) {
+			url.searchParams.delete(key);
+			return;
 		}
-	}
+		if (Array.isArray(_params[key])) {
+			_params[key] = _params[key].join(",");
+		}
+		url.searchParams.set(key, _params[key]);
+	});
+	window.history.replaceState({}, "", url);
+}
 
-	const url = `/compare?type=${comparison_type}&pillars=${pillars}&themes=${themes}&indicators=${indicators}&states=${states}&ijrs=${ijrs}`;
-	window.location.replace(url);
+function show_chart_type_switcher() {
+	const lineOrBarSwitcher = document.getElementById("line-or-bar-switcher");
+	const lineChartSwitcher = document.getElementById("line-chart-switcher");
+	const barChartSwitcher = document.getElementById("bar-chart-switcher");
+
+	lineOrBarSwitcher.classList.remove("hidden");
+	lineChartSwitcher.addEventListener("click", () => {
+		lineOrBar = "line";
+		render_chart_or_table();
+	});
+	barChartSwitcher.addEventListener("click", () => {
+		lineOrBar = "bar";
+		render_chart_or_table();
+	});
+
+	if (lineOrBar === "line") {
+		lineChartSwitcher.classList.add("active");
+		barChartSwitcher.classList.remove("active");
+	} else {
+		lineChartSwitcher.classList.remove("active");
+		barChartSwitcher.classList.add("active");
+	}
 }
 
 function getLineChartData(data) {
@@ -224,15 +589,16 @@ function getScatterChartData(data) {
 }
 
 let chartInstance = null;
-function renderChart(chartData, chartType = "line", axisLabels = {}) {
+function renderChart(chartData, lineOrBar = "line", axisLabels = {}) {
 	const ctx = document.getElementById("chart");
+	ctx.classList.remove("hidden");
 
 	if (chartInstance) {
 		chartInstance.destroy();
 	}
 
 	chartInstance = new Chart(ctx, {
-		type: chartType,
+		type: lineOrBar,
 		data: chartData,
 		options: {
 			animation: false,
@@ -280,8 +646,9 @@ function renderChart(chartData, chartType = "line", axisLabels = {}) {
 	});
 }
 
-function renderTable(data) {
+function render_table(data) {
 	const $table = document.getElementById("comparison-table");
+	$table.classList.remove("hidden");
 	const $thead = $table.querySelector("thead");
 	const $tbody = $table.querySelector("tbody");
 
@@ -297,8 +664,9 @@ function renderTable(data) {
 	}, {});
 
 	const maxValuePerIndicator = indicatorNames.reduce((acc, indicator) => {
-		const indicatorValues = data.filter((d) => d.indicator_name === indicator).map((d) => d.indicator_value);
-		console.log(indicator, indicatorValues);
+		const indicatorValues = data
+			.filter((d) => d.indicator_name === indicator)
+			.map((d) => d.indicator_value);
 		acc[indicator] = Math.max(...indicatorValues);
 		return acc;
 	}, {});
@@ -317,7 +685,9 @@ function renderTable(data) {
 					${indicatorNames
 						.map((indicator) => {
 							// show a inline bar chart for each indicator
-							let value = !isNaN(rows[state][indicator]) ? rows[state][indicator] : 0;
+							let value = !isNaN(rows[state][indicator])
+								? rows[state][indicator]
+								: 0;
 							let total = maxValuePerIndicator[indicator];
 							let percentageValue = (value / total) * 100;
 							if (percentageValue > 100) {
@@ -338,4 +708,18 @@ function renderTable(data) {
 			`;
 		})
 		.join("");
+}
+
+async function get_indicator_info_element(indicator_id, indicator_name) {
+	return `<sl-tooltip content="About this indicator">
+		<button class="change-indicator ml-2" onclick="indicator_${indicator_id}_info_dialog.show()">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.2rem">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+				</svg>
+		</button>
+	</sl-tooltip>
+	<sl-dialog id="indicator_${indicator_id}_info_dialog" label="${indicator_name}">
+		<p>${await get_indicator_description(indicator_id)}</p>
+	</sl-dialog>
+	`;
 }

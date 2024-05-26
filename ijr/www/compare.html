@@ -5,6 +5,11 @@ skip_frappe_bundle: 1
 ---
 
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/treeselectjs@0.10.0/dist/treeselectjs.umd.js"></script>
+<link
+	rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/treeselectjs@0.10.0/dist/treeselectjs.css"
+/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="d-none d-sm-block secondary-nav">
@@ -12,28 +17,34 @@ skip_frappe_bundle: 1
 		<div class="row align-items-center">
 			<h1 class="col-sm-2 text-lg font-semibold">Compare States</h1>
 			<div class="col">
-				<div class="secondary-nav-items">
-					<a
-						id="type-1"
-						href="/compare?type=one_indicator"
-						class="secondary-nav-link"
-					>
-						1 Indicator
-					</a>
-					<a
-						id="type-2"
-						href="/compare?type=two_indicator"
-						class="secondary-nav-link"
-					>
-						2 Indicators
-					</a>
-					<a
-						id="type-3"
-						href="/compare?type=multiple_indicator"
-						class="secondary-nav-link"
-					>
-						3 Indicators
-					</a>
+				<div class="secondary-nav-items flex gap-3">
+					<sl-tooltip placement="bottom" content="Compare states on one indicator across all IJRs">
+						<a
+							id="tab-1"
+							href="/compare?tab=one_indicator"
+							class="secondary-nav-link"
+						>
+							1 Indicator
+						</a>
+					</sl-tooltip>
+					<sl-tooltip placement="bottom" content="Correlate performance across two indicators">
+						<a
+							id="tab-2"
+							href="/compare?tab=two_indicator"
+							class="secondary-nav-link"
+						>
+							2 Indicators
+						</a>
+					</sl-tooltip>
+					<sl-tooltip placement="bottom" content="See how states fare for a set of similar indicators">
+						<a
+							id="tab-3"
+							href="/compare?tab=three_indicator"
+							class="secondary-nav-link"
+						>
+							3 Indicators
+						</a>
+					</sl-tooltip>
 					<div class="ml-auto">
 						<button class="secondary-nav-link" onclick="shareDialog.show()">
 							Share
@@ -46,53 +57,23 @@ skip_frappe_bundle: 1
 </div>
 <div class="flex flex-col gap-4">
 	<div class="flex gap-4">
-		<div class="flex-1 flex-shrink-0">
-			<sl-select
-				name="pillar"
-				label="Pillar"
-				placeholder="Select Pillar"
-				size="small"
-				style="min-width: 160px"
-				value="{{ selected_pillars | replace(',', ' ') }}"
-				{% if comparison_type != "one_indicator" %} multiple {% endif %}
-				{% if comparison_type != "one_indicator" %} clearable {% endif %}
-			>
-				{% for option in pillar_options %}
-				<sl-option value="{{ option.value }}">{{ option.label }}</sl-option>
-				{% endfor %}
-			</sl-select>
+		<div id="indicator-1-container" class="flex-1 flex-shrink-0">
+			<div>
+				<label for="indicator-input-1" class="mb-0.5 text-sm"></label>
+				<div id="indicator-input-1" class="text-sm"></div>
+			</div>
 		</div>
-		<div class="flex-1 flex-shrink-0">
-			<sl-select
-				name="theme"
-				label="Theme"
-				placeholder="Select Theme"
-				size="small"
-				style="min-width: 160px"
-				value="{{ selected_themes | replace(',', ' ') }}"
-				{% if comparison_type != "one_indicator" %} multiple {% endif %}
-				{% if comparison_type != "one_indicator" %} clearable {% endif %}
-			>
-				{% for option in theme_options %}
-				<sl-option value="{{ option.value }}">{{ option.label }}</sl-option>
-				{% endfor %}
-			</sl-select>
+		<div id="indicator-2-container" class="flex-1 flex-shrink-0 hidden">
+			<div>
+				<label for="indicator-input-2" class="mb-0.5 text-sm"></label>
+				<div id="indicator-input-2" class="text-sm"></div>
+			</div>
 		</div>
-		<div class="flex-1 flex-shrink-0">
-			<sl-select
-				name="indicator"
-				label="Indicator"
-				placeholder="Select Indicator"
-				size="small"
-				style="min-width: 160px"
-				value="{{ selected_indicators | replace(',', ' ') }}"
-				{% if comparison_type !="one_indicator" %} multiple {% endif %}
-				{% if comparison_type !="one_indicator" %} clearable {% endif %}
-			>
-				{% for option in indicator_options %}
-				<sl-option value="{{ option.value }}">{{ option.label }}</sl-option>
-				{% endfor %}
-			</sl-select>
+		<div id="indicator-3-container" class="flex-1 flex-shrink-0 hidden">
+			<div>
+				<label for="indicator-input-3" class="mb-0.5 text-sm"></label>
+				<div id="indicator-input-3" class="text-sm"></div>
+			</div>
 		</div>
 		<div class="flex-1 flex-shrink-0">
 			<sl-select
@@ -100,15 +81,8 @@ skip_frappe_bundle: 1
 				label="State"
 				placeholder="Select States"
 				size="small"
-				style="min-width: 160px"
-				value="{{ selected_states | replace(',', ' ') }}"
-				{% if comparison_type != "two_indicator" %} multiple {% endif %}
-				{% if comparison_type != "two_indicator" %} clearable {% endif %}
+				clearable
 			>
-				{% for option in state_options %}
-				<sl-option value="{{ option.value }}">{{ option.label }}</sl-option>
-				{% endfor %}
-			</sl-select>
 		</div>
 		<div class="flex-1 flex-shrink-0">
 			<sl-select
@@ -116,62 +90,40 @@ skip_frappe_bundle: 1
 				label="IJR"
 				placeholder="Select IJRs"
 				size="small"
-				style="min-width: 160px"
-				value="{{ selected_ijrs | replace(',', ' ') }}"
-				{% if comparison_type == "one_indicator" %} multiple {% endif %}
-				{% if comparison_type == "one_indicator" %} clearable {% endif %}
+				clearable
 			>
-				{% if comparison_type == "one_indicator" %}
-				<sl-option value="*">All IJRs</sl-option>
-				{% endif %}
-				{% for option in ijr_options %}
-				<sl-option value="{{ option.value }}">{{ option.label }}</sl-option>
-				{% endfor %}
 			</sl-select>
 		</div>
 	</div>
-	<div id="chart-container" class="">
+	<div id="chart-container">
+		<div id="empty-state" class="text-muted h-[75vh] text-sm border border-dashed flex items-center justify-center">
+			Select an Indicator and State to compare
+		</div>
 		<div class="mb-4 flex justify-between items-center">
 			<div>
-				<h2 class="text-lg font-semibold">{{ chart_title }}</h2>
+				<div id="indicator-1-title" class="inline-flex items-center hidden">
+				</div>
+				<div id="indicator-2-title" class="inline-flex items-center hidden">
+				</div>
 			</div>
 			<div>
-				{% if comparison_type == "one_indicator" %}
-				<div class="ml-2 view-switcher">
-					<button
-						id="line-chart-switcher"
-						class="active"
-						onclick="changeChartType('line')"
-					>
-						Line Chart
-					</button>
-					<button
-						id="bar-chart-switcher"
-						class=""
-						onclick="changeChartType('bar')"
-					>
-						Bar Chart
-					</button>
+				<div id="line-or-bar-switcher" class="ml-2 view-switcher hidden">
+					<button id="line-chart-switcher" class="active">Line Chart</button>
+					<button id="bar-chart-switcher" class="">Bar Chart</button>
 				</div>
-				{% endif %}
 			</div>
 		</div>
-		{% if comparison_type != "multiple_indicator" %}
-		<canvas id="chart"> </canvas>
-		{% endif %}
-		{% if comparison_type == "multiple_indicator" %}
-		<table id="comparison-table" class="featured-table" style="width: 100%">
+		<canvas id="chart" class="hidden"></canvas>
+		<table id="comparison-table" class="featured-table hidden" style="width: 100%">
 			<thead></thead>
 			<tbody></tbody>
 		</table>
-		{% endif %}
 	</div>
 </div>
 
 <script>
 	window.raw_data = JSON.parse(`{{ data }}`);
 </script>
-<script src="/compare.js"></script>
 
 <!-- share dialog with twitter and facebook share links -->
 <sl-dialog label="Share" id="shareDialog">
