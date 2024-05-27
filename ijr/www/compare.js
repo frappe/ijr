@@ -792,7 +792,8 @@ function custom_chart_tooltip(context) {
 	if (!tooltipEl) {
 		tooltipEl = document.createElement("div");
 		tooltipEl.id = "chartjs-tooltip";
-		tooltipEl.innerHTML = "<div></div>";
+		tooltipEl.innerHTML =
+			"<div class='mt-1 bg-white p-2 rounded-md shadow-md border'></div>";
 		document.body.appendChild(tooltipEl);
 	}
 
@@ -815,28 +816,60 @@ function custom_chart_tooltip(context) {
 	if (tooltipModel.body) {
 		const div = tooltipEl.querySelector("div");
 		const dataPoint = context.tooltip.dataPoints[0];
-		const meta = dataPoint.dataset.meta;
-		const state = lineOrBar == "line" ? meta.state : dataPoint.label;
-		const ijr = lineOrBar == "line" ? dataPoint.label : meta.ijr;
-		const period = meta.periodByIJR[ijr];
-		const indicator_name = meta.indicator_name;
-		const indicator_unit = meta.indicator_unit;
-		const value = dataPoint.formattedValue;
 
-		div.classList.add(
-			"mt-1",
-			"bg-white",
-			"p-2",
-			"rounded-md",
-			"shadow-md",
-			"border"
-		);
-		div.innerHTML = `
-			<h2 class="text-base font-semibold">${state}</h2>
-			<p>${indicator_name}</p>
-			<p>${value} ${indicator_unit}</p>
-			<p>${period}</p>
-		`;
+		if (cur_tab == "one_indicator") {
+			const meta = dataPoint.dataset.meta;
+			const state = lineOrBar == "line" ? meta.state : dataPoint.label;
+			const ijr = lineOrBar == "line" ? dataPoint.label : meta.ijr;
+			const period = meta.periodByIJR[ijr];
+			const indicator_name = meta.indicator_name;
+			const indicator_unit = meta.indicator_unit;
+			const value = dataPoint.formattedValue;
+			div.innerHTML = `
+				<h2 class="text-base font-semibold">${state}</h2>
+				<p>${indicator_name}</p>
+				<p>${value} ${indicator_unit}</p>
+				<p>${period}</p>
+			`;
+		}
+		if (cur_tab == "two_indicator") {
+			const state = dataPoint.dataset.label;
+			const ijr_number = filters.ijrs[0];
+			const indicator_1_data = raw_data.find(
+				(d) =>
+					d.indicator_id == filters.indicator_1 &&
+					d.state == state &&
+					d.ijr_number == ijr_number
+			);
+			const indicator_2_data = raw_data.find(
+				(d) =>
+					d.indicator_id == filters.indicator_2 &&
+					d.state == state &&
+					d.ijr_number == ijr_number
+			);
+			const indicator_1_name = indicator_1_data.indicator_name;
+			const indicator_1_unit = indicator_1_data.indicator_unit;
+			const value_1 = indicator_1_data.indicator_value;
+			const period_1 = indicator_1_data.year;
+
+			const indicator_2_name = indicator_2_data.indicator_name;
+			const indicator_2_unit = indicator_2_data.indicator_unit;
+			const value_2 = indicator_2_data.indicator_value;
+			const period_2 = indicator_2_data.year;
+
+			div.innerHTML = `
+				<h2 class="text-base font-semibold">${state}</h2>
+				<br>
+				<p>${indicator_1_name}</p>
+				<p>${value_1} ${indicator_1_unit}</p>
+				<p>${period_1}</p>
+
+				<br>
+				<p>${indicator_2_name}</p>
+				<p>${value_2} ${indicator_2_unit}</p>
+				<p>${period_2}</p>
+			`;
+		}
 	}
 
 	const position = context.chart.canvas.getBoundingClientRect();
