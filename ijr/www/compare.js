@@ -1,4 +1,4 @@
-const colors = ["#F1D68F", "#A8D8B4", "#63BDBB", "#8faaf1"];
+const colors = ["#F1D68F", "#A8D8B4", "#63BDBB", "#8FAAF1", "#F1909E"];
 const raw_data = window.raw_data;
 
 let cur_tab = undefined;
@@ -206,10 +206,13 @@ function setup_state_select() {
 		);
 	}
 
-	stateSelect.attr("value", filters.states.join(" "));
+	setTimeout(() => {
+		stateSelect.attr("value", filters.states.join(" "));
+	}, 100);
 
 	stateSelect.on("sl-change", () => {
-		update_filters("states", stateSelect.val());
+		const val = stateSelect.val();
+		update_filters("states", Array.isArray(val) ? val : [val]);
 		render_chart_or_table();
 	});
 }
@@ -251,10 +254,13 @@ function setup_ijr_select() {
 		}
 	}
 
-	ijrSelect.attr("value", filters.ijrs.join(" "));
+	setTimeout(() => {
+		ijrSelect.attr("value", filters.ijrs.join(" "));
+	}, 100);
 
 	ijrSelect.on("sl-change", () => {
-		update_filters("ijrs", ijrSelect.val());
+		const val = ijrSelect.val();
+		update_filters("ijrs", Array.isArray(val) ? val : [val]);
 		render_chart_or_table();
 	});
 }
@@ -347,20 +353,14 @@ function render_scatter_chart() {
 }
 
 function get_filtered_data() {
-	function match_state_cluster(state, clusters) {
-		if (clusters.includes("all")) {
+	function match_state_cluster(state, cluster) {
+		if (cluster == "all") {
 			return true;
 		}
-		if (
-			clusters.includes("large") &&
-			state.cluster.toLowerCase().includes("large")
-		) {
+		if (cluster == "large" && state.cluster.toLowerCase().includes("large")) {
 			return true;
 		}
-		if (
-			clusters.includes("small") &&
-			state.cluster.toLowerCase().includes("small")
-		) {
+		if (cluster == "small" && state.cluster.toLowerCase().includes("small")) {
 			return true;
 		}
 		return false;
@@ -376,7 +376,7 @@ function get_filtered_data() {
 		const stateMatch =
 			cur_tab === "one_indicator"
 				? filters.states.includes(d.region_code)
-				: match_state_cluster(d, filters.states);
+				: match_state_cluster(d, filters.states[0]);
 
 		const ijrMatch =
 			filters.ijrs.includes("all") ||
@@ -652,10 +652,16 @@ function render_table(data) {
 	const $thead = $table.querySelector("thead");
 	const $tbody = $table.querySelector("tbody");
 
-	const indicatorNames = data
-		.map((d) => d.indicator_name)
-		.filter((v, i, a) => a.indexOf(v) === i);
-
+	const indicatorIds = [
+		filters.indicator_1,
+		filters.indicator_2,
+		filters.indicator_3,
+	];
+	const indicatorNames = indicatorIds.map((indicator_id) => {
+		return data.find(
+			(d) => d.indicator_id.toString() === indicator_id.toString()
+		).indicator_name;
+	});
 	const columns = ["State", ...indicatorNames];
 	const rows = data.reduce((acc, d) => {
 		if (!acc[d.state]) acc[d.state] = {};
@@ -673,9 +679,23 @@ function render_table(data) {
 
 	$thead.innerHTML = `
 		<tr>
-			${columns.map((c) => `<th>${c}</th>`).join("")}
+			${columns.map((c, idx) => `<th id="header_${idx}">${c}</th>`).join("")}
 		</tr>
 	`;
+
+	indicatorIds.forEach((indicator_id, idx) => {
+		const header = document.getElementById(`header_${idx + 1}`);
+		get_indicator_info_element(indicator_id, indicatorNames[idx]).then(
+			(tooltip) => {
+				header.innerHTML = `
+				<div class="flex items-center">
+					${indicatorNames[idx]}
+					${tooltip}
+				</div>
+				`;
+			}
+		);
+	});
 
 	$tbody.innerHTML = Object.keys(rows)
 		.map((state) => {
@@ -683,21 +703,19 @@ function render_table(data) {
 				<tr>
 					<td>${state}</td>
 					${indicatorNames
-						.map((indicator) => {
+						.map((indicator, idx) => {
 							// show a inline bar chart for each indicator
 							let value = !isNaN(rows[state][indicator])
 								? rows[state][indicator]
 								: 0;
 							let total = maxValuePerIndicator[indicator];
 							let percentageValue = (value / total) * 100;
-							if (percentageValue > 100) {
-								console.log(value, total, percentageValue);
-							}
+							let color = colors[idx];
 							return `
 								<td>
 									<div class="flex items-center">
-										<div class="w-full h-4 bg-blue-100">
-											<div class="h-full bg-blue-500" style="width: ${percentageValue}%"></div>
+										<div class="w-full h-4" style="background-color: ${color}30;">
+											<div class="h-full" style="width: ${percentageValue}%; background-color: ${color};"></div>
 										</div>
 									</div>
 								</td>
@@ -718,8 +736,11 @@ async function get_indicator_info_element(indicator_id, indicator_name) {
 				</svg>
 		</button>
 	</sl-tooltip>
-	<sl-dialog id="indicator_${indicator_id}_info_dialog" label="${indicator_name}">
-		<p>${await get_indicator_description(indicator_id)}</p>
-	</sl-dialog>
+	<template x-teleport="body">
+		<sl-dialog id="indicator_${indicator_id}_info_dialog" label="${indicator_name}">
+			<p>${await get_indicator_description(indicator_id)}</p>
+		</sl-dialog>
+	</template>
 	`;
+}
 }
