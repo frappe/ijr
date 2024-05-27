@@ -269,7 +269,12 @@ function render_chart_or_table() {
 	toggle_empty_state(false);
 	if (cur_tab === "one_indicator" && validate_one_indicator_filters()) {
 		show_chart_type_switcher();
-		render_line_chart();
+		if (lineOrBar === "line") {
+			render_line_chart();
+		}
+		if (lineOrBar === "bar") {
+			render_bar_chart();
+		}
 	}
 	if (cur_tab === "two_indicator" && validate_two_indicator_filters()) {
 		render_scatter_chart();
@@ -330,7 +335,14 @@ function validate_three_indicator_filters() {
 function render_line_chart() {
 	const filteredData = get_filtered_data();
 	const chartData = getLineChartData(filteredData);
-	renderChart(chartData, lineOrBar);
+	renderChart(chartData, "line");
+	show_indicator_title(filteredData);
+}
+
+function render_bar_chart() {
+	const filteredData = get_filtered_data();
+	const chartData = getBarChartData(filteredData);
+	renderChart(chartData, "bar");
 	show_indicator_title(filteredData);
 }
 
@@ -500,12 +512,23 @@ function getLineChartData(data) {
 		return acc;
 	}, {});
 
+	const periodByIJR = data.reduce((acc, d) => {
+		acc[`IJR ${d.ijr_number}`] = d.year;
+		return acc;
+	}, {});
+
 	Object.keys(valueByState).forEach((state) => {
 		lineChartData.datasets.push({
 			label: state,
 			data: valueByState[state],
 			backgroundColor: colors[lineChartData.datasets.length % colors.length],
 			borderColor: colors[lineChartData.datasets.length % colors.length],
+			meta: {
+				state,
+				periodByIJR,
+				indicator_name: data[0].indicator_name,
+				indicator_unit: data[0].indicator_unit,
+			},
 		});
 	});
 
@@ -520,10 +543,17 @@ function getBarChartData(data) {
 		.filter((v, i, a) => a.indexOf(v) === i)
 		.sort();
 
-	const valueByIJR = data.reduce((acc, d) => {
-		if (!acc[`IJR ${d.ijr_number}`]) acc[`IJR ${d.ijr_number}`] = [];
-		const index = barChartData.labels.indexOf(d.state);
-		acc[`IJR ${d.ijr_number}`][index] = d.indicator_value;
+	const valueByIJR = data
+		.sort((a, b) => a.ijr_number - b.ijr_number)
+		.reduce((acc, d) => {
+			if (!acc[`IJR ${d.ijr_number}`]) acc[`IJR ${d.ijr_number}`] = [];
+			const index = barChartData.labels.indexOf(d.state);
+			acc[`IJR ${d.ijr_number}`][index] = d.indicator_value;
+			return acc;
+		}, {});
+
+	const periodByIJR = data.reduce((acc, d) => {
+		acc[`IJR ${d.ijr_number}`] = d.year;
 		return acc;
 	}, {});
 
@@ -533,6 +563,12 @@ function getBarChartData(data) {
 			data: valueByIJR[ijr],
 			backgroundColor: colors[barChartData.datasets.length % colors.length],
 			borderColor: colors[barChartData.datasets.length % colors.length],
+			meta: {
+				ijr,
+				periodByIJR,
+				indicator_name: data[0].indicator_name,
+				indicator_unit: data[0].indicator_unit,
+			},
 		});
 	});
 
@@ -615,7 +651,11 @@ function renderChart(chartData, lineOrBar = "line", axisLabels = {}) {
 						boxWidth: 12,
 					},
 				},
-				tooltip: {},
+				tooltip: {
+					enabled: false,
+					position: "nearest",
+					external: custom_chart_tooltip,
+				},
 			},
 			scales: {
 				x: {
@@ -743,4 +783,74 @@ async function get_indicator_info_element(indicator_id, indicator_name) {
 	</template>
 	`;
 }
+
+function custom_chart_tooltip(context) {
+	// Tooltip Element
+	let tooltipEl = document.getElementById("chartjs-tooltip");
+
+	// Create element on first render
+	if (!tooltipEl) {
+		tooltipEl = document.createElement("div");
+		tooltipEl.id = "chartjs-tooltip";
+		tooltipEl.innerHTML = "<div></div>";
+		document.body.appendChild(tooltipEl);
+	}
+
+	// Hide if no tooltip
+	const tooltipModel = context.tooltip;
+	if (tooltipModel.opacity === 0) {
+		tooltipEl.style.opacity = 0;
+		return;
+	}
+
+	// Set caret Position
+	tooltipEl.classList.remove("above", "below", "no-transform");
+	if (tooltipModel.yAlign) {
+		tooltipEl.classList.add(tooltipModel.yAlign);
+	} else {
+		tooltipEl.classList.add("no-transform");
+	}
+
+	// Set Text
+	if (tooltipModel.body) {
+		const div = tooltipEl.querySelector("div");
+		const dataPoint = context.tooltip.dataPoints[0];
+		const meta = dataPoint.dataset.meta;
+		const state = lineOrBar == "line" ? meta.state : dataPoint.label;
+		const ijr = lineOrBar == "line" ? dataPoint.label : meta.ijr;
+		const period = meta.periodByIJR[ijr];
+		const indicator_name = meta.indicator_name;
+		const indicator_unit = meta.indicator_unit;
+		const value = dataPoint.formattedValue;
+
+		div.classList.add(
+			"mt-1",
+			"bg-white",
+			"p-2",
+			"rounded-md",
+			"shadow-md",
+			"border"
+		);
+		div.innerHTML = `
+			<h2 class="text-base font-semibold">${state}</h2>
+			<p>${indicator_name}</p>
+			<p>${value} ${indicator_unit}</p>
+			<p>${period}</p>
+		`;
+	}
+
+	const position = context.chart.canvas.getBoundingClientRect();
+	const bodyFont = Chart.helpers.toFont(tooltipModel.options.bodyFont);
+
+	// Display, position, and set styles for font
+	tooltipEl.style.opacity = 1;
+	tooltipEl.style.position = "absolute";
+	tooltipEl.style.left =
+		position.left + window.scrollX + tooltipModel.caretX + "px";
+	tooltipEl.style.top =
+		position.top + window.scrollY + tooltipModel.caretY + "px";
+	tooltipEl.style.font = bodyFont.string;
+	tooltipEl.style.padding =
+		tooltipModel.padding + "px " + tooltipModel.padding + "px";
+	tooltipEl.style.pointerEvents = "none";
 }
