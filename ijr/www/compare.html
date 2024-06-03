@@ -129,22 +129,20 @@ skip_frappe_bundle: 1
 
 <!-- share dialog with twitter and facebook share links -->
 <sl-dialog label="Share" id="shareDialog">
-	{%- set text = (title + '\n') | urlencode -%}
 	<!--  -->
-	{%- set url = get_current_url() | urlencode -%}
-	<!--  -->
-	{%- set links = [ {'label': 'Share on Twitter', 'url':
-	"https://twitter.com/intent/tweet?url={url}&text={text}".format(url=url,
-	text=text), 'icon': 'twitter'}, {'label': 'Share on Facebook', 'url':
-	"https://www.facebook.com/sharer/sharer.php?u={url}".format(url=url), 'icon':
-	'facebook'}, {'label': 'Share on WhatsApp', 'url':
-	"https://wa.me/?text={text}".format(text=text+url), 'icon': 'whatsapp'}, ] -%}
+	{%-
+		set links = [
+		{'label': 'Share on Twitter', 'icon': 'twitter'},
+		{'label': 'Share on Facebook', 'icon': 'facebook'},
+		{'label': 'Share on WhatsApp', 'icon': 'whatsapp'}]
+	-%}
 	<!--  -->
 	{%- for link in links -%}
 	<!--  -->
 	<div class="mb-2">
 		<a
-			href="{{ link.url }}"
+			id="{{ link.icon }}_share_link"
+			href="#"
 			target="_blank"
 			class="accent-link d-inline-flex align-items-center"
 			style="gap: 0.5rem"

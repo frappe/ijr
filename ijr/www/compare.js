@@ -471,6 +471,32 @@ function set_query_params() {
 		url.searchParams.set(key, _params[key]);
 	});
 	window.history.replaceState({}, "", url);
+	set_share_links(url.href);
+}
+
+function set_share_links(url) {
+	const shareLinks = [
+		{
+			label: "Share on Twitter",
+			url: `https://twitter.com/intent/tweet?url=${url}`,
+			icon: "twitter",
+		},
+		{
+			label: "Share on Facebook",
+			url: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+			icon: "facebook",
+		},
+		{
+			label: "Share on WhatsApp",
+			url: `https://wa.me/?text=${url}`,
+			icon: "whatsapp",
+		},
+	];
+
+	shareLinks.forEach((link) => {
+		const $link = document.getElementById(`${link.icon}_share_link`);
+		$link.href = link.url;
+	});
 }
 
 function show_chart_type_switcher() {
