@@ -633,6 +633,7 @@ function renderChart(chartData, lineOrBar = "line", axisLabels = {}) {
 		chartInstance.destroy();
 	}
 
+	Chart.register(ChartDataLabels);
 	chartInstance = new Chart(ctx, {
 		type: lineOrBar,
 		data: chartData,
@@ -643,14 +644,30 @@ function renderChart(chartData, lineOrBar = "line", axisLabels = {}) {
 				position: "nearest",
 			},
 			plugins: {
-				legend: {
-					display: true,
-					position: "right",
-					align: "start",
-					labels: {
-						boxWidth: 12,
-					},
-				},
+				datalabels:
+					cur_tab === "two_indicator"
+						? {
+								anchor: "end",
+								align: "end",
+								color: (ctx) => ctx.dataset.borderColor,
+								formatter: function (value, context) {
+									return context.dataset.label;
+								},
+								offset: 2,
+								padding: 0,
+						  }
+						: false,
+				legend:
+					cur_tab !== "two_indicator"
+						? {
+								display: true,
+								position: "right",
+								align: "start",
+								labels: {
+									boxWidth: 12,
+								},
+						  }
+						: false,
 				tooltip: {
 					enabled: false,
 					position: "nearest",
