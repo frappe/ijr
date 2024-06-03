@@ -280,7 +280,9 @@ function render_chart_or_table() {
 		render_scatter_chart();
 	}
 	if (cur_tab === "three_indicator" && validate_three_indicator_filters()) {
-		render_table(get_filtered_data());
+		render_table(
+			get_filtered_data().sort((a, b) => a.state.localeCompare(b.state))
+		);
 	}
 }
 
@@ -762,7 +764,7 @@ function render_table(data) {
 
 	$thead.innerHTML = `
 		<tr>
-			${columns.map((c, idx) => `<th id="header_${idx}">${c}</th>`).join("")}
+			${columns.map((c, idx) => `<th id="header_${idx}"></th>`).join("")}
 		</tr>
 	`;
 
@@ -772,10 +774,21 @@ function render_table(data) {
 			(tooltip) => {
 				header.innerHTML = `
 				<div class="flex items-center">
-					${indicatorNames[idx]}
+					<span class="cursor-pointer hover:underline">${indicatorNames[idx]}</span>
 					${tooltip}
 				</div>
 				`;
+				header.querySelector("span").addEventListener("click", () => {
+					// sort by this column
+					const sortedData = data.sort((a, b) => {
+						const a_value =
+							a.indicator_id === indicator_id ? a.indicator_value : 0;
+						const b_value =
+							b.indicator_id === indicator_id ? b.indicator_value : 0;
+						return b_value - a_value;
+					});
+					render_table(sortedData);
+				});
 			}
 		);
 	});
@@ -797,9 +810,11 @@ function render_table(data) {
 							return `
 								<td>
 									<div class="flex items-center">
-										<div class="w-full h-4" style="background-color: ${color}30;">
-											<div class="h-full" style="width: ${percentageValue}%; background-color: ${color};"></div>
-										</div>
+											<div class="w-full h-4" style="background-color: ${color}30;">
+												<sl-tooltip placement="right" content="${value}">
+													<div class="h-full" style="width: ${percentageValue}%; background-color: ${color};"></div>
+												</sl-tooltip>
+											</div>
 									</div>
 								</td>
 							`;
