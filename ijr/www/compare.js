@@ -268,16 +268,22 @@ function setup_ijr_select() {
 function render_chart_or_table() {
 	toggle_empty_state(false);
 	if (cur_tab === "one_indicator" && validate_one_indicator_filters()) {
+		const filteredData = get_filtered_data();
 		show_chart_type_switcher();
 		if (lineOrBar === "line") {
-			render_line_chart();
+			render_line_chart(filteredData);
 		}
 		if (lineOrBar === "bar") {
-			render_bar_chart();
+			render_bar_chart(filteredData);
 		}
 	}
 	if (cur_tab === "two_indicator" && validate_two_indicator_filters()) {
-		render_scatter_chart();
+		const filteredData = get_filtered_data();
+		if (!filteredData.length) {
+			toggle_empty_state(true);
+			return;
+		}
+		render_scatter_chart(filteredData);
 	}
 	if (cur_tab === "three_indicator" && validate_three_indicator_filters()) {
 		render_table(
@@ -334,36 +340,52 @@ function validate_three_indicator_filters() {
 	return true;
 }
 
-function render_line_chart() {
-	const filteredData = get_filtered_data();
-	const chartData = getLineChartData(filteredData);
+function show_download_button(chart) {
+	const downloadButton = document.getElementById("download-button");
+	downloadButton.classList.remove("hidden");
+	downloadButton.addEventListener("click", () => {
+		const href = chart.toBase64Image();
+		const img = new Image();
+		img.src = href;
+		img.onload = () => {
+			const canvas = document.createElement("canvas");
+			const ctx = canvas.getContext("2d");
+			canvas.width = img.width;
+			canvas.height = img.height;
+			ctx.fillStyle = "white";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			ctx.drawImage(img, 0, 0);
+			const a = document.createElement("a");
+			a.download = "chart.png";
+			a.href = canvas.toDataURL("image/png");
+			a.click();
+		};
+	});
+}
+
+function render_line_chart(data) {
+	const chartData = getLineChartData(data);
 	renderChart(chartData, "line");
-	show_indicator_title(filteredData);
+	show_indicator_title(data);
 }
 
-function render_bar_chart() {
-	const filteredData = get_filtered_data();
-	const chartData = getBarChartData(filteredData);
+function render_bar_chart(data) {
+	const chartData = getBarChartData(data);
 	renderChart(chartData, "bar");
-	show_indicator_title(filteredData);
+	show_indicator_title(data);
 }
 
-function render_scatter_chart() {
-	const filteredData = get_filtered_data();
-	if (!filteredData.length) {
-		toggle_empty_state(true);
-		return;
-	}
-	const chartData = getScatterChartData(filteredData);
+function render_scatter_chart(data) {
+	const chartData = getScatterChartData(data);
 	renderChart(chartData, "scatter", {
-		x: filteredData.find(
+		x: data.find(
 			(d) => d.indicator_id.toString() === filters.indicator_1.toString()
 		).indicator_name,
-		y: filteredData.find(
+		y: data.find(
 			(d) => d.indicator_id.toString() === filters.indicator_2.toString()
 		).indicator_name,
 	});
-	show_indicator_title(filteredData);
+	show_indicator_title(data);
 }
 
 function get_filtered_data() {
@@ -729,6 +751,8 @@ function renderChart(chartData, lineOrBar = "line", axisLabels = {}) {
 			},
 		},
 	});
+
+	show_download_button(chartInstance);
 }
 
 function render_table(data) {
