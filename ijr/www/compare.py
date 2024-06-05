@@ -23,6 +23,7 @@ def get_context(context):
     data = []
     data = frappe.get_all(
         "State Indicator Data",
+        filters={"theme": ["!=", "Trends"]},
         fields=[
             "indicator_id",
             "indicator_name",
