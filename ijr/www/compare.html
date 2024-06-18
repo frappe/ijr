@@ -12,6 +12,7 @@ skip_frappe_bundle: 1
 />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
 
 
 <div class="d-none d-sm-block secondary-nav">
@@ -104,14 +105,14 @@ skip_frappe_bundle: 1
 		<div id="empty-state" class="text-muted h-[75vh] text-sm border border-dashed flex items-center justify-center">
 			Select an Indicator and State to compare
 		</div>
-		<div class="mb-4 flex justify-between items-center">
-			<div>
-				<div id="indicator-1-title" class="inline-flex items-center hidden">
+		<div class="mb-4 flex items-center justify-between items-center">
+			<div class="flex flex-1">
+				<div id="indicator-1-title" class="flex items-center hidden">
 				</div>
-				<div id="indicator-2-title" class="inline-flex items-center hidden">
+				<div id="indicator-2-title" class="flex items-center hidden">
 				</div>
 			</div>
-			<div>
+			<div class="flex flex-shrink-0">
 				<div id="line-or-bar-switcher" class="ml-2 view-switcher hidden">
 					<button id="line-chart-switcher" class="active">Line Chart</button>
 					<button id="bar-chart-switcher" class="">Bar Chart</button>

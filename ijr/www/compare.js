@@ -340,27 +340,38 @@ function validate_three_indicator_filters() {
 	return true;
 }
 
-function show_download_button(chart) {
+function show_download_button(downloadFn) {
 	const downloadButton = document.getElementById("download-button");
 	downloadButton.classList.remove("hidden");
-	downloadButton.addEventListener("click", () => {
-		const href = chart.toBase64Image();
-		const img = new Image();
-		img.src = href;
-		img.onload = () => {
-			const canvas = document.createElement("canvas");
-			const ctx = canvas.getContext("2d");
-			canvas.width = img.width;
-			canvas.height = img.height;
-			ctx.fillStyle = "white";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-			ctx.drawImage(img, 0, 0);
-			const a = document.createElement("a");
-			a.download = "chart.png";
-			a.href = canvas.toDataURL("image/png");
-			a.click();
-		};
-	});
+	downloadButton.addEventListener("click", downloadFn);
+}
+
+function downloadBase64Img(base64Img) {
+	const img = new Image();
+	img.src = base64Img;
+	img.onload = () => {
+		const width = 2048;
+		const aspectRatio = img.width / img.height;
+		const height = width / aspectRatio;
+		const img2 = this.resizeImage(img, width, height);
+
+		const link = document.createElement("a");
+		link.download = "chart.png";
+		link.href = img2.src;
+		link.click();
+	};
+}
+function resizeImage(img, w, h) {
+	const result = new Image();
+	const canvas = document.createElement("canvas");
+	canvas.width = w;
+	canvas.height = h;
+	const ctx = canvas.getContext("2d");
+	ctx.fillStyle = "white";
+	ctx.fillRect(0, 0, w, h);
+	ctx.drawImage(img, 20, 20, w - 40, h - 40);
+	result.src = canvas.toDataURL();
+	return result;
 }
 
 function render_line_chart(data) {
@@ -434,7 +445,7 @@ function show_indicator_title(data) {
 	const indicator_1_title = document.getElementById("indicator-1-title");
 	get_indicator_info_element(indicator_id, indicator_name).then((tooltip) => {
 		indicator_1_title.innerHTML = `
-		<h2 class="text-lg font-semibold">
+		<h2 class="text-lg font-semibold whitespace-nowrap">
 			${indicator_name} (${indicator_unit})
 		</h2>
 		${tooltip}`;
@@ -453,7 +464,7 @@ function show_indicator_title(data) {
 		get_indicator_info_element(indicator_id, indicator_name).then((tooltip) => {
 			indicator_2_title.innerHTML = `
 			<p class="mx-2"> vs </p>
-			<h2 class="text-lg font-semibold">
+			<h2 class="text-lg font-semibold whitespace-nowrap">
 				${indicator_name} (${indicator_unit})
 			</h2>
 			${tooltip}`;
@@ -752,7 +763,21 @@ function renderChart(chartData, lineOrBar = "line", axisLabels = {}) {
 		},
 	});
 
-	show_download_button(chartInstance);
+	show_download_button(async () => {
+		const container = document.getElementById("chart-container");
+		const canvas = await htmlToImage.toCanvas(container, {
+			filter: (element) => {
+				if (element.id == "line-or-bar-switcher") {
+					return false;
+				}
+				return true
+			},
+			pixelRatio: 4,
+		});
+
+		const href = canvas.toDataURL("image/png");
+		downloadBase64Img(href);
+	});
 }
 
 function render_table(data) {
@@ -797,8 +822,8 @@ function render_table(data) {
 		get_indicator_info_element(indicator_id, indicatorNames[idx]).then(
 			(tooltip) => {
 				header.innerHTML = `
-				<div class="flex items-center">
-					<span class="cursor-pointer hover:underline">${indicatorNames[idx]}</span>
+				<div class="flex items-center w-full">
+					<span class="cursor-pointer hover:underline whitespace-nowrap">${indicatorNames[idx]}</span>
 					${tooltip}
 				</div>
 				`;
@@ -848,11 +873,19 @@ function render_table(data) {
 			`;
 		})
 		.join("");
+
+	show_download_button(async () => {
+		const canvas = await htmlToImage.toCanvas($table, {
+			pixelRatio: 4,
+		});
+		const href = canvas.toDataURL("image/png");
+		downloadBase64Img(href);
+	});
 }
 
 async function get_indicator_info_element(indicator_id, indicator_name) {
 	return `<sl-tooltip content="About this indicator">
-		<button class="change-indicator ml-2" onclick="indicator_${indicator_id}_info_dialog.show()">
+		<button class="indicator-info ml-2" onclick="indicator_${indicator_id}_info_dialog.show()">
 				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.2rem">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
 				</svg>
