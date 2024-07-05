@@ -352,7 +352,7 @@ function show_download_button(downloadFn) {
 	downloadButton.addEventListener("click", downloadFn);
 }
 
-function downloadBase64Img(base64Img) {
+function downloadBase64Img(base64Img, filename) {
 	const img = new Image();
 	img.src = base64Img;
 	img.onload = () => {
@@ -362,7 +362,7 @@ function downloadBase64Img(base64Img) {
 		const img2 = this.resizeImage(img, width, height);
 
 		const link = document.createElement("a");
-		link.download = "chart.png";
+		link.download = `${filename}.png`;
 		link.href = img2.src;
 		link.click();
 	};
@@ -782,7 +782,13 @@ function renderChart(chartData, lineOrBar = "line", axisLabels = {}) {
 		);
 
 		const href = canvas.toDataURL("image/png");
-		downloadBase64Img(href);
+		const filename =
+			cur_tab === "two_indicator"
+				? `${axisLabels.x} vs ${axisLabels.y}`
+				: `${chartData.datasets[0].meta.indicator_name} in ${chartData.datasets
+						.map((d) => d.label)
+						.join(", ")}`;
+		downloadBase64Img(href, filename);
 	});
 }
 
@@ -805,7 +811,7 @@ function render_table(data) {
 	const indicatorLabels = indicatorNames.map((name) => {
 		const indicator = data.find((d) => d.indicator_name === name);
 		return `${name} (${indicator.indicator_unit}), ${indicator.year}`;
-	})
+	});
 
 	const rows = data.reduce((acc, d) => {
 		if (!acc[d.state]) acc[d.state] = {};
@@ -890,7 +896,8 @@ function render_table(data) {
 			pixelRatio: 4,
 		});
 		const href = canvas.toDataURL("image/png");
-		downloadBase64Img(href);
+		const filename = indicatorNames.join("_");
+		downloadBase64Img(href, filename);
 	});
 }
 
