@@ -394,13 +394,19 @@ function render_bar_chart(data) {
 
 function render_scatter_chart(data) {
 	const chartData = getScatterChartData(data);
+	const indicator1 = data.find(
+		(d) => d.indicator_id.toString() === filters.indicator_1.toString()
+	);
+	const indicator2 = data.find(
+		(d) => d.indicator_id.toString() === filters.indicator_2.toString()
+	);
+
+	const xLabel = `${indicator1.indicator_name} (${indicator1.indicator_unit}), ${indicator1.year}`;
+	const yLabel = `${indicator2.indicator_name} (${indicator2.indicator_unit}), ${indicator2.year}`;
+
 	renderChart(chartData, "scatter", {
-		x: data.find(
-			(d) => d.indicator_id.toString() === filters.indicator_1.toString()
-		).indicator_name,
-		y: data.find(
-			(d) => d.indicator_id.toString() === filters.indicator_2.toString()
-		).indicator_name,
+		x: xLabel,
+		y: yLabel,
 	});
 	show_indicator_title(data);
 }
@@ -770,16 +776,10 @@ function renderChart(chartData, lineOrBar = "line", axisLabels = {}) {
 	});
 
 	show_download_button(async () => {
-		const container = document.getElementById("chart-container");
-		const canvas = await htmlToImage.toCanvas(container, {
-			filter: (element) => {
-				if (element.id == "line-or-bar-switcher") {
-					return false;
-				}
-				return true
-			},
-			pixelRatio: 4,
-		});
+		const canvas = await htmlToImage.toCanvas(
+			document.getElementById("chart"),
+			{ pixelRatio: 4 }
+		);
 
 		const href = canvas.toDataURL("image/png");
 		downloadBase64Img(href);
@@ -802,7 +802,11 @@ function render_table(data) {
 			(d) => d.indicator_id.toString() === indicator_id.toString()
 		).indicator_name;
 	});
-	const columns = ["State", ...indicatorNames];
+	const indicatorLabels = indicatorNames.map((name) => {
+		const indicator = data.find((d) => d.indicator_name === name);
+		return `${name} (${indicator.indicator_unit}), ${indicator.year}`;
+	})
+
 	const rows = data.reduce((acc, d) => {
 		if (!acc[d.state]) acc[d.state] = {};
 		acc[d.state][d.indicator_name] = d.indicator_value;
@@ -819,17 +823,18 @@ function render_table(data) {
 
 	$thead.innerHTML = `
 		<tr>
-			${columns.map((c, idx) => `<th id="header_${idx}"></th>`).join("")}
+			<th width="200px"> State </th>
+			${indicatorNames.map((c, idx) => `<th id="header_${idx}"></th>`).join("")}
 		</tr>
 	`;
 
 	indicatorIds.forEach((indicator_id, idx) => {
-		const header = document.getElementById(`header_${idx + 1}`);
+		const header = document.getElementById(`header_${idx}`);
 		get_indicator_info_element(indicator_id, indicatorNames[idx]).then(
 			(tooltip) => {
 				header.innerHTML = `
 				<div class="flex items-center w-full">
-					<span class="cursor-pointer hover:underline whitespace-nowrap">${indicatorNames[idx]}</span>
+					<span class="cursor-pointer hover:underline trucate">${indicatorLabels[idx]}</span>
 					${tooltip}
 				</div>
 				`;
