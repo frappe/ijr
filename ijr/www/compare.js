@@ -341,7 +341,13 @@ function validate_three_indicator_filters() {
 }
 
 function show_download_button(downloadFn) {
-	const downloadButton = document.getElementById("download-button");
+	let downloadButton = document.getElementById("download-button");
+
+	// remove event listeners
+	let cloned = downloadButton.cloneNode(true);
+	downloadButton.parentElement.replaceChild(cloned, downloadButton);
+
+	downloadButton = document.getElementById("download-button");
 	downloadButton.classList.remove("hidden");
 	downloadButton.addEventListener("click", downloadFn);
 }
