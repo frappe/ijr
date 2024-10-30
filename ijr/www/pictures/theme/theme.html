@@ -1,0 +1,435 @@
+---
+base_template: 'templates/web.html'
+skip_frappe_bundle: 1
+---
+
+<!-- Add this in the head section, right after the base_template -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<div source-content-type="Markdown">
+  <div>
+    <h1>{{ frappe.form_dict.theme }}</h1>
+    {% set pictures = frappe.get_all("IJR Picture", ["name", "image", "theme", "caption"], filters={"theme": frappe.form_dict.theme}) %}
+    <div class="ijr-pictures">
+      {% for picture in pictures %}
+        <div class="ijr-picture-container" onclick="openImageViewer(this.querySelector('img'))">
+          <img
+            src="{{ picture.image }}"
+            alt="{{ picture.theme }}"
+            class="ijr-picture"
+            data-caption="{{ picture.caption or '' }}"
+            data-name="{{ picture.name }}"
+          >
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Replace modal div with image-viewer -->
+<div class="image-viewer" id="imageViewer" style="touch-action: none;">
+  <div class="image-viewer-content">
+    <button class="close-button" onclick="closeImageViewer()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <button class="nav-button prev-button" onclick="showPreviousImage()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <button class="nav-button next-button" onclick="showNextImage()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+    <img id="viewerImage" src="" alt="">
+    <div class="image-viewer-caption"></div>
+    <div class="zoom-controls">
+      <button onclick="zoomIn()" class="zoom-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="11" y1="8" x2="11" y2="14"></line>
+          <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
+      </button>
+      <button onclick="resetZoom()" class="zoom-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <circle cx="11" cy="11" r="3"></circle>
+        </svg>
+      </button>
+      <button onclick="zoomOut()" class="zoom-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
+      </button>
+      <button onclick="downloadImage()" class="zoom-button" title="Download image">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+      </button>
+      <button onclick="toggleFullscreen()" class="zoom-button" title="Toggle fullscreen">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="fullscreenIcon">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
+          <path d="M21 8V5a2 2 0 0 0-2-2h-3"></path>
+          <path d="M3 16v3a2 2 0 0 0 2 2h3"></path>
+          <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="zoom-level">100%</div>
+  </div>
+</div>
+
+<script>
+let currentZoom = 1;
+const ZOOM_STEP = 0.25;
+const MAX_ZOOM = 3;
+const MIN_ZOOM = 0.5;
+let currentImageIndex = 0;
+let allImages = [];
+
+// Touch variables
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartDistance = 0;
+let touchStartZoom = 1;
+let lastTouchX = 0;
+let lastTouchY = 0;
+let isDragging = false;
+let translateX = 0;
+let translateY = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if there's an image parameter in the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const imageName = urlParams.get('image');
+
+  if (imageName) {
+    // Find the image with matching name
+    const images = document.querySelectorAll('.ijr-picture');
+    const imageToOpen = Array.from(images).find(img => img.dataset.name === imageName);
+
+    if (imageToOpen) {
+      // Open the image viewer with this image
+      openImageViewer(imageToOpen);
+    }
+  }
+});
+
+// Add touch event listeners to the viewer image
+function initializeTouchEvents() {
+  const viewerImg = document.getElementById('viewerImage');
+  viewerImg.addEventListener('touchstart', handleTouchStart, { passive: false });
+  viewerImg.addEventListener('touchmove', handleTouchMove, { passive: false });
+  viewerImg.addEventListener('touchend', handleTouchEnd);
+}
+
+function handleTouchStart(e) {
+  e.preventDefault();
+  touchStartTime = Date.now();
+  const touches = e.touches;
+
+  // Store initial touch position
+  touchStartX = touches[0].clientX;
+  touchStartY = touches[0].clientY;
+  lastTouchX = translateX;
+  lastTouchY = translateY;
+
+  if (touches.length === 2) {
+    // Pinch-to-zoom
+    touchStartDistance = getTouchDistance(touches);
+    touchStartZoom = currentZoom;
+  } else {
+    isDragging = currentZoom > 1;
+  }
+}
+
+function handleTouchMove(e) {
+  e.preventDefault();
+  const touches = e.touches;
+
+  if (touches.length === 2) {
+    // Handle pinch-to-zoom
+    const currentDistance = getTouchDistance(touches);
+    const scale = currentDistance / touchStartDistance;
+    const newZoom = Math.min(Math.max(touchStartZoom * scale, MIN_ZOOM), MAX_ZOOM);
+
+    if (newZoom !== currentZoom) {
+      currentZoom = newZoom;
+      applyZoom();
+    }
+  } else if (touches.length === 1 && isDragging) {
+    // Handle drag when zoomed in
+    const deltaX = touches[0].clientX - touchStartX;
+    const deltaY = touches[0].clientY - touchStartY;
+
+    translateX = lastTouchX + deltaX;
+    translateY = lastTouchY + deltaY;
+
+    const img = document.getElementById('viewerImage');
+    img.style.transform = `scale(${currentZoom}) translate(${translateX / currentZoom}px, ${translateY / currentZoom}px)`;
+  }
+}
+
+function handleTouchEnd(e) {
+  const touches = e.touches;
+
+  if (touches.length === 0) {
+    // If no more touches, check if it was a quick tap/swipe
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    const deltaY = e.changedTouches[0].clientY - touchStartY;
+    const timeDiff = Date.now() - touchStartTime;
+
+    if (Math.abs(deltaX) > 50 && Math.abs(deltaY) < 30 && timeDiff < 300) {
+      // Horizontal swipe
+      if (deltaX > 0) {
+        showPreviousImage();
+      } else {
+        showNextImage();
+      }
+    }
+  }
+
+  isDragging = false;
+}
+
+function getTouchDistance(touches) {
+  return Math.hypot(
+    touches[1].clientX - touches[0].clientX,
+    touches[1].clientY - touches[0].clientY
+  );
+}
+
+function zoomIn() {
+  if (currentZoom < MAX_ZOOM) {
+    currentZoom += ZOOM_STEP;
+    applyZoom();
+  }
+}
+
+function zoomOut() {
+  if (currentZoom > MIN_ZOOM) {
+    currentZoom -= ZOOM_STEP;
+    applyZoom();
+  }
+}
+
+function resetZoom() {
+  currentZoom = 1;
+  translateX = 0;
+  translateY = 0;
+  applyZoom();
+}
+
+function applyZoom() {
+  const img = document.getElementById('viewerImage');
+  const zoomLevel = document.querySelector('.zoom-level');
+
+  img.style.transform = `scale(${currentZoom}) translate(${translateX / currentZoom}px, ${translateY / currentZoom}px)`;
+
+  zoomLevel.textContent = `${Math.round(currentZoom * 100)}%`;
+  zoomLevel.classList.add('visible');
+
+  clearTimeout(window.zoomTimeout);
+  window.zoomTimeout = setTimeout(() => {
+    zoomLevel.classList.remove('visible');
+  }, 1500);
+}
+
+function openImageViewer(img) {
+  allImages = Array.from(document.querySelectorAll('.ijr-picture'));
+  currentImageIndex = allImages.indexOf(img);
+
+  const viewer = document.getElementById('imageViewer');
+  const viewerImg = document.getElementById('viewerImage');
+  const captionDiv = document.querySelector('.image-viewer-caption');
+
+  currentZoom = 1;
+  applyZoom();
+
+  viewer.style.display = "flex";
+  viewerImg.src = img.src;
+  captionDiv.textContent = img.dataset.caption;
+
+  updateNavigationButtons();
+
+  document.addEventListener('keydown', handleKeyPress);
+
+  // Reset zoom level indicator
+  const zoomLevel = document.querySelector('.zoom-level');
+  zoomLevel.classList.remove('visible');
+  zoomLevel.textContent = '100%';
+
+  // Initialize touch events
+  initializeTouchEvents();
+
+  // Reset touch variables
+  translateX = 0;
+  translateY = 0;
+
+  // Prevent page zoom on mobile
+  document.documentElement.style.touchAction = 'none';
+}
+
+function closeImageViewer() {
+  document.getElementById('imageViewer').style.display = "none";
+  document.removeEventListener('keydown', handleKeyPress);
+
+  // Re-enable page zoom
+  document.documentElement.style.touchAction = '';
+}
+
+function showPreviousImage() {
+  if (currentImageIndex > 0) {
+    currentImageIndex--;
+    updateImage();
+  }
+}
+
+function showNextImage() {
+  if (currentImageIndex < allImages.length - 1) {
+    currentImageIndex++;
+    updateImage();
+  }
+}
+
+function updateImage() {
+  const viewerImg = document.getElementById('viewerImage');
+  const captionDiv = document.querySelector('.image-viewer-caption');
+  const currentImg = allImages[currentImageIndex];
+
+  currentZoom = 1;
+  applyZoom();
+
+  viewerImg.src = currentImg.src;
+  captionDiv.textContent = currentImg.dataset.caption;
+  updateNavigationButtons();
+}
+
+function updateNavigationButtons() {
+  const prevButton = document.querySelector('.prev-button');
+  const nextButton = document.querySelector('.next-button');
+
+  prevButton.style.visibility = currentImageIndex === 0 ? 'hidden' : 'visible';
+  nextButton.style.visibility = currentImageIndex === allImages.length - 1 ? 'hidden' : 'visible';
+}
+
+function handleKeyPress(e) {
+  if (e.key === 'Escape') closeImageViewer();
+  if (e.key === 'ArrowLeft') showPreviousImage();
+  if (e.key === 'ArrowRight') showNextImage();
+}
+
+// Close image viewer when clicking outside the image
+document.getElementById('imageViewer').addEventListener('click', function(e) {
+  if (e.target === this) closeImageViewer();
+});
+
+function downloadImage() {
+  const img = document.getElementById('viewerImage');
+
+  // Get filename from URL and decode it
+  let filename = decodeURIComponent(img.src.split('/').pop());
+
+  // Remove or replace any remaining problematic characters
+  filename = filename.replace(/%20/g, ' ')  // Replace any remaining %20 with spaces
+                    .replace(/[^a-zA-Z0-9-_. ]/g, '') // Remove any other special characters
+                    .trim(); // Remove leading/trailing spaces
+
+  // Create a temporary link element
+  const link = document.createElement('a');
+  link.href = img.src;
+  link.download = filename;
+
+  // Programmatically click the link to trigger download
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function toggleFullscreen() {
+  const viewer = document.getElementById('imageViewer');
+  const icon = document.getElementById('fullscreenIcon');
+
+  if (!document.fullscreenElement) {
+    if (viewer.requestFullscreen) {
+      viewer.requestFullscreen();
+    } else if (viewer.webkitRequestFullscreen) {
+      viewer.webkitRequestFullscreen();
+    } else if (viewer.msRequestFullscreen) {
+      viewer.msRequestFullscreen();
+    }
+    // Exit fullscreen icon (arrows pointing inward to a rectangle)
+    icon.innerHTML = `
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
+      <path d="M7 9V7h4"></path>
+      <path d="M17 9V7h-4"></path>
+      <path d="M7 15v2h4"></path>
+      <path d="M17 15v2h-4"></path>
+    `;
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+    // Enter fullscreen icon (arrows pointing outward from a rectangle)
+    icon.innerHTML = `
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
+      <path d="M9 3v2"></path>
+      <path d="M15 3v2"></path>
+      <path d="M9 21v-2"></path>
+      <path d="M15 21v-2"></path>
+      <path d="M21 9h-2"></path>
+      <path d="M21 15h-2"></path>
+      <path d="M3 9h2"></path>
+      <path d="M3 15h2"></path>
+    `;
+  }
+}
+
+// Add fullscreen change event listener
+document.addEventListener('fullscreenchange', updateFullscreenIcon);
+document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
+document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
+
+function updateFullscreenIcon() {
+  const icon = document.getElementById('fullscreenIcon');
+  if (!document.fullscreenElement) {
+    // Enter fullscreen icon (arrows pointing outward from a rectangle)
+    icon.innerHTML = `
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
+      <path d="M9 3v2"></path>
+      <path d="M15 3v2"></path>
+      <path d="M9 21v-2"></path>
+      <path d="M15 21v-2"></path>
+      <path d="M21 9h-2"></path>
+      <path d="M21 15h-2"></path>
+      <path d="M3 9h2"></path>
+      <path d="M3 15h2"></path>
+    `;
+  } else {
+    // Exit fullscreen icon (arrows pointing inward to a rectangle)
+    icon.innerHTML = `
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
+      <path d="M7 9V7h4"></path>
+      <path d="M17 9V7h-4"></path>
+      <path d="M7 15v2h4"></path>
+      <path d="M17 15v2h-4"></path>
+    `;
+  }
+}
+</script>

@@ -1,0 +1,30 @@
+.ijr-theme-pictures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.ijr-theme-picture {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .ijr-theme-pictures {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Add these styles */
+.theme-picture-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.theme-picture-link:hover {
+  text-decoration: none;
+}

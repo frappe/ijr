@@ -1,0 +1,65 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-10-30 12:14:49.145736",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "image",
+  "caption",
+  "pillar",
+  "theme"
+ ],
+ "fields": [
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image",
+   "reqd": 1
+  },
+  {
+   "fieldname": "caption",
+   "fieldtype": "Data",
+   "label": "Caption"
+  },
+  {
+   "fieldname": "pillar",
+   "fieldtype": "Link",
+   "label": "Pillar",
+   "options": "Pillar"
+  },
+  {
+   "fieldname": "theme",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Theme",
+   "options": "Theme"
+  }
+ ],
+ "image_field": "image",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-10-30 12:54:39.842814",
+ "modified_by": "Administrator",
+ "module": "India Justice Report",
+ "name": "IJR Picture",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

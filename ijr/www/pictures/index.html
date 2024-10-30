@@ -1,0 +1,37 @@
+---
+base_template: 'templates/web.html'
+skip_frappe_bundle: 1
+---
+
+{% import "templates/macros.html" as m %}
+
+<div source-content-type="Markdown">
+    <div class="web-page-content">
+      <h1>IJR in Pictures</h1>
+      {% set themes = [
+        {"name": "Diversity", "description": "IJR captures data on the extent to which institutions involved in the administration of justice have fulfilled their \"diversity\" promises, including and in particular gender diversity."},
+        {"name": "Human Resources", "description": "Gaps between \"sanctioned strengths\" and actual available personnel remain a perennial problem. IJR deconstructs how states fare on human resources across the sub-system."},
+        {"name": "Trends", "description": "IJR captures data on trends in the administration of justice to understand how the sub-system is evolving over time."},
+        {"name": "Infrastructure", "description": "IJR captures data on infrastructure to understand how the sub-system is equipped to deliver justice."},
+        {"name": "Workload", "description": "IJR captures data on workload to understand how the sub-system is coping with the cases it has to deal with."},
+        {"name": "Budgets", "description": "IJR captures data on budgets to measure how states utilise allocated budgets in the justice system."}
+      ] %}
+      {% for theme in themes %}
+      <div class="mb-16">
+        <div class="mb-8 d-flex justify-content-between align-items-center">
+          <h2 class="m-0">{{ theme.name }}</h2>
+          <a class="m-0" href="/pictures/theme/{{ theme.name }}">Explore all &rarr;</a>
+        </div>
+        <p>{{ theme.description }}</p>
+        {% set pictures = frappe.get_all("IJR Picture", ["name", "image", "theme"], filters={"theme": theme.name}, limit=3) %}
+        <div class="ijr-theme-pictures">
+          {% for picture in pictures %}
+            <a href="/pictures/theme/{{ theme.name }}?image={{ picture.name }}" class="theme-picture-link">
+              <img src="{{ picture.image }}" alt="{{ picture.theme }}" class="ijr-theme-picture">
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+</div>
