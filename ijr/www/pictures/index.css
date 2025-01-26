@@ -1,30 +1,286 @@
-.ijr-theme-pictures {
+.ijr-pictures {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  padding-top: 1rem;
   gap: 1rem;
+  row-gap: 2rem;
 }
 
-.ijr-theme-picture {
+.ijr-picture-container {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+}
+
+.ijr-picture {
   width: 100%;
-  aspect-ratio: 16/9;
+  height: 100%;
   object-fit: cover;
   border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
 }
 
-@media (max-width: 768px) {
-  .ijr-theme-pictures {
-    grid-template-columns: 1fr;
+.ijr-picture-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.2s ease;
+  border-radius: var(--border-radius);
+}
+
+.ijr-picture-container:hover::after {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.ijr-picture-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+/* Replace modal styles with image-viewer styles */
+.image-viewer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+}
+
+.controls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 1001;
+}
+
+.image-viewer-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--gray-800);
+}
+
+.viewer-image-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.image-viewer-content img {
+  max-width: 90vw;
+  max-height: calc(90vh - 4rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  transform-origin: center center;
+}
+
+.image-viewer-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
   }
+
+  .image-viewer-meta {
+    flex-shrink: 0;
+    width: 400px;
+    height: 100%;
+    padding: 40px 20px;
+  }
+
+  .image-viewer-title {
+    margin: 0 0 15px 0;
+    font-size: 1.25rem;
+    color: white;
+  }
+
+  .image-viewer-caption {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: white;
+  }
+
+/* Add these styles */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  gap: 0.5rem;
+  z-index: 1001;
+}
+
+.zoom-button {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  backdrop-filter: blur(2px); /* Optional: adds a slight blur effect behind buttons */
+}
+
+.zoom-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1001;
+  color: white;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  backdrop-filter: blur(2px);
+}
+
+.close-button:hover {
+  background: rgba(0, 0, 0, 0.7);
 }
 
 /* Add these styles */
-.theme-picture-link {
-  display: block;
-  width: 100%;
-  height: 100%;
-  text-decoration: none;
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  backdrop-filter: blur(2px);
+  z-index: 1001;
 }
 
-.theme-picture-link:hover {
-  text-decoration: none;
+.prev-button {
+  left: 2rem;
+}
+
+.next-button {
+  right: 2rem;
+}
+
+.nav-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Add styles for zoom level indicator */
+.zoom-level {
+  position: absolute;
+  top: 5rem; /* Position below zoom controls */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  z-index: 1001;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.zoom-level.visible {
+  opacity: 1;
+}
+
+/* Update button and icon sizes */
+.zoom-button svg,
+.close-button svg,
+.nav-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Add responsive sizes for mobile */
+@media (max-width: 768px) {
+
+    .image-viewer {
+        flex-direction: column;
+    }
+    .image-viewer-meta {
+        height: auto;
+    }
+
+
+  .zoom-button svg,
+  .close-button svg,
+  .nav-button svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Create a top controls container for mobile */
+  .zoom-controls {
+    position: fixed;
+    top: 1rem; /* Same as close button */
+    left: 1rem; /* Align with left edge */
+    right: calc(56px + 1rem); /* Leave space for close button */
+    transform: none; /* Remove center transform */
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    width: auto;
+  }
+
+  .close-button {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  /* Navigation buttons stay the same */
+  .nav-button.prev-button {
+    left: 1rem;
+  }
+
+  .nav-button.next-button {
+    right: 1rem;
+  }
+
+  /* Adjust zoom level indicator position */
+  .zoom-level {
+    top: calc(56px + 1.5rem);
+  }
 }

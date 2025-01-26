@@ -4,35 +4,512 @@ skip_frappe_bundle: 1
 no_cache: 1
 ---
 
+<!-- Add this in the head section, right after the base_template -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
 {% import "templates/macros.html" as m %}
 
-<div source-content-type="Markdown">
-    <div class="web-page-content">
-      <h1>IJR in Pictures</h1>
-      {% set themes = [
-        {"name": "Diversity", "description": "IJR captures data on the extent to which institutions involved in the administration of justice have fulfilled their \"diversity\" promises, including and in particular gender diversity."},
-        {"name": "Human Resources", "description": "Gaps between \"sanctioned strengths\" and actual available personnel remain a perennial problem. IJR deconstructs how states fare on human resources across the sub-system."},
-        {"name": "Trends", "description": "IJR captures data on trends in the administration of justice to understand how the sub-system is evolving over time."},
-        {"name": "Infrastructure", "description": "IJR captures data on infrastructure to understand how the sub-system is equipped to deliver justice."},
-        {"name": "Workload", "description": "IJR captures data on workload to understand how the sub-system is coping with the cases it has to deal with."},
-        {"name": "Budgets", "description": "IJR captures data on budgets to measure how states utilise allocated budgets in the justice system."}
-      ] %}
-      {% for theme in themes %}
-      <div class="mb-16">
-        <div class="mb-8 d-flex justify-content-between align-items-center">
-          <h2 class="m-0">{{ theme.name }}</h2>
-          <a class="m-0" href="/pictures/theme/{{ theme.name }}">Explore all &rarr;</a>
+<div class="row pb-12">
+    <div class="col-sm-2 d-none d-sm-block">
+        <div class="vertical-nav mt-4">
+            {% macro sidebar_item(label, value, path) %}
+            <a href="{{ '/pictures' + path }}" class="sidebar-nav-item {{ 'active' if current_theme == value else '' }}">{{ label }}</a>
+            {% endmacro %}
+            {{ sidebar_item('All', 'All', '') }}
+            {{ sidebar_item('Diversity', 'Diversity', '/theme/Diversity') }}
+            {{ sidebar_item('Human Resources', 'Human Resources', '/theme/Human Resources') }}
+            {{ sidebar_item('Trends', 'Trends', '/theme/Trends') }}
+            {{ sidebar_item('Infrastructure', 'Infrastructure', '/theme/Infrastructure') }}
+            {{ sidebar_item('Workload', 'Workload', '/theme/Workload') }}
+            {{ sidebar_item('Budgets', 'Budgets', '/theme/Budgets') }}
         </div>
-        <p>{{ theme.description }}</p>
-        {% set pictures = frappe.get_all("IJR Picture", ["name", "image", "theme"], filters={"theme": theme.name}, limit=3) %}
-        <div class="ijr-theme-pictures">
-          {% for picture in pictures %}
-            <a href="/pictures/theme/{{ theme.name }}?image={{ picture.name }}" class="theme-picture-link">
-              <img src="{{ picture.image }}" alt="{{ picture.theme }}" class="ijr-theme-picture">
-            </a>
-          {% endfor %}
+    </div>
+    <div class="col-12 col-sm-10">
+        <div>
+            <!-- <h1>{{ page_title }}</h1> -->
+            <div class="ijr-pictures">
+                {% for picture in pictures %}
+                <div>
+                    <div class="ijr-picture-container" onclick="openImageByClick(this.querySelector('img'))">
+                        <img
+                            src="{{ picture.image }}"
+                            alt="{{ picture.theme }}"
+                            class="ijr-picture"
+                            data-title="{{ picture.title or '' | e }}"
+                            data-caption="{{ picture.caption or '' | e }}"
+                            data-name="{{ picture.name }}"
+                            data-index="{{ loop.index }}"
+                        >
+                    </div>
+                    <div class="mt-2 ijr-picture-title">{{ picture.title or '' }}</div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-      </div>
-      {% endfor %}
     </div>
 </div>
+
+<!-- Replace modal div with image-viewer -->
+<div class="image-viewer" id="imageViewer" style="touch-action: none;">
+    <div class="image-viewer-content">
+        <button class="close-button" onclick="closeImageViewer()">
+            <sl-icon name="x-lg"></sl-icon>
+        </button>
+        <div class="zoom-controls">
+            <button onclick="zoomIn()" class="zoom-button">
+                <sl-icon name="zoom-in"></sl-icon>
+            </button>
+            <button onclick="resetZoom()" class="zoom-button">
+                <sl-icon name="search"></sl-icon>
+            </button>
+            <button onclick="zoomOut()" class="zoom-button">
+                <sl-icon name="zoom-out"></sl-icon>
+            </button>
+            <button onclick="downloadImage()" class="zoom-button" title="Download image">
+                <sl-icon name="download"></sl-icon>
+            </button>
+            <button onclick="toggleFullscreen()" class="zoom-button" title="Toggle fullscreen">
+                <sl-icon name="fullscreen"></sl-icon>
+            </button>
+        </div>
+        <div class="viewer-image-container">
+            <button class="nav-button prev-button" onclick="showPreviousImage()">
+                <sl-icon name="chevron-left"></sl-icon>
+            </button>
+            <button class="nav-button next-button" onclick="showNextImage()">
+                <sl-icon name="chevron-right"></sl-icon>
+            </button>
+            <img id="viewerImage" src="" alt="">
+        </div>
+        <div class="zoom-level"></div>
+  </div>
+  <div class="image-viewer-meta">
+    <h2 class="image-viewer-title"></h2>
+    <div class="image-viewer-caption"></div>
+    <div class="image-viewer-share-buttons mt-4">
+    </div>
+  </div>
+</div>
+
+<script>
+let currentZoom = 1;
+const ZOOM_STEP = 0.25;
+const MAX_ZOOM = 3;
+const MIN_ZOOM = 0.5;
+let currentImageIndex = 0;
+let totalImages = parseInt('{{ pictures | length }}');
+
+// Touch variables
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartDistance = 0;
+let touchStartZoom = 1;
+let lastTouchX = 0;
+let lastTouchY = 0;
+let isDragging = false;
+let translateX = 0;
+let translateY = 0;
+
+let showPicture = '{{ frappe.form_dict.picture_id or "" }}';
+if (showPicture) {
+    openImageById(showPicture);
+}
+let previousPath = null
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if there's an image parameter in the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const imageName = urlParams.get('image');
+
+  if (imageName) {
+    // Find the image with matching name
+    const images = document.querySelectorAll('.ijr-picture');
+    const imageToOpen = Array.from(images).find(img => img.dataset.name === imageName);
+
+    if (imageToOpen) {
+      // Open the image viewer with this image
+      openImageViewer(imageToOpen);
+    }
+  }
+});
+
+// Add touch event listeners to the viewer image
+function initializeTouchEvents() {
+  const viewerImg = document.getElementById('viewerImage');
+  viewerImg.addEventListener('touchstart', handleTouchStart, { passive: false });
+  viewerImg.addEventListener('touchmove', handleTouchMove, { passive: false });
+  viewerImg.addEventListener('touchend', handleTouchEnd);
+}
+
+function handleTouchStart(e) {
+  e.preventDefault();
+  touchStartTime = Date.now();
+  const touches = e.touches;
+
+  // Store initial touch position
+  touchStartX = touches[0].clientX;
+  touchStartY = touches[0].clientY;
+  lastTouchX = translateX;
+  lastTouchY = translateY;
+
+  if (touches.length === 2) {
+    // Pinch-to-zoom
+    touchStartDistance = getTouchDistance(touches);
+    touchStartZoom = currentZoom;
+  } else {
+    isDragging = currentZoom > 1;
+  }
+}
+
+function handleTouchMove(e) {
+  e.preventDefault();
+  const touches = e.touches;
+
+  if (touches.length === 2) {
+    // Handle pinch-to-zoom
+    const currentDistance = getTouchDistance(touches);
+    const scale = currentDistance / touchStartDistance;
+    const newZoom = Math.min(Math.max(touchStartZoom * scale, MIN_ZOOM), MAX_ZOOM);
+
+    if (newZoom !== currentZoom) {
+      currentZoom = newZoom;
+      applyZoom();
+    }
+  } else if (touches.length === 1 && isDragging) {
+    // Handle drag when zoomed in
+    const deltaX = touches[0].clientX - touchStartX;
+    const deltaY = touches[0].clientY - touchStartY;
+
+    translateX = lastTouchX + deltaX;
+    translateY = lastTouchY + deltaY;
+
+    const img = document.getElementById('viewerImage');
+    img.style.transform = `scale(${currentZoom}) translate(${translateX / currentZoom}px, ${translateY / currentZoom}px)`;
+  }
+}
+
+function handleTouchEnd(e) {
+  const touches = e.touches;
+
+  if (touches.length === 0) {
+    // If no more touches, check if it was a quick tap/swipe
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    const deltaY = e.changedTouches[0].clientY - touchStartY;
+    const timeDiff = Date.now() - touchStartTime;
+
+    if (Math.abs(deltaX) > 50 && Math.abs(deltaY) < 30 && timeDiff < 300) {
+      // Horizontal swipe
+      if (deltaX > 0) {
+        showPreviousImage();
+      } else {
+        showNextImage();
+      }
+    }
+  }
+
+  isDragging = false;
+}
+
+function getTouchDistance(touches) {
+  return Math.hypot(
+    touches[1].clientX - touches[0].clientX,
+    touches[1].clientY - touches[0].clientY
+  );
+}
+
+function zoomIn() {
+  if (currentZoom < MAX_ZOOM) {
+    currentZoom += ZOOM_STEP;
+    applyZoom();
+  }
+}
+
+function zoomOut() {
+  if (currentZoom > MIN_ZOOM) {
+    currentZoom -= ZOOM_STEP;
+    applyZoom();
+  }
+}
+
+function resetZoom() {
+  currentZoom = 1;
+  translateX = 0;
+  translateY = 0;
+  applyZoom();
+}
+
+function applyZoom() {
+  const img = document.getElementById('viewerImage');
+  const zoomLevel = document.querySelector('.zoom-level');
+
+  img.style.transform = `scale(${currentZoom}) translate(${translateX / currentZoom}px, ${translateY / currentZoom}px)`;
+
+  zoomLevel.textContent = `${Math.round(currentZoom * 100)}%`;
+  zoomLevel.classList.add('visible');
+
+  clearTimeout(window.zoomTimeout);
+  window.zoomTimeout = setTimeout(() => {
+    zoomLevel.classList.remove('visible');
+  }, 1500);
+}
+
+function openImageById(id) {
+    const img = document.querySelector(`img[data-name="${id}"]`);
+    if (img) openImageViewer(img);
+}
+
+function openImageByClick(img) {
+    if (img) {
+        openImageViewer(img);
+        // update url
+        let imageId = img.dataset.name;
+        updateUrl(imageId);
+    }
+}
+
+function updateUrl(imageId, { replace = false } = {}) {
+    if (!imageId) return;
+    if (!replace) {
+        previousPath = window.location.pathname
+    }
+    let imagePath = `/pictures/i/${imageId}`;
+    if (window.location.pathname != imagePath) {
+        replace ? history.replaceState({}, '', imagePath) : history.pushState({}, '', imagePath);
+    }
+}
+
+window.addEventListener("popstate", (event) => {
+    let path = window.location.pathname;
+    if (path.startsWith('/pictures/i/')) {
+        let imageId = path.split('/').pop();
+        openImageById(imageId);
+    } else {
+        closeImageViewer();
+    }
+});
+
+
+function openImageViewer(img) {
+    // openedViewerFromPath
+
+  currentImageIndex = parseInt(img.dataset.index) - 1
+
+  const viewer = document.getElementById('imageViewer');
+  const viewerImg = document.getElementById('viewerImage');
+  const titleDiv = document.querySelector('.image-viewer-title');
+  const captionDiv = document.querySelector('.image-viewer-caption');
+
+  currentZoom = 1;
+  applyZoom();
+
+  viewer.style.display = "flex";
+  viewerImg.src = img.src;
+  titleDiv.textContent = img.dataset.title;
+  captionDiv.textContent = img.dataset.caption;
+
+  updateNavigationButtons();
+  updateShareButtons();
+
+  document.addEventListener('keydown', handleKeyPress);
+
+  // Reset zoom level indicator
+  const zoomLevel = document.querySelector('.zoom-level');
+  zoomLevel.classList.remove('visible');
+  zoomLevel.textContent = '100%';
+
+  // Initialize touch events
+  initializeTouchEvents();
+
+  // Reset touch variables
+  translateX = 0;
+  translateY = 0;
+
+  // Prevent page zoom on mobile
+  document.documentElement.style.touchAction = 'none';
+}
+
+function closeImageViewer() {
+  if (previousPath) {
+    history.pushState({}, '', previousPath);
+  } else {
+    history.pushState({}, '', '/pictures');
+  }
+
+  document.getElementById('imageViewer').style.display = "none";
+  document.removeEventListener('keydown', handleKeyPress);
+
+  // Re-enable page zoom
+  document.documentElement.style.touchAction = '';
+}
+
+function showPreviousImage() {
+  if (currentImageIndex > 0) {
+    currentImageIndex--;
+    updateImage();
+  }
+}
+
+function showNextImage() {
+  if (currentImageIndex < totalImages - 1) {
+    currentImageIndex++;
+    updateImage();
+  }
+}
+
+function updateImage() {
+  const viewerImg = document.getElementById('viewerImage');
+  const titleDiv = document.querySelector('.image-viewer-title');
+  const captionDiv = document.querySelector('.image-viewer-caption');
+  const currentImg = document.querySelector(`img.ijr-picture[data-index="${currentImageIndex + 1}"]`);
+
+  currentZoom = 1;
+  applyZoom();
+
+  viewerImg.src = currentImg.src;
+  titleDiv.textContent = currentImg.dataset.title;
+  captionDiv.textContent = currentImg.dataset.caption;
+  updateNavigationButtons();
+  updateShareButtons();
+
+  updateUrl(currentImg.dataset.name, { replace: true });
+}
+
+function updateNavigationButtons() {
+  const prevButton = document.querySelector('.prev-button');
+  const nextButton = document.querySelector('.next-button');
+
+  prevButton.style.visibility = currentImageIndex === 0 ? 'hidden' : 'visible';
+  nextButton.style.visibility = currentImageIndex === totalImages - 1 ? 'hidden' : 'visible';
+}
+
+function handleKeyPress(e) {
+  if (e.key === 'Escape') closeImageViewer();
+  if (e.key === 'ArrowLeft') showPreviousImage();
+  if (e.key === 'ArrowRight') showNextImage();
+}
+
+// Close image viewer when clicking outside the image
+document.getElementById('imageViewer').addEventListener('click', function(e) {
+  if (e.target === this) closeImageViewer();
+});
+
+function downloadImage() {
+  const img = document.getElementById('viewerImage');
+
+  // Get filename from URL and decode it
+  let filename = decodeURIComponent(img.src.split('/').pop());
+
+  // Remove or replace any remaining problematic characters
+  filename = filename.replace(/%20/g, ' ')  // Replace any remaining %20 with spaces
+                    .replace(/[^a-zA-Z0-9-_. ]/g, '') // Remove any other special characters
+                    .trim(); // Remove leading/trailing spaces
+
+  // Create a temporary link element
+  const link = document.createElement('a');
+  link.href = img.src;
+  link.download = filename;
+
+  // Programmatically click the link to trigger download
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function toggleFullscreen() {
+  const viewer = document.getElementById('imageViewer');
+  const icon = document.getElementById('fullscreenIcon');
+
+  if (!document.fullscreenElement) {
+    if (viewer.requestFullscreen) {
+      viewer.requestFullscreen();
+    } else if (viewer.webkitRequestFullscreen) {
+      viewer.webkitRequestFullscreen();
+    } else if (viewer.msRequestFullscreen) {
+      viewer.msRequestFullscreen();
+    }
+    // Exit fullscreen icon (arrows pointing inward to a rectangle)
+    icon.innerHTML = `
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
+      <path d="M7 9V7h4"></path>
+      <path d="M17 9V7h-4"></path>
+      <path d="M7 15v2h4"></path>
+      <path d="M17 15v2h-4"></path>
+    `;
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+    // Enter fullscreen icon (arrows pointing outward from a rectangle)
+    icon.innerHTML = `
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
+      <path d="M9 3v2"></path>
+      <path d="M15 3v2"></path>
+      <path d="M9 21v-2"></path>
+      <path d="M15 21v-2"></path>
+      <path d="M21 9h-2"></path>
+      <path d="M21 15h-2"></path>
+      <path d="M3 9h2"></path>
+      <path d="M3 15h2"></path>
+    `;
+  }
+}
+
+// Add fullscreen change event listener
+document.addEventListener('fullscreenchange', updateFullscreenIcon);
+document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
+document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
+
+function updateFullscreenIcon() {
+  const icon = document.getElementById('fullscreenIcon');
+  if (!document.fullscreenElement) {
+    // Enter fullscreen icon (arrows pointing outward from a rectangle)
+    icon.innerHTML = `
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
+      <path d="M9 3v2"></path>
+      <path d="M15 3v2"></path>
+      <path d="M9 21v-2"></path>
+      <path d="M15 21v-2"></path>
+      <path d="M21 9h-2"></path>
+      <path d="M21 15h-2"></path>
+      <path d="M3 9h2"></path>
+      <path d="M3 15h2"></path>
+    `;
+  } else {
+    // Exit fullscreen icon (arrows pointing inward to a rectangle)
+    icon.innerHTML = `
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
+      <path d="M7 9V7h4"></path>
+      <path d="M17 9V7h-4"></path>
+      <path d="M7 15v2h4"></path>
+      <path d="M17 15v2h-4"></path>
+    `;
+  }
+}
+
+function updateShareButtons() {
+    let title = document.querySelector('.image-viewer-title').textContent;
+    let text = encodeURIComponent(title + '\n')
+    let url = window.location.href
+    let links = [
+        {'label': 'Share on Twitter', 'url': `https://twitter.com/intent/tweet?url=${url}&text=${text}`, 'icon': 'twitter'},
+        {'label': 'Share on Facebook', 'url': `https://www.facebook.com/sharer/sharer.php?u=${url}`, 'icon': 'facebook'},
+        {'label': 'Share on WhatsApp', 'url': `https://wa.me/?text=${text}${url}`, 'icon': 'whatsapp'},
+    ]
+    function linkHtml(link) {
+        return `<div class="mb-2">
+            <a href="${link.url}" target="_blank" class="d-inline-flex align-items-center" style="gap: 0.5rem; color: #fff">
+                <sl-icon name="${link.icon}"></sl-icon>
+                ${link.label}
+            </a>
+        </div>`
+    }
+
+    const shareButtons = document.querySelector('.image-viewer-share-buttons');
+    shareButtons.innerHTML = links.map(linkHtml).join('');
+}
+</script>

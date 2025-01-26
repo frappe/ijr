@@ -61,7 +61,8 @@ website_route_rules = [
 	{"from_route": "/indicator/<indicator_id>", "to_route": "indicator"},
 	{"from_route": "/indicator/<indicator_id>/ijr-<int:ijr_number>/<cluster>/<view>", "to_route": "indicator"},
 
-	{"from_route": "/pictures/theme/<theme>", "to_route": "pictures/theme/theme"},
+	{"from_route": "/pictures/theme/<theme>", "to_route": "pictures"},
+	{"from_route": "/pictures/i/<picture_id>", "to_route": "pictures"},
 ]
 
 # Jinja

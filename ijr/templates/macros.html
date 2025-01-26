@@ -72,3 +72,33 @@
     </ol>
 </nav>
 {% endmacro %}
+
+{% macro share_dialog() %}
+<!-- share dialog with twitter and facebook share links -->
+<script>
+    function showShareDialog(title) {
+        let text = encodeURIComponent(title + '\n')
+        let dialog = document.getElementById('shareDialog');
+        let url = window.location.href
+        let links = [
+            {'label': 'Share on Twitter', 'url': `https://twitter.com/intent/tweet?url=${url}&text=${text}`, 'icon': 'twitter'},
+            {'label': 'Share on Facebook', 'url': `https://www.facebook.com/sharer/sharer.php?u=${url}`, 'icon': 'facebook'},
+            {'label': 'Share on WhatsApp', 'url': `https://wa.me/?text=${text}${url}`, 'icon': 'whatsapp'},
+        ]
+        function linkHtml(link) {
+            return `<div class="mb-2">
+                <a href="${link.url}" target="_blank" class="accent-link d-inline-flex align-items-center" style="gap: 0.5rem">
+                    <sl-icon name="${link.icon}"></sl-icon>
+                    ${link.label}
+                </a>
+            </div>`
+        }
+        dialog.querySelector('#shareDialogContent').innerHTML = links.map(linkHtml).join('');
+        dialog.show();
+    }
+</script>
+
+<sl-dialog label="Share" id="shareDialog" style="z-index: 1500;">
+    <div id="shareDialogContent"></div>
+</sl-dialog>
+{% endmacro %}

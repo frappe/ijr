@@ -6,9 +6,13 @@
  "engine": "InnoDB",
  "field_order": [
   "image",
+  "title",
   "caption",
+  "column_break_dhvs",
   "pillar",
-  "theme"
+  "theme",
+  "section_break_bdcl",
+  "image_preview"
  ],
  "fields": [
   {
@@ -19,7 +23,7 @@
   },
   {
    "fieldname": "caption",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Caption"
   },
   {
@@ -35,12 +39,30 @@
    "in_standard_filter": 1,
    "label": "Theme",
    "options": "Theme"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title"
+  },
+  {
+   "fieldname": "column_break_dhvs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "image_preview",
+   "fieldtype": "HTML",
+   "label": "Image Preview"
+  },
+  {
+   "fieldname": "section_break_bdcl",
+   "fieldtype": "Section Break"
   }
  ],
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-30 12:54:39.842814",
+ "modified": "2024-12-05 23:21:58.908163",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "IJR Picture",
@@ -61,5 +83,6 @@
  ],
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "title"
 }
