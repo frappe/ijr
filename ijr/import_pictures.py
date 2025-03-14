@@ -2,9 +2,9 @@ import frappe
 import os
 import sys
 
-def execute():
-    folder_to_import = '/path/to/folder'
+# bench --site ijr.test execute ijr.import_pictures.execute --args "('<folder-path>',)"
 
+def execute(folder_to_import):
     # Check if folder exists
     if not os.path.exists(folder_to_import):
         frappe.throw(f"Folder not found: {folder_to_import}")
@@ -21,25 +21,36 @@ def execute():
                     filename = parts[1]
                     fullpath = os.path.join(root, file)
                     if theme in ('Diversity', 'Human Resources', 'Trends', 'Infrastructure', 'Workload', 'Budgets'):
-                        import_picture(fullpath, theme)
+                        # title should be filename without extension
+                        title = os.path.splitext(filename)[0]
+                        import_picture(fullpath, theme, title=title)
                     else:
                         import_picture(fullpath)
                 else:
                     import_picture(fullpath)
 
-def import_picture(filename, theme=None):
-    print(f"Filename: {filename}, Theme: {theme}")
+def import_picture(filename, theme=None, title=None):
+    print(f"Filename: {filename}, Theme: {theme}, Title: {title}")
 
     with open(filename, 'rb') as f:
         file = frappe.new_doc("File")
         file.content = f.read()
-        file.file_name = os.path.basename(filename)
+        base_name = os.path.basename(filename)
+        # collapse spaces and replace with underscore
+        file_name = '_'.join(base_name.split())
+        file.file_name = file_name
         file.is_private = False
         file.save()
         file.reload()
 
     picture = frappe.new_doc("IJR Picture")
+    picture.title = title or base_name
     picture.image = file.file_url
     picture.theme = theme
     picture.save()
+    file.db_set({
+        "attached_to_doctype": "IJR Picture",
+        "attached_to_name": picture.name,
+        "attached_to_field": "image"
+    })
     print(f"Saved picture: {picture.image}")

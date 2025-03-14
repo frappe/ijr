@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "creation": "2024-10-30 12:14:49.145736",
  "doctype": "DocType",
@@ -62,7 +63,7 @@
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-05 23:21:58.908163",
+ "modified": "2025-03-14 15:35:27.883738",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "IJR Picture",
