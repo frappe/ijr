@@ -14,7 +14,10 @@ def get_context(context):
 	context.pictures = frappe.get_all(
 		"IJR Picture", ["name", "title", "image", "theme", "caption"], filters=filters
 	)
-	context.page_title = theme
+	context.page_title = None if theme == "All" else theme
+	context.page_description = frappe.db.get_value(
+		"Theme", theme, "pictures_page_description"
+	)
 	if frappe.form_dict.picture_id:
 		picture_id = cstr(frappe.form_dict.picture_id)
 		picture = frappe.db.get_value(
@@ -24,5 +27,5 @@ def get_context(context):
 			context.metatags = {
 				"title": picture.title,
 				"image": picture.image,
-				"description": (picture.caption or '')[:155],
+				"description": (picture.caption or "")[:155],
 			}

@@ -26,7 +26,12 @@ no_cache: 1
     </div>
     <div class="col-12 col-sm-10">
         <div>
-            <!-- <h1>{{ page_title }}</h1> -->
+            {% if page_title %}
+            <h1 class="mt-4">{{ page_title }}</h1>
+            {% endif %}
+            {% if page_description %}
+            <p class="mt-2 mb-0">{{ page_description }}</p>
+            {% endif %}
             <div class="ijr-pictures">
                 {% for picture in pictures %}
                 <div>

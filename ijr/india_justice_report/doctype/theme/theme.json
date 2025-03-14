@@ -9,7 +9,8 @@
  "engine": "InnoDB",
  "field_order": [
   "slug",
-  "description"
+  "description",
+  "pictures_page_description"
  ],
  "fields": [
   {
@@ -21,11 +22,16 @@
    "fieldname": "slug",
    "fieldtype": "Data",
    "label": "Slug"
+  },
+  {
+   "fieldname": "pictures_page_description",
+   "fieldtype": "Small Text",
+   "label": "Pictures Page Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-15 16:48:48.651478",
+ "modified": "2025-03-14 14:45:43.774500",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "Theme",
