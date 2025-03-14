@@ -16,10 +16,10 @@ def execute(folder_to_import):
         for file in files:
             if file.endswith(file_types):
                 parts = file.split('-')
+                fullpath = os.path.join(root, file)
                 if len(parts) > 1:
                     theme = parts[0]
                     filename = parts[1]
-                    fullpath = os.path.join(root, file)
                     if theme in ('Diversity', 'Human Resources', 'Trends', 'Infrastructure', 'Workload', 'Budgets'):
                         # title should be filename without extension
                         title = os.path.splitext(filename)[0]
