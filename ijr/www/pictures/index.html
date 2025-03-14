@@ -265,10 +265,9 @@ function openImageById(id) {
 
 function openImageByClick(img) {
     if (img) {
-        openImageViewer(img);
-        // update url
         let imageId = img.dataset.name;
         updateUrl(imageId);
+        openImageViewer(img);
     }
 }
 
