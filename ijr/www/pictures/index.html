@@ -114,6 +114,9 @@ let lastTouchY = 0;
 let isDragging = false;
 let translateX = 0;
 let translateY = 0;
+let isMouseDragging = false;
+let mouseStartX = 0;
+let mouseStartY = 0;
 
 let showPicture = '{{ frappe.form_dict.picture_id or "" }}';
 if (showPicture) {
@@ -144,6 +147,42 @@ function initializeTouchEvents() {
   viewerImg.addEventListener('touchstart', handleTouchStart, { passive: false });
   viewerImg.addEventListener('touchmove', handleTouchMove, { passive: false });
   viewerImg.addEventListener('touchend', handleTouchEnd);
+
+  // Add mouse events for panning
+  viewerImg.addEventListener('mousedown', handleMouseDown);
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
+}
+
+// Mouse event handlers for panning
+function handleMouseDown(e) {
+  if (currentZoom > 1) {
+    e.preventDefault();
+    isMouseDragging = true;
+    mouseStartX = e.clientX;
+    mouseStartY = e.clientY;
+    document.getElementById('viewerImage').style.cursor = 'grabbing';
+  }
+}
+
+function handleMouseMove(e) {
+  if (isMouseDragging && currentZoom > 1) {
+    const deltaX = e.clientX - mouseStartX;
+    const deltaY = e.clientY - mouseStartY;
+
+    translateX += deltaX;
+    translateY += deltaY;
+
+    mouseStartX = e.clientX;
+    mouseStartY = e.clientY;
+
+    applyZoom();
+  }
+}
+
+function handleMouseUp() {
+  isMouseDragging = false;
+  document.getElementById('viewerImage').style.cursor = currentZoom > 1 ? 'grab' : 'default';
 }
 
 function handleTouchStart(e) {
@@ -227,6 +266,7 @@ function zoomIn() {
     currentZoom += ZOOM_STEP;
     applyZoom();
   }
+  updateCursorStyle();
 }
 
 function zoomOut() {
@@ -234,6 +274,7 @@ function zoomOut() {
     currentZoom -= ZOOM_STEP;
     applyZoom();
   }
+  updateCursorStyle();
 }
 
 function resetZoom() {
@@ -241,6 +282,12 @@ function resetZoom() {
   translateX = 0;
   translateY = 0;
   applyZoom();
+  updateCursorStyle();
+}
+
+function updateCursorStyle() {
+  const img = document.getElementById('viewerImage');
+  img.style.cursor = currentZoom > 1 ? 'grab' : 'default';
 }
 
 function applyZoom() {
