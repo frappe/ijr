@@ -13,9 +13,9 @@ def get_states_by_cluster():
 	return states_by_cluster
 
 def get_indicators_by_pillars_and_themes():
-	indicators = frappe.db.get_all('State Indicator Data',
-		fields=['distinct(`indicator_id`) as value', 'indicator_name as label', 'pillar', 'theme'],
-		order_by='indicator_id asc'
+	indicators = frappe.db.get_all('State Indicator',
+		fields=['`name` as value', '`indicator_name` as label', 'pillar', 'theme', 'badge'],
+		order_by='name asc'
 	)
 	indicators_by_pillars = {}
 	for i in indicators:

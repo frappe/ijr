@@ -81,7 +81,12 @@
             <label style="--sl-font-size-medium: 14px">{{ theme }}</label>
             {%- for _indicator in indicators -%}
             <a href="{{ indicator_url(indicator_id=_indicator.value) }}" class="{{ resolve_class({'active': indicator and indicator.name == _indicator.value }) }}">
-                {{ _indicator.label }}
+                <span class="mr-2">
+                    {{ _indicator.label }}
+                </span>
+                {%- if _indicator.badge -%}
+                <sl-badge variant="success">{{ _indicator.badge }}</sl-badge>
+                {%- endif -%}
             </a>
             {%- endfor -%}
         </div>

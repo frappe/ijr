@@ -10,10 +10,13 @@
  "engine": "InnoDB",
  "field_order": [
   "indicator_name",
+  "badge",
+  "column_break_gttz",
   "pillar",
   "theme",
-  "description",
-  "long_description"
+  "section_break_clth",
+  "long_description",
+  "description"
  ],
  "fields": [
   {
@@ -51,11 +54,24 @@
    "fieldname": "long_description",
    "fieldtype": "Text Editor",
    "label": "Long Description"
+  },
+  {
+   "fieldname": "badge",
+   "fieldtype": "Data",
+   "label": "Badge"
+  },
+  {
+   "fieldname": "column_break_gttz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_clth",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-29 14:01:21.075324",
+ "modified": "2025-04-14 23:33:29.632236",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "State Indicator",
