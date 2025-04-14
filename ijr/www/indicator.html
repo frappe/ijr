@@ -122,21 +122,22 @@ skip_frappe_bundle: 1
                         <tr>
                             <th>Metric</th>
                             <th>Unit</th>
-                            <th class="text-right">IJR 1</th>
-                            <th class="text-right">IJR 2</th>
-                            <th class="text-right">IJR 3</th>
-                            <th class="text-right">IJR 4</th>
+                            {% for ijr_number in ijr_numbers %}
+                            <th class="text-right">{{ ijr_number.title }}</th>
+                            {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
                         ${(raw_data[d.state] || []).map(d => {
+                            let ijr_numbers = {{ as_json(ijr_numbers, indent=None) }};
                             return `
                                 <tr>
                                     <td>${d.raw_data_name}</td>
                                     <td>${d.raw_data_unit}</td>
-                                    <td class="text-right">${d.ijr_1_value}</td>
-                                    <td class="text-right">${d.ijr_2_value}</td>
-                                    <td class="text-right">${d.ijr_3_value}</td>
+                                    ${ijr_numbers.map(ijr_number => {
+                                        let value = d[`ijr_${ijr_number.name}_value`];
+                                        return `<td class="text-right">${value}</td>`;
+                                    }).join('')}
                                 </tr>
                             `
                         }).join('')}

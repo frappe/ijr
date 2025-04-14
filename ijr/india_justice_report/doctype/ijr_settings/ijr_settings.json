@@ -8,7 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "rankings_meta_image",
-  "indicator_meta_image"
+  "indicator_meta_image",
+  "default_ijr"
  ],
  "fields": [
   {
@@ -20,12 +21,17 @@
    "fieldname": "indicator_meta_image",
    "fieldtype": "Attach Image",
    "label": "Indicator Meta Image"
+  },
+  {
+   "fieldname": "default_ijr",
+   "fieldtype": "Int",
+   "label": "Default IJR"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-04-04 00:56:32.516246",
+ "modified": "2025-04-14 23:52:24.452602",
  "modified_by": "Administrator",
  "module": "India Justice Report",
  "name": "IJR Settings",

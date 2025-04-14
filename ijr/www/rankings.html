@@ -29,19 +29,21 @@ skip_frappe_bundle: 1
     <div class="col-12 d-sm-none mb-6 mt-4">
         <select class="cluster-select w-100" onchange="window.location.href = this.value">
             {% macro option(label, value) %}
-            <option value="{{ rankings_url(rank_by=value) }}" {{ 'selected' if rank_by == value else '' }}>{{ label }}</option>
+            <option value="{{ rankings_url(rank_by=value) }}" {{ 'selected' if rank_by == value else '' }}>
+              {{ label }}
+            </option>
             {% endmacro %}
             {{ option('Overall', 'overall') }}
             <optgroup label="Rank by Pillars">
-            {{ option('Police', 'police') }}
-            {{ option('Prisons', 'prisons') }}
-            {{ option('Judiciary', 'judiciary') }}
-            {{ option('Legal Aid', 'legal_aid') }}
+              {{ option('Police', 'police') }}
+              {{ option('Prisons', 'prisons') }}
+              {{ option('Judiciary', 'judiciary') }}
+              {{ option('Legal Aid', 'legal_aid') }}
             </optgroup>
-            <optgroup label="Rank by Themees">
-                {{ option('Human Resources', 'hr') }}
-                {{ option('Diversity', 'diversity') }}
-                {{ option('Trends', 'trends') }}
+            <optgroup label="Rank by Themes">
+              {{ option('Human Resources', 'hr') }}
+              {{ option('Diversity', 'diversity') }}
+              {{ option('Trends', 'trends') }}
             </optgroup>
         </select>
     </div>
@@ -76,7 +78,7 @@ skip_frappe_bundle: 1
 
         <div class="ml-2 view-switcher">
             {%- set options = [
-                ['Map', {'view': 'map', 'ijr_number': 3 if ijr_number == 0 else ijr_number }],
+                ['Map', {'view': 'map', 'ijr_number': default_ijr_number if ijr_number == 0 else ijr_number }],
                 ['Table', {'view': 'table', 'ijr_number': 0 if view == 'map' else ijr_number }]
             ] -%}
             {% for option in options %}

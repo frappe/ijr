@@ -11,7 +11,8 @@
 </sl-popup>
 
 <!-- prettier-ignore -->
-{% set ranked_states = frappe.db.get_all('State Ranking', {'ijr_number': 3}, pluck='region_code') %}
+ {% set default_ijr_number = frappe.db.get_single_value('IJR Settings', 'default_ijr') %}
+{% set ranked_states = frappe.db.get_all('State Ranking', {'ijr_number': default_ijr_number}, pluck='region_code') %}
 
 <script>
   let state_rankings = JSON.parse(`{{ as_json(state_rankings, indent=None) }}`);

@@ -7,14 +7,16 @@ from frappe.utils.formatters import format_value
 from ijr.jinja_helpers import indicator_url
 
 def get_context(context):
+	default_ijr = frappe.db.get_single_value('IJR Settings', 'default_ijr')
 	if not frappe.form_dict.indicator_id and frappe.form_dict.pillar:
-		result = frappe.qb.get_query('State Indicator', filters={'pillar.slug': frappe.form_dict.pillar}, fields=['name']).run(as_dict=1)
+		result = frappe.qb.get_query('State Indicator',
+			filters={'pillar.slug': frappe.form_dict.pillar}, fields=['name']).run(as_dict=1)
 		indicator_id = result[0].name if result else None
 
 		if indicator_id:
 			frappe.flags.redirect_location = indicator_url(
 				indicator_id=indicator_id,
-				ijr_number=3,
+				ijr_number=default_ijr,
 				cluster='large-states',
 				view='map'
 			)
@@ -30,7 +32,7 @@ def get_context(context):
 	if not (frappe.form_dict.ijr_number or frappe.form_dict.view or frappe.form_dict.cluster):
 		url = indicator_url(
 			indicator_id=frappe.form_dict.indicator_id,
-			ijr_number=3,
+			ijr_number=default_ijr,
 			cluster='large-states',
 			view='map'
 		)
@@ -63,6 +65,7 @@ def get_context(context):
 		del filters['ijr_score']
 		pass
 
+	context.ijr_numbers = frappe.db.get_all('IJR Number', fields=['name', 'year'], order_by='name asc')
 	indicator = frappe.get_doc('State Indicator', indicator_id)
 	context.indicator_data = indicator_rankings_data(filters, order_by)
 	if context.indicator_data:

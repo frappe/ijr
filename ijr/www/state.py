@@ -16,12 +16,14 @@ def get_context(context):
 	if frappe.form_dict.state and not frappe.db.exists('State', {'code': frappe.form_dict.state}):
 		frappe.throw('State not found', exc=frappe.PageDoesNotExistError)
 
+	default_ijr_number = frappe.db.get_single_value('IJR Settings', 'default_ijr')
+
 	redirect = None
 	if not frappe.form_dict.pillar_or_theme:
 		frappe.form_dict.pillar_or_theme = 'overall'
 		redirect = True
 	if frappe.form_dict.ijr_number is None:
-		frappe.form_dict.ijr_number = 3
+		frappe.form_dict.ijr_number = default_ijr_number
 		redirect = True
 
 	if redirect:
@@ -49,9 +51,9 @@ def get_context(context):
 	state = frappe.get_doc('State', {'code': state_code})
 	current_ranking = None
 	previous_ranking = None
-	if frappe.db.exists('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number or 3 }):
-		current_ranking = frappe.get_doc('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number or 3 })
-		previous_ijr_number = (ijr_number or 3) - 1
+	if frappe.db.exists('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number or default_ijr_number }):
+		current_ranking = frappe.get_doc('State Ranking', {'region_code': state_code, 'ijr_number': ijr_number or default_ijr_number })
+		previous_ijr_number = (ijr_number or default_ijr_number) - 1
 		if frappe.db.exists('State Ranking', {'region_code': state_code, 'ijr_number': previous_ijr_number }):
 			previous_ranking = frappe.get_doc('State Ranking', {'region_code': state_code, 'ijr_number': previous_ijr_number })
 
@@ -99,8 +101,11 @@ def get_context(context):
 		})
 
 	context.raw_data = get_raw_data_by_indicator(state_code)
+	context.ijr_numbers = frappe.db.get_all('IJR Number',
+		fields=['name', 'year', 'title'], order_by='name asc')
 	context.state = state
 	context.title = f'{context.state.name} State Analysis | India Justice Report'
+
 	if state.cluster == 'Large and mid-sized states':
 		context.description = f'{state.name} ranks {current_ranking.overall_rank} out of {len(states_by_cluster[state.cluster])} large states in the {ijr_number}rd edition of the India Justice Report'
 	elif state.cluster == 'Small states':

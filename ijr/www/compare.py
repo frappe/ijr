@@ -41,7 +41,7 @@ def get_context(context):
 
     context.update(
         {
-            "title": "Compare States | India Justice Report", 
+            "title": "Compare States | India Justice Report",
             "data": json.dumps(data),
         }
     )
@@ -52,8 +52,8 @@ def sanitize_args(form_dict):
     if not tab or tab not in TABS:
         frappe.local.flags.redirect_location = f"/compare?tab={DEFAULT_TAB}"
         raise frappe.Redirect
-
-    default_ijr = "all" if tab == "one_indicator" else "3"
+    default_ijr_number = frappe.db.get_single_value("IJR Settings", "default_ijr")
+    default_ijr = "all" if tab == "one_indicator" else str(default_ijr_number)
     ijrs = form_dict.ijrs or default_ijr
 
     indicators = form_dict.indicators

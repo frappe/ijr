@@ -13,13 +13,15 @@ def get_context(context):
 		frappe.local.flags.redirect_location = url
 		raise frappe.Redirect
 
+	default_ijr_number = frappe.db.get_single_value('IJR Settings', 'default_ijr')
+
 	view = frappe.form_dict.view or 'map'
 	rank_by = frappe.form_dict.rank_by or 'overall'
-	default_ijr = 3 if view == 'map' else 0
+	default_ijr = default_ijr_number if view == 'map' else 0
 	ijr_number = cint(frappe.form_dict.ijr_number or default_ijr)
 
 	if view == 'map' and ijr_number == 0:
-		ijr_number = 3
+		ijr_number = default_ijr_number
 
 	cluster = frappe.form_dict.cluster or 'large-states'
 
@@ -53,6 +55,7 @@ def get_context(context):
 	context.table_view = table_view
 	context.rank_by = rank_by
 	context.ijr_number = ijr_number
+	context.default_ijr_number = default_ijr_number
 	context.form_dict = frappe.form_dict
 
 	help_text = ''
