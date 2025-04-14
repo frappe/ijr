@@ -452,6 +452,7 @@ skip_frappe_bundle: 1
                 <th class="text-right">IJR 1</th>
                 <th class="text-right">IJR 2</th>
                 <th class="text-right">IJR 3</th>
+                <th class="text-right">IJR 4</th>
             `;
             rows = data.map(row => {
                 return `<tr>
@@ -460,6 +461,7 @@ skip_frappe_bundle: 1
                     <td class="text-right">${row.ijr_1_value}</td>
                     <td class="text-right">${row.ijr_2_value}</td>
                     <td class="text-right">${row.ijr_3_value}</td>
+                    <td class="text-right">${row.ijr_4_value}</td>
                 </tr>`
             }).join('');
         }
