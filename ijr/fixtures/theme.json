@@ -5,6 +5,8 @@
   "doctype": "Theme",
   "modified": "2023-03-23 15:01:00.019780",
   "name": "Budgets",
+  "show_in_pictures_sidebar": 1,
+  "sidebar_order": 6,
   "slug": "budgets"
  },
  {
@@ -13,6 +15,8 @@
   "doctype": "Theme",
   "modified": "2023-03-23 15:00:50.375754",
   "name": "Human Resources",
+  "show_in_pictures_sidebar": 1,
+  "sidebar_order": 2,
   "slug": "hr"
  },
  {
@@ -21,6 +25,8 @@
   "doctype": "Theme",
   "modified": "2023-03-23 15:00:41.781153",
   "name": "Diversity",
+  "show_in_pictures_sidebar": 1,
+  "sidebar_order": 1,
   "slug": "diversity"
  },
  {
@@ -29,6 +35,8 @@
   "doctype": "Theme",
   "modified": "2023-03-23 15:00:32.780082",
   "name": "Infrastructure",
+  "show_in_pictures_sidebar": 1,
+  "sidebar_order": 4,
   "slug": "infrastructure"
  },
  {
@@ -37,6 +45,8 @@
   "doctype": "Theme",
   "modified": "2023-03-23 15:00:18.407978",
   "name": "Trends",
+  "show_in_pictures_sidebar": 1,
+  "sidebar_order": 3,
   "slug": "trends"
  },
  {
@@ -45,6 +55,19 @@
   "doctype": "Theme",
   "modified": "2023-03-23 15:00:12.209369",
   "name": "Workload",
+  "show_in_pictures_sidebar": 1,
+  "sidebar_order": 5,
   "slug": "workload"
+ },
+ {
+  "description": "Charts that map how the Indian justice system is structured.",
+  "docstatus": 0,
+  "doctype": "Theme",
+  "modified": "2026-09-03 21:00:00.000000",
+  "name": "Justice in Maps",
+  "pictures_page_description": "Charts that map how the Indian justice system is structured: who sits where, what each body decides, and where an appeal goes next.",
+  "show_in_pictures_sidebar": 1,
+  "sidebar_order": 7,
+  "slug": "justice_in_maps"
  }
 ]

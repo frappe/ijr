@@ -16,12 +16,9 @@ no_cache: 1
             <a href="{{ '/pictures' + path }}" class="sidebar-nav-item {{ 'active' if current_theme == value else '' }}">{{ label }}</a>
             {% endmacro %}
             {{ sidebar_item('All', 'All', '') }}
-            {{ sidebar_item('Diversity', 'Diversity', '/theme/Diversity') }}
-            {{ sidebar_item('Human Resources', 'Human Resources', '/theme/Human Resources') }}
-            {{ sidebar_item('Trends', 'Trends', '/theme/Trends') }}
-            {{ sidebar_item('Infrastructure', 'Infrastructure', '/theme/Infrastructure') }}
-            {{ sidebar_item('Workload', 'Workload', '/theme/Workload') }}
-            {{ sidebar_item('Budgets', 'Budgets', '/theme/Budgets') }}
+            {% for t in sidebar_themes %}
+            {{ sidebar_item(t.name, t.name, '/theme/' + t.name) }}
+            {% endfor %}
         </div>
     </div>
     <div class="col-12 col-sm-10">

@@ -10,7 +10,10 @@
  "field_order": [
   "slug",
   "description",
-  "pictures_page_description"
+  "pictures_page_description",
+  "pictures_sidebar_section",
+  "show_in_pictures_sidebar",
+  "sidebar_order"
  ],
  "fields": [
   {
@@ -27,6 +30,26 @@
    "fieldname": "pictures_page_description",
    "fieldtype": "Small Text",
    "label": "Pictures Page Description"
+  },
+  {
+   "fieldname": "pictures_sidebar_section",
+   "fieldtype": "Section Break",
+   "label": "Pictures Sidebar"
+  },
+  {
+   "default": "0",
+   "description": "Show this theme in the sidebar on the IJR in Pictures page.",
+   "fieldname": "show_in_pictures_sidebar",
+   "fieldtype": "Check",
+   "label": "Show in Pictures Sidebar"
+  },
+  {
+   "default": "0",
+   "depends_on": "show_in_pictures_sidebar",
+   "description": "Lower numbers appear first. Themes with the same order are sorted by name.",
+   "fieldname": "sidebar_order",
+   "fieldtype": "Int",
+   "label": "Sidebar Order"
   }
  ],
  "index_web_pages_for_search": 1,
