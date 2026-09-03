@@ -11,6 +11,12 @@ def get_context(context):
 		theme = frappe.form_dict.theme
 	filters = None if theme == "All" else {"theme": frappe.form_dict.theme}
 	context.current_theme = theme
+	context.sidebar_themes = frappe.get_all(
+		"Theme",
+		filters={"show_in_pictures_sidebar": 1},
+		fields=["name", "sidebar_order"],
+		order_by="sidebar_order asc, name asc",
+	)
 	context.pictures = frappe.get_all(
 		"IJR Picture", ["name", "title", "image", "theme", "caption"], filters=filters
 	)
