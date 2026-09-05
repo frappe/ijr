@@ -94,7 +94,7 @@
 </sl-dialog>
 
 <sl-dialog label="Downloads" id="downloadsDialog">
-{%- for file in frappe.db.get_all('IJR File', {'published': 1, 'file': ('is', 'set')}, '*', order_by='`order` asc') -%}
+{%- for file in frappe.db.get_all('IJR File', {'published': 1, 'file': ('is', 'set')}, '*', order_by='order asc') -%}
 <div class="mb-2">
     <a href="/api/method/ijr.api.download?file_id={{ file.name }}" download
         class="accent-link d-inline-flex align-items-center" style="gap: 0.5rem">

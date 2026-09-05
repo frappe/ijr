@@ -52,7 +52,7 @@ def get_context(context):
 		order_by = 'state asc, ijr_number asc'
 	elif view == 'map':
 		filters['indicator_id'] = indicator_id
-		order_by = 'ijr_score desc, `order` asc'
+		order_by = 'ijr_score desc, order asc'
 
 	if ijr_number:
 		filters['ijr_number'] = ijr_number
