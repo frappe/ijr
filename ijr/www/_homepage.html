@@ -35,7 +35,7 @@ description: India Justice Report ranks 18 large and 7 small states according to
     </div>
     {% endmacro %}
 
-    {% for fact in frappe.db.get_all('IJR Homepage Fact', filters={'published': 1}, fields=['*'], order_by='creation asc, `order` asc') %}
+    {% for fact in frappe.db.get_all('IJR Homepage Fact', filters={'published': 1}, fields=['*'], order_by='creation asc, order asc') %}
     <section class="homepage-stat">
         <div class="container">
             <div class="row align-items-center">
